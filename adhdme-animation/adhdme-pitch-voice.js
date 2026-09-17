@@ -3,139 +3,157 @@ const BEATS = [
   {
     "id": "hook",
     "start": 0.0,
-    "dur": 5.833333333333333,
-    "speech": 4.367
+    "dur": 6.5,
+    "speech": 4.371
   },
   {
     "id": "maze",
-    "start": 5.8333,
+    "start": 6.5,
     "dur": 5.0,
-    "speech": 3.541
+    "speech": 3.413
   },
   {
     "id": "pain1",
-    "start": 10.8333,
+    "start": 11.5,
     "dur": 4.583333333333333,
-    "speech": 3.111
+    "speech": 3.019
   },
   {
     "id": "pain2",
-    "start": 15.4167,
-    "dur": 4.5,
-    "speech": 3.043
+    "start": 16.0833,
+    "dur": 4.666666666666667,
+    "speech": 3.047
   },
   {
     "id": "pain3",
-    "start": 19.9167,
-    "dur": 3.5,
-    "speech": 2.09
+    "start": 20.75,
+    "dur": 4.0,
+    "speech": 1.985
   },
   {
     "id": "pain4",
-    "start": 23.4167,
-    "dur": 4.916666666666667,
-    "speech": 3.437
+    "start": 24.75,
+    "dur": 4.5,
+    "speech": 2.775
   },
   {
     "id": "giveup",
-    "start": 28.3333,
-    "dur": 3.75,
-    "speech": 2.276
+    "start": 29.25,
+    "dur": 4.0,
+    "speech": 2.183
   },
   {
     "id": "who",
-    "start": 32.0833,
-    "dur": 9.666666666666666,
-    "speech": 8.233
+    "start": 33.25,
+    "dur": 8.0,
+    "speech": 6.13
   },
   {
     "id": "solution",
-    "start": 41.75,
-    "dur": 6.416666666666667,
-    "speech": 4.926
+    "start": 41.25,
+    "dur": 7.0,
+    "speech": 5.316
   },
   {
     "id": "pair1",
-    "start": 48.1667,
-    "dur": 7.166666666666667,
-    "speech": 5.689
+    "start": 48.25,
+    "dur": 8.0,
+    "speech": 6.084
   },
   {
     "id": "pair2",
-    "start": 55.3333,
-    "dur": 10.166666666666666,
-    "speech": 8.696
+    "start": 56.25,
+    "dur": 10.416666666666666,
+    "speech": 8.8
   },
   {
     "id": "pair3",
-    "start": 65.5,
-    "dur": 8.166666666666666,
-    "speech": 6.687
+    "start": 66.6667,
+    "dur": 9.0,
+    "speech": 6.85
   },
   {
     "id": "pairs",
-    "start": 73.6667,
-    "dur": 7.166666666666667,
-    "speech": 5.74
+    "start": 75.6667,
+    "dur": 7.583333333333333,
+    "speech": 5.96
   },
   {
-    "id": "how1",
-    "start": 80.8333,
-    "dur": 6.666666666666667,
-    "speech": 5.215
+    "id": "algo1",
+    "start": 83.25,
+    "dur": 11.25,
+    "speech": 9.618
   },
   {
-    "id": "how2",
-    "start": 87.5,
-    "dur": 5.5,
-    "speech": 4.052
+    "id": "algo2",
+    "start": 94.5,
+    "dur": 8.0,
+    "speech": 6.368
   },
   {
-    "id": "how3",
-    "start": 93.0,
-    "dur": 4.666666666666667,
-    "speech": 3.228
+    "id": "algo3",
+    "start": 102.5,
+    "dur": 11.416666666666666,
+    "speech": 9.809
+  },
+  {
+    "id": "algo4",
+    "start": 113.9167,
+    "dur": 12.666666666666666,
+    "speech": 11.093
+  },
+  {
+    "id": "value",
+    "start": 126.5833,
+    "dur": 12.666666666666666,
+    "speech": 11.098
+  },
+  {
+    "id": "how",
+    "start": 139.25,
+    "dur": 11.083333333333334,
+    "speech": 9.49
   },
   {
     "id": "whynow",
-    "start": 97.6667,
-    "dur": 12.25,
-    "speech": 10.826
+    "start": 150.3333,
+    "dur": 10.5,
+    "speech": 8.932
   },
   {
     "id": "market",
-    "start": 109.9167,
-    "dur": 7.416666666666667,
-    "speech": 5.981
+    "start": 160.8333,
+    "dur": 7.583333333333333,
+    "speech": 5.996
   },
   {
     "id": "model",
-    "start": 117.3333,
-    "dur": 7.166666666666667,
-    "speech": 5.691
+    "start": 168.4167,
+    "dur": 7.0,
+    "speech": 5.439
   },
   {
     "id": "traction",
-    "start": 124.5,
-    "dur": 8.0,
-    "speech": 6.513
+    "start": 175.4167,
+    "dur": 7.5,
+    "speech": 5.875
   },
   {
     "id": "gallery",
-    "start": 132.5,
-    "dur": 3.5,
+    "start": 182.9167,
+    "dur": 4.0,
     "speech": 0.0
   },
   {
     "id": "close",
-    "start": 136.0,
-    "dur": 4.5,
-    "speech": 2.763
+    "start": 186.9167,
+    "dur": 7.0,
+    "speech": 4.429
   },
   {
     "id": "signoff",
-    "start": 140.5,
-    "dur": 3.5,
-    "speech": 1.242
+    "start": 193.9167,
+    "dur": 4.0,
+    "speech": 1.126
   }
 ];

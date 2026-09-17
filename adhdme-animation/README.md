@@ -9,7 +9,7 @@ to 24 fps ("on twos"), and a soundtrack generated from the same timeline.
 | film | file | look | what it is |
 |---|---|---|---|
 | Explainer | `adhdme.html` | ink on warm paper, with blueprint interludes | 28.75 s. Sam, a patient, tries to find a GP; the deck's problem, solution, assessment, fit loop and patient value |
-| Pitch | `adhdme-pitch.html` | riso print: cream stock, fluorescent inks, halftone plates, drawn portraits | About 2 min 24 s, narrated, with a composed music bed. A YC-style pitch: hook, problem, who, solution, three matches on life experience shown as faces, how, why now, market, model, traction, close. Content from the Value Proposition Canvas plus the deck's numbers |
+| Pitch | `adhdme-pitch.html` | riso print: cream stock, fluorescent inks, halftone plates, drawn people and icons | About 3 min 17 s, narrated, with a composed music bed that lands its bars on the cuts. A YC-style pitch: hook, problem, who, solution, three matches on life experience shown as faces, how the match is made (four beats), what that changes, how it works, why now, market, model, traction, close. Content from the Value Proposition Canvas plus the deck's numbers |
 
 Outputs with sound: `out/adhdme-final.mp4` and `out/adhdme-pitch-final.mp4`, 1920x1080, 24 fps.
 Contact sheets (two tiles per second) sit next to them.
@@ -75,25 +75,32 @@ Times are from the current narration; they move when a line changes.
 | 0:06 | maze | The headline knocked out of a real generated maze, the patient at the entrance, the door at the far end. | Getting ADHD care in Australia is a maze. |
 | 0:11 | pain1 to pain4 | A swinging price tag with a question for an amount; a round peg lowered onto a triangular hole; three clinicians' sheets that disagree; a bottle draining while the alert is crossed out. | The cost is hidden… You get whoever is available… Every clinician assesses you differently… Prescriptions lapse without warning. |
 | 0:29 | giveup | | So people give up before the first booking. |
-| 0:32 | who | Australia prints in blue, then Sydney, Melbourne and Brisbane ring one by one. | We start with 16 to 25 year olds in Sydney, Melbourne and Brisbane… |
-| 0:42 | solution | A patient dot and five clinicians; lines draw, the fit lights up. | ADHDme is matching, not triage. Not the next free slot. The right person. |
+| 0:33 | who | Australia prints in blue, then Sydney, Melbourne and Brisbane ring one by one; five young people arrive in a row. | We start with 16 to 25 year olds in Sydney, Melbourne and Brisbane, seeking a diagnosis. |
+| 0:41 | solution | A patient faces five clinicians; lines draw, the fit lights up. | ADHDme is matching, not triage. Not the next free slot. The right person, for you. |
 | 0:48 | pair1 | A new mother with her baby, a pram and a night-feed moon behind her, faces a GP with a heart badge. The line lands. | A new parent in the postpartum period is matched with a GP who has perinatal experience. |
-| 0:55 | pair2 | A young woman with her family behind her, a lit window, and a "…" for the things not said, faces a bearded doctor whose name tag reads हिंदी and اردو. | Someone from a South Asian family, where ADHD is not talked about at home, is matched with a doctor who shares that background and speaks Hindi and Urdu. |
-| 1:05 | pair3 | A hooded patient with a crowd behind and a thought bubble holding a pill and a question mark, faces a clinician who waves, with a heart and a tick in a speech bubble. | Someone afraid of being judged for wanting medication is matched with a clinician who uses plain language, and no judgement. |
-| 1:14 | pairs | The three pairs as small portraits, cross-matched. | Postpartum. Cultural background. Stigma. The things a directory never asks. |
-| 1:21 | how1 to how3 | Published cost bands; standard diagnosis templates; script-expiry alerts (the bell rings). | Costs are published as bands… Standard diagnosis templates… Script expiry alerts… |
-| 1:38 | whynow | A starfield timeline: QLD live since Dec 2025, NSW and VIC in 2026. | Why now? GPs can now diagnose ADHD… |
-| 1:50 | market | ">1M" pops, "250K" counts up while a quarter of the crowd turns pink. | More than a million Australians have ADHD. A quarter of a million are actively seeking care. |
-| 1:57 | model | Pink and blue duotone: patient, door, clinician. | It is free for patients. Clinicians subscribe for a steady flow of well matched patients. |
-| 2:04 | traction | Three stamps land with a tilt. | We are live today at adhdme.au, with two GPs in Sydney, and two matching models in test. |
-| 2:12 | gallery | Every card as a badge on dashed rings, collapsing into the seed dot. | |
-| 2:16 | close | The tagline types out over ripples. | The right ADHD doctor should not be hard to find. |
-| 2:20 | signoff | ADHDme / adhdme.au in two inks. | ADHDme. |
+| 0:56 | pair2 | A young woman with her family behind her, a lit window, and a "…" for the things not said, faces a bearded doctor whose name tag reads हिंदी and اردو. | Someone from a South Asian family, where ADHD is not talked about at home, is matched with a doctor who shares that background, and speaks Hindi and Urdu. |
+| 1:06 | pair3 | A hooded patient with a crowd behind and a thought bubble holding a pill and a question mark, faces a clinician who waves, with a heart and a tick in a speech bubble. | Someone afraid of being judged for wanting medication is matched with a clinician who uses plain language, and no judgement. |
+| 1:15 | pairs | The three pairs as small portraits, cross-matched. | Postpartum. Cultural background. Stigma. The things a directory never asks. |
+| 1:23 | algo1 | What we ask: a patient beside seven life factors that arrive as they are named (stage of life, background and language, what you fear, how you like to be spoken to, cost, telehealth, when). | Here is how a match is made. We ask about your life, not your postcode… |
+| 1:34 | algo2 | What we know: a clinician beside the seven things the interview covers (interviewed first, what they have seen, who they do best with, how they speak, how they run a consult, scope, availability). | We know every clinician the same way. We interview them first… |
+| 1:42 | algo3 | Two lanes: rules that score every factor as growing bars, and a language model that reads what you wrote; both end on the same match. | Two models run side by side… We test which earns its place. |
+| 1:53 | algo4 | The loop: a consultation in the middle, five fit signals around it feeding back, the next match better; a crossed-out star. | After every consultation, five fit signals feed back… The next match is better than the last. |
+| 2:06 | value | Three columns: a pair who fit before they meet; faster and cheaper; the same clinician at 6, 12 and 24 months. | You know your doctor fits before you meet… the same clinician stays with you… |
+| 2:19 | how | Cost bands, standard templates, script alerts, and a pill: free for patients. | Costs are published before you book… And it is free for patients. |
+| 2:30 | whynow | A starfield timeline: QLD live, NSW and VIC in 2026. | Why now? GPs can now diagnose ADHD… |
+| 2:40 | market | ">1M" pops, "250K" counts up while a quarter of the crowd turns pink. | More than a million Australians have ADHD. A quarter of a million are seeking care right now. |
+| 2:48 | model | Pink and blue duotone: patient, door, clinician. | Free for patients. Clinicians subscribe for a steady flow of well matched patients. |
+| 2:55 | traction | Three stamps land with a tilt; two GPs stand by theirs. | We are live at adhdme.au, with two GPs in Sydney, and two matching models in test. |
+| 3:02 | gallery | Every card as a badge on dashed rings, collapsing into the seed dot. | |
+| 3:06 | close | The tagline types out; the six people stand together, smiling. | The right ADHD doctor should not be hard to find. Now, they are not. |
+| 3:13 | signoff | ADHDme / adhdme.au in two inks. | ADHDme. |
 
-The music is written in `score()` from the same timeline: pads on a chord loop (minor through
-the problem, major from the segment on), a bass, a plucked arpeggio from the solution on, soft
-drums through the middle, and a two-note accent each time a match lands. `build-pitch.sh` ducks
-it under the narration with a sidechain compressor.
+The music is written in `score()` from the same timeline and re-anchors its bars on every
+beat, so downbeats land on the cuts: warm pads in the hook, a minor loop through the problem,
+a major loop from the segment on with a plucked arpeggio from the solution, a lead motif on
+each match, drums through the matching engine, a key change up a whole tone for the value,
+a riser into the market, pads alone for the gallery and the close. `build-pitch.sh` ducks it
+under the narration with a sidechain compressor.
 
 ## The explainer, scene by scene
 
@@ -111,6 +118,45 @@ it under the narration with a sidechain compressor.
 | 22.75 | value | Three badges: transparent, fast, personal. "Save money. Get diagnosed fast. Find a doctor who gets you." |
 | 25.25 | tagline | "The right ADHD doctor should not be hard to find." Sam and the GP walk off together. |
 | 27.25 | signoff | ADHDme / adhdme.au in two inks, Sam waving. |
+
+## What would take the pitch further
+
+A critical appraisal of the current cut, most valuable first.
+
+- **The voice.** The narrator is a synthetic US voice because it was the best one reachable
+  from the build machine. An Australian voice matters for an Australian company: on a
+  machine with network access, `"engine": "edge"` in the narration file gives Microsoft's
+  en-AU neural voices for free; a human voice actor reading the same script would be better
+  still, and voice.py's timing step works unchanged from recorded clips. Piper's synthesis
+  is also not bit-for-bit deterministic, so beat lengths can drift by a frame between builds;
+  caching clips by text would fix that.
+- **Length.** The narrated cut runs about 3 min 18 s against a 2 min 30 s target. The
+  narration file is the length control: dropping the summary of the three pairs and the
+  "why now" beat, and shortening the four pain lines to one sentence each, brings it under
+  2 min 45 s without touching the picture code.
+- **The music.** The bed is oscillators and a generated reverb, written in the film. It sits
+  correctly under the voice and lands its accents on the cuts, but it lacks the warmth of
+  sampled instruments. A next step is a real piano or felt-piano sample set through the same
+  timeline, loudness normalisation of the mix to a broadcast level (about -16 LUFS), and a
+  limiter. Light foley on the cuts (a paper flip, the thump of a stamp) would sell the print
+  idea.
+- **Claims and compliance.** "Faster and cheaper than the psychiatrist-only route" and the
+  market numbers should carry an on-screen source or be softened; the deck's own tone rule
+  is "no claims", and Australian health-advertising rules apply to anything public. The
+  business model on screen follows the canvas (free for patients, a clinician subscription);
+  the deck says a 10% booking fee. One of them should win before the film goes out.
+- **Accessibility.** Captions can be generated from the narration file since every line has a
+  start time; a burned-in caption track and an SRT are one script away. The riso dot
+  screens hold contrast well, but the yellow glow behind navy lettering should be checked
+  against WCAG at small sizes.
+- **Motion.** The people blink and the plates land in print order, but nothing breathes: a slow
+  push-in on each pair card, a head tilt on the stressed word of a line, and a path drawn
+  through the maze would add life without breaking the drawn-on-twos cadence.
+- **Cuts and formats.** A 60 s trailer (hook, one pair, the engine, the close) for social, and
+  9:16 and 1:1 layouts, which need the lettering resized per format.
+- **Tooling.** A check that every hand-lettered line fits its frame (measureText against the
+  card width) and a contact-sheet diff against a golden render would catch layout
+  regressions before a four-minute build.
 
 ## Design notes
 

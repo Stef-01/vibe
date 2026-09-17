@@ -4,7 +4,7 @@
 <style>
   /* core.js lists "Bradley Hand" first in HAND_FONT. Registering Caveat Brush (OFL, fonts/OFL.txt) under that
      name gives this film its bold marker lettering on every machine, headless or not. Noto faces carry the
-     Hindi and Urdu on the clinician's label. */
+     Hindi and Urdu on the clinician's label and the language icon. */
   @font-face { font-family: "Bradley Hand"; src: url("fonts/CaveatBrush-Regular.ttf"); }
   @font-face { font-family: "Noto Devanagari"; src: url("fonts/NotoSansDevanagari[wdth,wght].ttf"); font-weight: 100 900; }
   @font-face { font-family: "Noto Urdu"; src: url("fonts/NotoNastaliqUrdu[wght].ttf"); font-weight: 100 900; }
@@ -26,59 +26,66 @@
 
 // ===================== BRIEF & BEAT SHEET =====================
 // BRIEF
-// Subject: ADHDme as a YC-style pitch with a narrator: hook, problem, who, solution, three matches on
-//          life experience shown as faces, how, why now, market, business model, traction, close. Content
-//          from the Value Proposition Canvas with market numbers and traction from the strategic plan deck.
+// Subject: ADHDme as a YC-style pitch with a narrator: hook, problem, who, solution, three matches on life
+//          experience shown as faces, how the match is made (what we ask, what we know about each clinician,
+//          two models side by side, the feedback loop), what that changes, how it works, why now, market,
+//          model, traction, close. Content from the Value Proposition Canvas with numbers from the deck.
 // Format: 16:9, output width 1920, drawn 12 fps, output 24 fps. Length follows the narration: every beat
 //         lasts max(its visual minimum, lead + speech + pad), computed by voice.py into adhdme-pitch-voice.js.
-//         With the current script that is about 118 seconds.
+// Pace:   slow. Headlines type over 1.2 s, sub lines over 1.6 s, reveals spread across each beat, and every
+//         card holds long enough to read twice.
 // Look:   riso throughout: cream stock, fluorescent inks printed as halftone plates with knockouts, each
-//         card's plates arriving in print order. Portraits are drawn: skin, hair and clothes as flat fills
-//         under a riso dot screen, features in navy line. Crayon ripples, an iris, a card montage, a badge
-//         gallery, one duotone beat, one starfield.
+//         card's plates arriving in print order. People are drawn: skin, hair and clothes as flat fills under
+//         a riso dot screen, features in navy line. Icons are small drawn marks on paper discs.
 // Palette: risoPop (blue, pink, yellow, navy). Skin tones and clothes are tints and shades of its fills.
 // Anchor: the seed dot, navy with a pink offset, at the bottom centre of every frame.
-// Puppets: bust(): head, hair, shoulders, a face with mood and brows, glasses, beard, bindi, a baby held,
-//          a raised hand, a stethoscope, a badge, a bilingual name label. Three patients, three clinicians,
-//          and the faceless figures around them (a family, a crowd).
-// Sound:  voice.py narrates each beat with piper; score() writes the music from the same timeline: pads
-//         on a I V vi IV loop, a bass, a plucked arpeggio from the solution on, soft drums through the
-//         middle, accents on the cuts; build-pitch.sh ducks the music under the voice.
+// Puppets: bust() for every person (three patients, five clinicians, five young people, families, crowds);
+//          icon() for two dozen marks: baby, moon, house, family, languages, plain speech, a pill with a
+//          question, tag, phone, clock, calendar, checklist, stethoscope, heart, microphone, match rings,
+//          a network, notes, a crossed star, coin, bell, pin, magnifier.
+// Sound:  voice.py narrates each beat with piper. score() writes the music from the same timeline and
+//         re-anchors its bars on every cut, so downbeats land on the picture: warm pads in the hook, a minor
+//         loop through the problem, a major loop from the segment on with an arpeggio from the solution,
+//         a lead motif on the matches, drums through the matching engine, a key change up for the value,
+//         a riser into the market, pads alone for the gallery and the close. build-pitch.sh ducks it under
+//         the voice.
 //
-// beat       look        what changes                                                          kit                          sound
-// hook       riso        ripples from the dot; an iris opens on the title card                  crayon iris plates           pads in, rising note
-// maze       riso        a real maze, the headline knocked out of it                            plates knockouts             minor loop
-// pain1..4   riso        a swinging tag, a peg on the wrong hole, three sheets, a draining bottle plates selfDraw              a square per cut
-// giveup     riso        "so people give up before the first booking"                           plates ko                    low sine
-// who        riso        Australia prints in, three cities ring one by one                      plates dashedRing            major loop begins
-// solution   riso        patient dot, five clinicians, the fit lights up                        plates crayon selfDraw       arpeggio in
-// pair1..3   riso        a patient and a clinician face each other; the life around the patient  bust plates bubble crayon    a two-note ding per match
-//                        (a pram and a night moon; a home and a family; a crowd); the line lands
-// pairs      riso        the three pairs as small portraits, cross-matched                        bust crayon                  hold
-// how1..3    riso        cost bands, diagnosis templates, script alerts                          plates selfDraw              drums in
-// whynow     starfield   timeline: QLD live, NSW and VIC 2026, asters ignite                     night grain aster            sawtooth swell
-// market     riso        >1M pops, 250K counts up while a quarter of the crowd turns pink        plates hand                  accent
-// model      duotone     patient, door, clinician in two inks; free for patients                 duotone plates crayon        drums out
-// traction   riso        three stamps land with a tilt                                           plates dashedRing            three rising notes
-// gallery    riso        every card as a badge, collapsing into the dot                          badges                       pads only
-// close      riso        the tagline types out over ripples                                      crayon hand                  resolve
-// signoff    riso        ADHDme / adhdme.au, two dots                                            signOff                      last chord
+// beat       what changes
+// hook       ripples from the dot; an iris opens on the title card
+// maze..giveup  a real maze; a swinging tag; a peg on the wrong hole; three sheets; a draining bottle; "people give up"
+// who        Australia prints in, three cities ring; five young people arrive in a row
+// solution   a patient faces five clinicians; lines draw; the fit lights up
+// pair1..3   a patient and a clinician face each other with the life around the patient printed behind; the line lands
+// pairs      the three pairs as small portraits, cross-matched
+// algo1      what we ask: a patient with seven life factors arriving around them, one as each is named
+// algo2      what we know: a clinician with seven things we learn in the interview
+// algo3      two models side by side: rules that score factors as bars; a language model that reads notes; the same match
+// algo4      the loop: a consultation, five fit signals, the next match better; a crossed star
+// value      three columns: they fit before you meet; faster and cheaper; the same clinician at 6, 12, 24 months
+// how        cost bands, templates, alerts, free for patients
+// whynow     starfield timeline: QLD live, NSW and VIC 2026
+// market     >1M pops, 250K counts up while a quarter of the crowd turns pink
+// model      duotone: patient, door, clinician
+// traction   three stamps land with a tilt; two GPs stand by theirs
+// gallery    every card as a badge, collapsing into the dot
+// close      the tagline; the six people stand together, smiling
+// signoff    ADHDme / adhdme.au
 
 // ===================== TIMELINE FROM THE NARRATION =====================
-// adhdme-pitch-voice.js (from voice.py) gives BEATS = [{id, start, dur, speech}]. Without it, these minimums apply.
-const FALLBACK = [['hook', 5], ['maze', 3], ['pain1', 3], ['pain2', 3], ['pain3', 3], ['pain4', 3], ['giveup', 3], ['who', 5], ['solution', 5], ['pair1', 5.5], ['pair2', 5.5], ['pair3', 5.5], ['pairs', 4], ['how1', 4], ['how2', 4], ['how3', 4], ['whynow', 6], ['market', 6], ['model', 5], ['traction', 5], ['gallery', 3.5], ['close', 4.5], ['signoff', 3.5]];
+const FALLBACK = [['hook', 6.5], ['maze', 5], ['pain1', 4.5], ['pain2', 4.5], ['pain3', 4], ['pain4', 4.5], ['giveup', 4], ['who', 8], ['solution', 7], ['pair1', 8], ['pair2', 10], ['pair3', 9], ['pairs', 6], ['algo1', 10], ['algo2', 8], ['algo3', 10], ['algo4', 10], ['value', 10], ['how', 9], ['whynow', 9], ['market', 7], ['model', 6.5], ['traction', 7], ['gallery', 4], ['close', 7], ['signoff', 4]];
 const B = (() => { const list = typeof BEATS !== 'undefined' ? BEATS : (() => { let t = 0; return FALLBACK.map(([id, dur]) => { const b = { id, start: t, dur, speech: 0 }; t += dur; return b; }); })(); return Object.fromEntries(list.map(b => [b.id, b])); })();
+const ORDER = Object.keys(B);
 const D = id => B[id].dur;
 function beatAt(ids, tau) { let acc = 0; for (const id of ids) { if (tau < acc + D(id)) return [id, tau - acc]; acc += D(id); } const id = ids[ids.length - 1]; return [id, tau - (acc - D(id))]; }
 
 // ===================== PALETTE =====================
 usePalette('risoPop');
-const DUO = makePalette({ paperBand: null }, duotone(PALETTES.risoPop.inks[1], PALETTES.risoPop.inks[0]));   // pink and blue, the flipbook's two-ink beat, on plain stock
+const DUO = makePalette({ paperBand: null }, duotone(PALETTES.risoPop.inks[1], PALETTES.risoPop.inks[0]));
 const ANCHOR = () => [CX, H * .905];
 const SKIN = () => ({ light: tint(PAL.fills[4], .66), mid: tint(PAL.fills[4], .34), tan: shade(tint(PAL.fills[4], .18), .18), deep: shade(PAL.fills[4], .5) });
+const TYPE = 1.2, TYPE2 = 1.6;   // seconds a headline and a sub line take to type
 
 // ===================== HELPERS =====================
-// hand lettering in two inks (Caveat Brush is a single weight); `font` swaps the face for other scripts
 function hand(c, text, x, y, o = {}) {
   const { size = 48, ink = PAL.ink, ink2 = PAL.accents[0], offset = 4, align = 'left', al = 1, font = HAND_FONT } = o;
   if (!text) return;
@@ -86,7 +93,6 @@ function hand(c, text, x, y, o = {}) {
   if (ink2) { c.fillStyle = ink2; c.globalAlpha = .85 * al; c.fillText(text, x + offset, y + offset * .6); }
   c.fillStyle = ink; c.globalAlpha = al; c.fillText(text, x, y); c.restore();
 }
-// a run of texts in different faces, centred as one line: parts = [[text, font, sizeScale]]
 function mixed(c, parts, x, y, size, o = {}) {
   c.save(); const widths = parts.map(([t, f, k = 1]) => { c.font = `${size * k}px ${f || HAND_FONT}`; return c.measureText(t).width; }); const total = widths.reduce((a, b) => a + b, 0);
   let px = x - total / 2; parts.forEach(([t, f, k = 1], n) => { hand(c, t, px, y, { ...o, size: size * k, align: 'left', font: f || HAND_FONT }); px += widths[n]; }); c.restore();
@@ -97,26 +103,24 @@ const sub = (c, text, o = {}) => hand(c, typed(text, o.p ?? 1), CX, o.y ?? H * .
 const label = (c, text, p = 1) => hand(c, typed(text, p), CX, H * .83, { size: 84, align: 'center' });
 const blinkAt = (i, off = 0) => pulse(i + off, 11) ? 1 : 0;
 function mark(c, onNight = false) { resetT(c); const [x, y] = ANCHOR(); seedDot(c, x, y, 11, onNight ? PAL.chalk : PAL.ink, PAL.accents[0]); }
-// riso printing: three reusable plates, coverage drawn in black on white, white is a knockout.
-// Plates arrive in print order over the first third of a second of a card: yellow, then blue, then pink.
-const PLATES = [layer(), layer(), layer()], ARRIVAL = [2 / 12, 4 / 12, 0];
+const PLATES = [layer(), layer(), layer()], ARRIVAL = [3 / 12, 6 / 12, 0];
 function risoCard(c, draw, o = {}) {
   const inks = o.inks || PAL.inks.slice(0, 3), angles = o.angles || [.26, 1.31, 0], cell = o.cell || 7, tau = o.tau ?? 99; paper(c);
-  inks.forEach((ink, k) => { if (tau < (inks.length === 3 ? ARRIVAL[k] : k * 2 / 12)) return;
+  inks.forEach((ink, k) => { if (tau < (inks.length === 3 ? ARRIVAL[k] : k * 3 / 12)) return;
     const P = PLATES[k], g = P.getContext('2d'); resetT(g); g.globalAlpha = 1; g.fillStyle = '#fff'; g.fillRect(0, 0, W, H); g.fillStyle = '#000'; g.strokeStyle = '#000'; g.lineWidth = 6; g.lineCap = 'round'; draw(g, k); printPlate(c, P, { cell, ink, angle: angles[k], seed: 30 + k }); });
 }
-const gray = v => `rgb(${255 - v * 255 | 0},${255 - v * 255 | 0},${255 - v * 255 | 0})`;   // plate coverage 0..1 -> grey
+const gray = v => `rgb(${255 - v * 255 | 0},${255 - v * 255 | 0},${255 - v * 255 | 0})`;
 const radial = (g, x, y, r0, r1, c0, c1) => { const gr = g.createRadialGradient(x, y, r0, x, y, r1); gr.addColorStop(0, c0); gr.addColorStop(1, c1); return gr; };
 function glow(g, x, y, r0, r1, v) { g.fillStyle = radial(g, x, y, r0, r1, gray(v), gray(0)); g.fillRect(0, 0, W, H); }
-function ko(g, text, x, y, size, align = 'center') { g.save(); g.font = `${size}px ${HAND_FONT}`; g.textAlign = align; g.fillStyle = '#fff'; g.fillText(text, x, y); g.restore(); }   // knockout lettering
+function ko(g, text, x, y, size, align = 'center') { g.save(); g.font = `${size}px ${HAND_FONT}`; g.textAlign = align; g.fillStyle = '#fff'; g.fillText(text, x, y); g.restore(); }
 function pill(g, x, y, w, h) { g.beginPath(); g.roundRect(x - w / 2, y - h / 2, w, h, h / 2); g.fill(); }
+function roundRectPts(x, y, w, h, r, n = 6) { const pts = [], corner = (cx, cy, a0) => { for (let k = 0; k <= n; k++) { const a = a0 + k / n * Math.PI / 2; pts.push([cx + Math.cos(a) * r, cy + Math.sin(a) * r]); } }; corner(x + w - r, y + r, -Math.PI / 2); corner(x + w - r, y + h - r, 0); corner(x + r, y + h - r, Math.PI / 2); corner(x + r, y + r, Math.PI); return pts; }
 function doorPath(g, cx, cy, w, h) { g.beginPath(); g.moveTo(cx - w / 2, cy + h / 2); g.lineTo(cx - w / 2, cy - h / 2 + w / 2); g.arc(cx, cy - h / 2 + w / 2, w / 2, Math.PI, 0); g.lineTo(cx + w / 2, cy + h / 2); g.closePath(); }
 function bellPath(g, x, y, s) { g.beginPath(); g.moveTo(x - 70 * s, y + 40 * s); g.quadraticCurveTo(x - 70 * s, y - 60 * s, x, y - 72 * s); g.quadraticCurveTo(x + 70 * s, y - 60 * s, x + 70 * s, y + 40 * s); g.lineTo(x + 92 * s, y + 62 * s); g.lineTo(x - 92 * s, y + 62 * s); g.closePath(); }
 function tagPath(g, x, y, s) { g.beginPath(); g.moveTo(x - 48 * s, y - 30 * s); g.lineTo(x + 14 * s, y - 30 * s); g.lineTo(x + 50 * s, y); g.lineTo(x + 14 * s, y + 30 * s); g.lineTo(x - 48 * s, y + 30 * s); g.closePath(); }
 const heartPts = (cx, cy, k, n = 40) => Array.from({ length: n }, (_, j) => { const t = j / n * TAU; return [cx + 16 * Math.pow(Math.sin(t), 3) * k, cy - (13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t)) * k + 3 * k]; });
 const arcPts = (cx, cy, rx, ry, a0, a1, n = 30) => Array.from({ length: n + 1 }, (_, k) => { const a = a0 + (a1 - a0) * k / n; return [cx + Math.cos(a) * rx, cy + Math.sin(a) * ry]; });
 const halfPath = (cx, cy, rx, ry, top = true) => { const p = new Path2D(); p.ellipse(cx, cy, rx, ry, 0, top ? Math.PI : 0, top ? TAU : Math.PI); p.closePath(); return p; };
-// a thought or speech bubble with a drawing inside, and the trail of circles or the tail to whoever says it
 function bubble(c, x, y, rx, ry, seed, draw, q = 1) {
   if (q <= 0) return; c.save(); c.translate(x, y); c.scale(q, q);
   const p = ellPath(0, 0, rx, ry); c.fillStyle = PAL.light; c.fill(p); surface(c, p, [-rx, -ry, 2 * rx, 2 * ry], { finish: 'riso', seed, density: .1, cell: 8, color: PAL.inks[2], alpha: .8 });
@@ -128,24 +132,22 @@ function bubbleTrail(c, from, to, seed, q) {
     c.fillStyle = PAL.light; c.fill(circPath(x, y, r)); c.strokeStyle = PAL.ink; c.lineWidth = 2.2; wob(c, ellPts(x, y, r, r, 0, 16), 1.2, seed + k, true); }
 }
 function tail(c, from, to, seed) { c.strokeStyle = PAL.ink; c.lineWidth = 2.6; c.fillStyle = PAL.light; const p = polyPath([from, [to[0] - 14, to[1]], [to[0] + 14, to[1]]]); c.fill(p); wob(c, [[to[0] - 14, to[1]], from, [to[0] + 14, to[1]]], 1.2, seed); }
-// a real maze (recursive backtracker, seeded) for the problem card
+function dotted(c, a, b, seed, col = PAL.ink) { c.save(); c.setLineDash([3, 9]); c.strokeStyle = col; c.lineWidth = 2; c.globalAlpha = .6; wob(c, [a, b], 1, seed); c.restore(); }
+function arrow(c, pts, q, seed, col = PAL.ink, w = 4) { if (q <= 0) return; c.strokeStyle = col; c.lineWidth = w; c.lineCap = 'round'; selfDraw(c, pts, q, seed, 1.8); if (q >= 1) { const [x1, y1] = pts[pts.length - 2], [x2, y2] = pts[pts.length - 1], a = Math.atan2(y2 - y1, x2 - x1); wob(c, [[x2 - Math.cos(a - .5) * 16, y2 - Math.sin(a - .5) * 16], [x2, y2], [x2 - Math.cos(a + .5) * 16, y2 - Math.sin(a + .5) * 16]], 1, seed + 1); } }
 const MZ = { s: 110, cols: 19, rows: 11 };
 const MAZE = (() => { const { cols, rows } = MZ, r = rng(55), vis = Array(cols * rows).fill(false), right = Array(cols * rows).fill(true), below = Array(cols * rows).fill(true), stack = [[0, 0]]; vis[0] = true;
   while (stack.length) { const [x, y] = stack[stack.length - 1], nb = [[1, 0], [-1, 0], [0, 1], [0, -1]].map(([dx, dy]) => [x + dx, y + dy, dx, dy]).filter(([nx, ny]) => nx >= 0 && ny >= 0 && nx < cols && ny < rows && !vis[ny * cols + nx]);
     if (!nb.length) { stack.pop(); continue; } const [nx, ny, dx, dy] = nb[r() * nb.length | 0];
     if (dx === 1) right[y * cols + x] = false; if (dx === -1) right[ny * cols + nx] = false; if (dy === 1) below[y * cols + x] = false; if (dy === -1) below[ny * cols + nx] = false; vis[ny * cols + nx] = true; stack.push([nx, ny]); }
   return { right, below }; })();
-// a rough Australia, lon/lat, for the segment card
 const AUS = [[114.0,-22.0],[113.6,-24.5],[114.6,-28.5],[115.0,-31.5],[115.7,-33.5],[115.0,-34.5],[117.5,-35.0],[120.0,-33.9],[124.0,-33.0],[128.0,-32.0],[131.5,-31.5],[134.0,-32.5],[135.6,-34.8],[137.5,-35.6],[138.5,-35.6],[140.5,-38.0],[143.5,-38.8],[146.0,-39.0],[147.5,-38.0],[150.0,-37.5],[150.2,-35.8],[151.2,-33.9],[153.0,-31.0],[153.6,-28.2],[153.2,-25.5],[150.9,-22.9],[149.0,-21.0],[146.5,-19.0],[145.5,-16.5],[144.5,-14.5],[143.5,-12.0],[142.5,-10.7],[141.6,-12.7],[141.4,-15.5],[140.8,-17.5],[139.0,-17.6],[137.0,-16.0],[136.5,-14.0],[136.0,-12.2],[133.5,-11.5],[131.0,-12.2],[129.5,-14.5],[127.5,-14.0],[126.0,-14.5],[124.5,-16.0],[123.0,-17.0],[121.5,-19.0],[119.0,-20.0],[116.5,-20.7],[114.5,-21.7]];
 const TAS = [[145.0,-40.8],[148.2,-40.9],[147.8,-43.2],[146.0,-43.5],[144.7,-41.3]];
-const CITIES = [[151.2,-33.9], [145.0,-37.8], [153.0,-27.5]];   // Sydney, Melbourne, Brisbane
-const MAP = () => ({ x: W * .56, y: H * .15, w: 760, h: 620 });
+const CITIES = [[151.2,-33.9], [145.0,-37.8], [153.0,-27.5]];
+const MAP = () => ({ x: W * .56, y: H * .13, w: 720, h: 590 });
 const geo = ([lon, lat]) => { const m = MAP(); return [m.x + (lon - 112) / 42 * m.w, m.y + (-lat - 10) / 34 * m.h]; };
 
 // ===================== PUPPET: A PORTRAIT =====================
 // bust(c, x, y, s, look, pose, seed): origin at the base of the neck, about 330 px tall at scale 1.
-// look: { skin, hair, top, style: crop|short|bun|curly|long|hood|none, coat, steth, glasses, beard, bindi, tired, baby, wave, badge, tag, faceless }
-// pose: { mood -1..1 (frown..smile), brow -1..1 (worried..friendly), blink }
 function bust(c, x, y, s, look, pose = {}, seed = 400) {
   const line = PAL.ink, mood = pose.mood || 0, brow = pose.brow || 0;
   c.save(); c.translate(x, y); c.scale(s, s); c.lineJoin = 'round'; c.lineCap = 'round';
@@ -170,124 +172,69 @@ function bust(c, x, y, s, look, pose = {}, seed = 400) {
       if (look.glasses) { c.lineWidth = 2.2; wob(c, ellPts(ex, ey, 18, 15, 0, 20), 1, seed + 66 + sg, true); c.lineWidth = 2.4; } }
     if (look.glasses) { c.beginPath(); c.moveTo(-6, -108); c.lineTo(6, -108); c.stroke(); }
     if (look.bindi) { c.fillStyle = PAL.accents[0]; c.beginPath(); c.arc(0, -142, 4.5, 0, TAU); c.fill(); }
-    c.strokeStyle = look.beard ? PAL.paper : line; c.lineWidth = look.beard ? 3.2 : 2.6; c.beginPath(); c.moveTo(-18, -72); c.quadraticCurveTo(0, -72 + mood * 16, 18, -72); c.stroke();   // a smile shows through a beard in paper colour
-    c.lineWidth = 1.8; wob(c, [[2, -100], [8, -86], [0, -84]], .6, seed + 70);
+    c.strokeStyle = look.beard ? PAL.paper : line; c.lineWidth = look.beard ? 3.2 : 2.6; c.beginPath(); c.moveTo(-18, -72); c.quadraticCurveTo(0, -72 + mood * 16, 18, -72); c.stroke();
+    c.strokeStyle = line; c.lineWidth = 1.8; wob(c, [[2, -100], [8, -86], [0, -84]], .6, seed + 70);
   }
   if (look.steth) { c.strokeStyle = PAL.inks[0]; c.lineWidth = 3; wob(c, [[-30, -4], [-44, 46], [-16, 88], [14, 96]], 1.2, seed + 72); c.fillStyle = PAL.inks[0]; c.beginPath(); c.arc(20, 98, 11, 0, TAU); c.fill(); c.strokeStyle = line; c.lineWidth = 2; wob(c, ellPts(20, 98, 11, 11, 0, 14), .8, seed + 73, true); }
   if (look.badge) { part(circPath(-72, 62, 24), ellPts(-72, 62, 24, 24, 0, 18), [-96, 38, 48, 48], PAL.fills[2], 80, { density: .2, color: PAL.inks[1] }); c.strokeStyle = PAL.accents[0]; c.lineWidth = 2.2; wob(c, heartPts(-72, 62, .62), 1, seed + 82, true); }
-  if (look.baby) {   // held on the right shoulder, asleep
+  if (look.baby) {
     c.strokeStyle = line; c.lineWidth = 27; wob(c, [[-30, 56], [60, 100], [118, 76]], 1, seed + 90); c.strokeStyle = look.skin; c.lineWidth = 21; wob(c, [[-30, 56], [60, 100], [118, 76]], 1, seed + 90);
     part(ellPath(84, 40, 36, 60, .6), ellPts(84, 40, 36, 60, .6, 40), [40, -30, 100, 140], tint(PAL.fills[3], .45), 92, { density: .2, color: PAL.inks[0] });
     part(circPath(106, -12, 25), ellPts(106, -12, 25, 25, 0, 24), [81, -37, 50, 50], SKIN().light, 94, { density: .15 });
     part(halfPath(106, -22, 26, 18), arcPts(106, -22, 26, 18, Math.PI, TAU), [80, -40, 52, 20], tint(PAL.fills[2], .3), 96, { density: .2 });
     c.strokeStyle = line; c.lineWidth = 1.8; wob(c, [[96, -8], [102, -6]], .5, seed + 97); wob(c, [[110, -6], [116, -8]], .5, seed + 98); wob(c, [[103, 2], [109, 3]], .5, seed + 99);
   }
-  if (look.wave) {   // a hand up, hello
+  if (look.wave) {
     c.strokeStyle = line; c.lineWidth = 30; wob(c, [[112, 70], [128, -20]], 1, seed + 100); c.strokeStyle = look.coat ? look.top : look.skin; c.lineWidth = 24; wob(c, [[112, 70], [126, -12]], 1, seed + 100);
     part(circPath(130, -46, 23), ellPts(130, -46, 23, 23, 0, 22), [107, -69, 46, 46], look.skin, 102, { density: .16 });
     c.strokeStyle = line; c.lineWidth = 2.2; for (let k = -1; k <= 1; k++) wob(c, [[130 + k * 12, -62], [132 + k * 14, -84]], .8, seed + 104 + k + 1);
   }
-  if (look.tag) {   // a name label on the coat, in the languages spoken
+  if (look.tag) {
     const p = roundRectPath(30, 34, 118, 52, 8); c.fillStyle = PAL.light; c.fill(p); c.strokeStyle = line; c.lineWidth = 1.8; wob(c, [[30, 34], [148, 34], [148, 86], [30, 86]], 1, seed + 110, true);
     hand(c, 'हिंदी', 58, 72, { size: 26, ink2: null, font: '"Noto Devanagari"', align: 'center' }); hand(c, 'اردو', 116, 68, { size: 24, ink2: null, font: '"Noto Urdu"', align: 'center' });
   }
   c.restore();
 }
 
-// ===================== CARDS =====================
-// Each card is (c, tau, i): plates first, portraits, lettering and crayon on top. tau = 99 gives the finished card for the gallery.
-function cardTitle(c, tau, i) {
-  usePalette('risoPop'); const dx = CX - 420, dy = CY + 30, d = D('hook');
-  risoCard(c, (g, k) => {
-    if (k === 2) { glow(g, dx, dy - 40, 80, 640, .9); doorPath(g, dx, dy, 300, 540); g.fillStyle = '#fff'; g.fill(); }
-    if (k === 0) { doorPath(g, dx, dy, 300, 540); g.fillStyle = gray(.6); g.fill(); doorPath(g, dx, dy, 226, 466); g.fillStyle = '#fff'; g.fill(); }
-    if (k === 1) { doorPath(g, dx, dy, 226, 466); g.fillStyle = gray(.9); g.fill(); g.fillStyle = '#fff'; g.beginPath(); g.arc(dx + 66, dy + 30, 14, 0, TAU); g.fill(); }
-  }, { tau });
-  hand(c, 'ADHDme', CX - 140, CY - 20, { size: 230 });
-  hand(c, typed('The front door to', sm(d * .55, d * .68, tau)), CX - 130, CY + 80, { size: 66, ink2: null }); hand(c, typed('ADHD care in Australia.', sm(d * .66, d * .84, tau)), CX - 130, CY + 156, { size: 66, ink2: null });
+// ===================== ICONS =====================
+// icon(c, name, x, y, s, o): a drawn mark about 110 px wide at scale 1, riso finish, navy line. o.badge puts it on a paper disc.
+function icon(c, name, x, y, s = 1, o = {}) {
+  c.save(); c.translate(x, y); c.scale(s, s); c.lineJoin = 'round'; c.lineCap = 'round';
+  const seed = o.seed || 700, line = PAL.ink;
+  const sh = (path, pts, box, fill, sd, oo = {}) => { c.fillStyle = fill; c.fill(path); surface(c, path, box, { finish: 'riso', seed: seed + sd, density: oo.density ?? .22, cell: 6, color: oo.color || PAL.inks[1], alpha: .75 }); c.strokeStyle = line; c.lineWidth = oo.lw ?? 2.6; wob(c, pts, 1.4, seed + sd + 1, true); };
+  const stroke = (pts, w = 2.6, col = line, close = false) => { c.strokeStyle = col; c.lineWidth = w; wob(c, pts, 1.2, seed + 90 + pts.length, close); };
+  if (o.badge) { const r = o.badge === true ? 74 : o.badge; sh(circPath(0, 0, r), ellPts(0, 0, r, r, 0, 40), [-r, -r, 2 * r, 2 * r], o.badgeFill || PAL.light, 2, { density: .1, color: PAL.inks[2] }); }
+  switch (name) {
+    case 'baby': sh(ellPath(0, 8, 30, 46, .5), ellPts(0, 8, 30, 46, .5, 30), [-40, -40, 80, 96], tint(PAL.fills[3], .45), 10, { color: PAL.inks[0] }); sh(circPath(16, -24, 20), ellPts(16, -24, 20, 20, 0, 20), [-4, -44, 40, 40], SKIN().light, 12, { density: .15 }); sh(halfPath(16, -32, 21, 14), arcPts(16, -32, 21, 14, Math.PI, TAU), [-5, -46, 42, 16], tint(PAL.fills[2], .3), 14); stroke([[8, -22], [13, -20]], 1.6); stroke([[19, -20], [24, -22]], 1.6); break;
+    case 'moon': c.save(); c.clip(circPath(0, 0, 40)); sh(circPath(0, 0, 40), ellPts(0, 0, 40, 40, 0, 30), [-40, -40, 80, 80], PAL.fills[2], 10, { density: .3 }); c.fillStyle = o.badge ? PAL.light : PAL.paper; c.beginPath(); c.arc(16, -10, 34, 0, TAU); c.fill(); c.restore(); stroke(arcPts(0, 0, 40, 40, .9, 5.7), 2.6); break;
+    case 'house': sh(polyPath([[-50, 0], [50, 0], [50, 44], [-50, 44]]), [[-50, 0], [50, 0], [50, 44], [-50, 44]], [-50, 0, 100, 44], tint(PAL.fills[0], .55), 10); sh(polyPath([[-58, 2], [0, -44], [58, 2]]), [[-58, 2], [0, -44], [58, 2]], [-58, -44, 116, 46], PAL.fills[1], 12, { color: PAL.inks[0] }); c.fillStyle = PAL.fills[2]; c.fillRect(-14, 10, 28, 22); stroke([[-14, 10], [14, 10], [14, 32], [-14, 32]], 1.8, line, true); break;
+    case 'family': [[-34, 6, .8], [0, -6, 1], [34, 6, .8]].forEach(([dx, dy, k], n) => { const tops = [PAL.fills[5], PAL.fills[3], PAL.fills[1]], skins = [SKIN().tan, SKIN().mid, SKIN().light]; sh(polyPath([[dx - 24 * k, dy + 30], [dx - 16 * k, dy - 4], [dx + 16 * k, dy - 4], [dx + 24 * k, dy + 30]]), [[dx - 24 * k, dy + 30], [dx - 16 * k, dy - 4], [dx + 16 * k, dy - 4], [dx + 24 * k, dy + 30]], [dx - 24, dy - 4, 48, 34], tops[n], 20 + n * 2); sh(circPath(dx, dy - 22 * k, 14 * k), ellPts(dx, dy - 22 * k, 14 * k, 14 * k, 0, 16), [dx - 14, dy - 36, 28, 28], skins[n], 10 + n * 2, { density: .15 }); }); break;
+    case 'speech': sh(ellPath(0, -6, 52, 36), ellPts(0, -6, 52, 36, 0, 40), [-52, -42, 104, 72], PAL.light, 10, { density: .1, color: PAL.inks[2] }); stroke([[-14, 24], [-22, 44], [4, 26]], 2.4); hand(c, 'अ', -18, 8, { size: 34, ink2: null, font: '"Noto Devanagari"', align: 'center' }); hand(c, 'ا', 18, 8, { size: 32, ink2: null, font: '"Noto Urdu"', align: 'center' }); break;
+    case 'plain': sh(ellPath(0, -6, 52, 36), ellPts(0, -6, 52, 36, 0, 40), [-52, -42, 104, 72], PAL.light, 10, { density: .1, color: PAL.inks[2] }); stroke([[-14, 24], [-22, 44], [4, 26]], 2.4); stroke([[-30, -8], [30, -8]], 6, PAL.inks[0]); break;
+    case 'fear': { const cap = roundRectPath(-52, -14, 76, 28, 14); c.save(); c.clip(cap); c.fillStyle = PAL.fills[1]; c.fillRect(-52, -14, 38, 28); c.fillStyle = PAL.fills[0]; c.fillRect(-14, -14, 38, 28); c.restore(); stroke(roundRectPts(-52, -14, 76, 28, 14), 2.2, line, true); stroke([[-14, -14], [-14, 14]], 1.4); hand(c, '?', 44, 18, { size: 56, ink: PAL.blush, ink2: PAL.accents[2], align: 'center' }); break; }
+    case 'tag': { const p = new Path2D(); p.moveTo(-48, -30); p.lineTo(14, -30); p.lineTo(50, 0); p.lineTo(14, 30); p.lineTo(-48, 30); p.closePath(); sh(p, [[-48, -30], [14, -30], [50, 0], [14, 30], [-48, 30]], [-48, -30, 98, 60], PAL.fills[2], 10, { density: .25 }); c.fillStyle = o.badge ? PAL.light : PAL.paper; c.beginPath(); c.arc(-34, 0, 6, 0, TAU); c.fill(); hand(c, '$', 6, 16, { size: 44, ink2: null, align: 'center' }); break; }
+    case 'phone': sh(roundRectPath(-24, -46, 48, 92, 10), roundRectPts(-24, -46, 48, 92, 10), [-24, -46, 48, 92], PAL.light, 10, { density: .12, color: PAL.inks[0] }); c.fillStyle = PAL.fills[1]; c.fillRect(-16, -34, 32, 58); c.fillStyle = line; c.beginPath(); c.arc(0, 34, 4, 0, TAU); c.fill(); break;
+    case 'clock': sh(circPath(0, 0, 42), ellPts(0, 0, 42, 42, 0, 36), [-42, -42, 84, 84], PAL.light, 10, { density: .1, color: PAL.inks[2] }); stroke([[0, 0], [0, -26]], 4); stroke([[0, 0], [18, 10]], 4); c.fillStyle = line; c.beginPath(); c.arc(0, 0, 3.5, 0, TAU); c.fill(); break;
+    case 'calendar': sh(roundRectPath(-46, -36, 92, 80, 8), roundRectPts(-46, -36, 92, 80, 8), [-46, -36, 92, 80], PAL.light, 10, { density: .1, color: PAL.inks[0] }); c.fillStyle = PAL.fills[1]; c.fillRect(-46, -36, 92, 22); stroke([[-28, -48], [-28, -26]], 3); stroke([[28, -48], [28, -26]], 3); if (o.text) hand(c, o.text, 0, 30, { size: 26, ink2: null, align: 'center' }); else stroke([[-20, 12], [-8, 26], [22, -4]], 4, PAL.accents[0]); break;
+    case 'checklist': sh(rectPath(-40, -50, 80, 100), [[-40, -50], [40, -50], [40, 50], [-40, 50]], [-40, -50, 80, 100], PAL.light, 10, { density: .1, color: PAL.inks[0] }); for (let k = 0; k < 3; k++) { const yy = -30 + k * 30; stroke([[-28, yy - 8], [-14, yy - 8], [-14, yy + 6], [-28, yy + 6]], 1.6, line, true); stroke([[-26, yy - 1], [-21, yy + 4], [-15, yy - 6]], 2.6, PAL.accents[0]); stroke([[-4, yy - 1], [28, yy - 1]], 3, PAL.inks[0]); } break;
+    case 'steth': stroke([[-24, -44], [-34, -4], [-10, 30], [16, 34]], 4, PAL.inks[0]); stroke([[24, -44], [30, -10]], 4, PAL.inks[0]); sh(circPath(24, 38, 14), ellPts(24, 38, 14, 14, 0, 16), [10, 24, 28, 28], PAL.inks[0], 10, { density: .3, color: PAL.inks[1] }); break;
+    case 'heart': sh(polyPath(heartPts(0, 0, 2.4)), heartPts(0, 0, 2.4), [-42, -40, 84, 80], PAL.fills[0], 10, { density: .3 }); break;
+    case 'mic': sh(roundRectPath(-18, -50, 36, 66, 18), roundRectPts(-18, -50, 36, 66, 18), [-18, -50, 36, 66], PAL.fills[1], 10, { color: PAL.inks[0] }); stroke(arcPts(0, -6, 32, 32, .2, Math.PI - .2), 3); stroke([[0, 26], [0, 46]], 3); stroke([[-18, 46], [18, 46]], 3); break;
+    case 'match': sh(circPath(-18, 0, 32), ellPts(-18, 0, 32, 32, 0, 30), [-50, -32, 64, 64], PAL.fills[0], 10, { density: .3 }); sh(circPath(18, 0, 32), ellPts(18, 0, 32, 32, 0, 30), [-14, -32, 64, 64], PAL.fills[1], 12, { color: PAL.inks[0], density: .3 }); c.save(); c.clip(circPath(-18, 0, 32)); c.fillStyle = PAL.fills[5]; c.fill(circPath(18, 0, 32)); c.restore(); stroke(ellPts(-18, 0, 32, 32, 0, 30), 2.6, line, true); break;
+    case 'brain': { sh(ellPath(0, 0, 50, 40), ellPts(0, 0, 50, 40, 0, 36), [-50, -40, 100, 80], tint(PAL.fills[5], .4), 10, { color: PAL.inks[0], density: .15 }); const r = rng(seed + 5), pts = Array.from({ length: 7 }, () => [(r() - .5) * 70, (r() - .5) * 52]); c.strokeStyle = PAL.inks[0]; c.lineWidth = 1.6; pts.forEach((p, k) => { const q = pts[(k + 2) % 7]; c.beginPath(); c.moveTo(p[0], p[1]); c.lineTo(q[0], q[1]); c.stroke(); }); pts.forEach(p => { c.fillStyle = PAL.accents[0]; c.beginPath(); c.arc(p[0], p[1], 4, 0, TAU); c.fill(); }); break; }
+    case 'notes': sh(rectPath(-38, -50, 76, 100), [[-38, -50], [38, -50], [38, 50], [-38, 50]], [-38, -50, 76, 100], PAL.light, 10, { density: .1, color: PAL.inks[0] }); squiggleText(c, -28, -32, 56, 5, { seed: seed + 7, lineH: 16, amp: 4, width: 1.8, color: PAL.ink }); break;
+    case 'starx': { const st = []; for (let k = 0; k < 10; k++) { const a = -Math.PI / 2 + k / 10 * TAU, r = k % 2 ? 18 : 42; st.push([Math.cos(a) * r, Math.sin(a) * r]); } sh(polyPath(st), st, [-42, -42, 84, 84], PAL.fills[2], 10, { density: .3 }); stroke([[-46, -46], [46, 46]], 6, PAL.blush); stroke([[46, -46], [-46, 46]], 6, PAL.blush); break; }
+    case 'coin': sh(circPath(0, 0, 40), ellPts(0, 0, 40, 40, 0, 32), [-40, -40, 80, 80], PAL.fills[2], 10, { density: .3 }); stroke(ellPts(0, 0, 30, 30, 0, 24), 1.6, line, true); hand(c, '$', 0, 16, { size: 46, ink2: null, align: 'center' }); break;
+    case 'bell': { const p = new Path2D(); p.moveTo(-36, 22); p.quadraticCurveTo(-36, -32, 0, -38); p.quadraticCurveTo(36, -32, 36, 22); p.lineTo(48, 34); p.lineTo(-48, 34); p.closePath(); sh(p, [[-36, 22], [-30, -20], [0, -38], [30, -20], [36, 22], [48, 34], [-48, 34]], [-48, -38, 96, 72], PAL.fills[2], 10, { density: .3 }); c.fillStyle = PAL.inks[0]; c.beginPath(); c.arc(0, 44, 9, 0, TAU); c.fill(); break; }
+    case 'pin': { const p = new Path2D(); p.arc(0, -20, 30, Math.PI * .75, Math.PI * 2.25); p.lineTo(0, 40); p.closePath(); sh(p, [...arcPts(0, -20, 30, 30, Math.PI * .75, Math.PI * 2.25, 20), [0, 40]], [-30, -50, 60, 90], PAL.fills[0], 10, { density: .3 }); c.fillStyle = o.badge ? PAL.light : PAL.paper; c.beginPath(); c.arc(0, -20, 11, 0, TAU); c.fill(); break; }
+    case 'magnifier': sh(circPath(-8, -8, 34), ellPts(-8, -8, 34, 34, 0, 30), [-42, -42, 68, 68], PAL.light, 10, { density: .1, color: PAL.inks[2] }); stroke([[16, 16], [44, 44]], 8); break;
+  }
+  c.restore();
 }
-function cardMaze(c, tau, i) {
-  usePalette('risoPop'); const { s, cols, rows } = MZ, ox = (W - cols * s) / 2, oy = (H - rows * s) / 2;
-  risoCard(c, (g, k) => {
-    if (k === 2) glow(g, CX, CY, 100, 900, .8);
-    if (k === 0) { g.fillStyle = gray(.6); const t = 12;
-      for (let y = 0; y < rows; y++) for (let x = 0; x < cols; x++) { const px = ox + x * s, py = oy + y * s; if (MAZE.right[y * cols + x]) g.fillRect(px + s - t / 2, py - t / 2, t, s + t); if (MAZE.below[y * cols + x]) g.fillRect(px - t / 2, py + s - t / 2, s + t, t); }
-      g.fillRect(ox - t / 2, oy - t / 2, cols * s + t, t); g.fillRect(ox - t / 2, oy - t / 2, t, rows * s + t);
-      g.fillStyle = '#fff'; g.beginPath(); g.roundRect(CX - 700, CY - 190, 1400, 360, 40); g.fill(); }
-    if (k === 1) { g.fillStyle = gray(.9); g.beginPath(); g.arc(ox + s / 2, oy + s / 2, 28, 0, TAU); g.fill(); doorPath(g, ox + (cols - .5) * s, oy + (rows - .5) * s + 8, 46, 74); g.fill(); }
-  }, { tau });
-  head(c, 'Getting ADHD care', { y: CY - 60, size: 130, p: sm(0, .6, tau) }); head(c, 'is a maze.', { y: CY + 90, size: 130, p: sm(.5, 1.0, tau) });
-}
-function cardGiveUp(c, tau, i) {
-  usePalette('risoPop'); const a = typed('So people give up', sm(0, .7, tau)), b = typed('before the first booking.', sm(.6, 1.4, tau));
-  risoCard(c, (g, k) => { if (k === 1) { g.fillStyle = gray(.85); g.beginPath(); g.ellipse(CX, CY + 20, 620, 330, -.08, 0, TAU); g.fill(); ko(g, a, CX, CY - 40, 130); ko(g, b, CX, CY + 110, 100); } if (k === 2) glow(g, CX + 500, CY - 260, 40, 500, .7); }, { tau });
-  hand(c, a, CX, CY - 40, { size: 130, align: 'center', ink2: null }); hand(c, b, CX, CY + 110, { size: 100, align: 'center', ink2: null });
-}
-function cardPain1(c, tau, i) {   // price opacity: a tag that swings, the amount a question
-  usePalette('risoPop'); const sw = Math.sin(tau * 3) * .035;
-  risoCard(c, (g, k) => {
-    if (k === 2) glow(g, CX, CY, 100, 760, .6);
-    g.save(); g.translate(CX - 232, -10); g.rotate(sw); g.translate(-(CX - 232), 10);
-    if (k === 0) { g.fillStyle = gray(.7); g.fillRect(CX - 236, -10, 8, CY - 140); }
-    if (k === 1) { g.fillStyle = gray(.85); g.beginPath(); g.moveTo(CX - 300, CY - 150); g.lineTo(CX + 150, CY - 150); g.lineTo(CX + 300, CY); g.lineTo(CX + 150, CY + 150); g.lineTo(CX - 300, CY + 150); g.closePath(); g.fill(); g.fillStyle = '#fff'; g.beginPath(); g.arc(CX - 228, CY, 22, 0, TAU); g.fill(); ko(g, '$?', CX + 10, CY + 78, 220); }
-    g.restore();
-  }, { tau });
-  label(c, 'Cost is hidden', sm(.2, .8, tau));
-}
-function cardPain2(c, tau, i) {   // wrong fit: a round peg comes down to a triangular hole and stops
-  usePalette('risoPop'); const d = D('pain2'), py = CY - 300 + 70 * sm(d * .1, d * .6, tau, easeOut);
-  risoCard(c, (g, k) => {
-    if (k === 2) { glow(g, CX, CY - 200, 60, 420, .8); g.fillStyle = '#fff'; g.beginPath(); g.arc(CX, py, 130, 0, TAU); g.fill(); }
-    if (k === 1) { g.fillStyle = gray(.85); g.fillRect(CX - 200, CY - 40, 400, 360); g.fillStyle = '#fff'; g.beginPath(); g.moveTo(CX, CY + 40); g.lineTo(CX + 130, CY + 250); g.lineTo(CX - 130, CY + 250); g.closePath(); g.fill(); }
-    if (k === 0) { g.fillStyle = gray(.9); g.beginPath(); g.arc(CX, py, 130, 0, TAU); g.fill(); }
-  }, { tau });
-  label(c, 'Wrong fit', sm(.2, .8, tau));
-}
-function cardPain3(c, tau, i) {   // three clinicians, three different answers, one sheet at a time
-  usePalette('risoPop'); const d = D('pain3'), shown = 1 + Math.min(2, Math.floor(tau / (d * .18)));
-  risoCard(c, (g, k) => {
-    for (let m = 0; m < shown; m++) { const x = CX - 560 + m * 400, y = CY - 250;
-      if (k === 0) { g.fillStyle = gray(.22); g.fillRect(x, y, 320, 420); squiggleText(g, x + 30, y + 70, 260, 6 - m, { color: '#000', seed: 70 + m, lineH: 44 + m * 16, amp: 6 + m * 6, width: 5 }); }
-      if (k === 1 && m === 1) { g.fillStyle = gray(.85); g.beginPath(); g.arc(x + 270, y + 50, 46, 0, TAU); g.fill(); }
-      if (k === 2 && m === 2) { g.fillStyle = gray(.85); g.fillRect(x, y, 320, 70); }
-    }
-  }, { tau });
-  label(c, 'No standard', sm(.2, .8, tau));
-}
-function cardPain4(c, tau, i) {   // scripts lapse at handover: the bottle drains, the alert is crossed out
-  usePalette('risoPop'); const d = D('pain4'), level = lerp(.75, .12, sm(d * .1, d * .7, tau));
-  risoCard(c, (g, k) => {
-    if (k === 2) { glow(g, CX - 200, CY + 40, 80, 520, .6); bellPath(g, CX + 300, CY - 40, 1.7); g.fillStyle = '#fff'; g.fill(); }
-    if (k === 1) { g.fillStyle = gray(.85); g.beginPath(); g.roundRect(CX - 330, CY - 160, 260, 400, 30); g.fill(); g.fillRect(CX - 280, CY - 230, 160, 80); g.fillStyle = '#fff'; g.fillRect(CX - 305, CY - 135, 210, 300); g.fillStyle = gray(.85); g.fillRect(CX - 305, CY + 165 - 300 * level, 210, 300 * level); }
-    if (k === 0) { bellPath(g, CX + 300, CY - 40, 1.7); g.fillStyle = gray(.8); g.fill(); g.beginPath(); g.arc(CX + 300, CY + 95, 24, 0, TAU); g.fill(); }
-  }, { tau });
-  const q = sm(d * .55, d * .75, tau, easeOut); if (q > 0) { c.strokeStyle = PAL.ink; c.lineWidth = 16; c.lineCap = 'round'; selfDraw(c, [[CX + 170, CY - 190], [CX + 430, CY + 110]], q, 75, 3); selfDraw(c, [[CX + 430, CY - 190], [CX + 170, CY + 110]], q, 76, 3); }
-  label(c, 'Scripts lapse', sm(.2, .8, tau));
-}
-function cardWho(c, tau, i) {
-  usePalette('risoPop'); const m = MAP(), d = D('who'), t1 = d * .35;
-  risoCard(c, (g, k) => {
-    if (k === 2) { glow(g, m.x + m.w * .55, m.y + m.h * .5, 100, 620, .8); g.fillStyle = '#fff'; g.fill(polyPath(AUS.map(geo))); g.fill(polyPath(TAS.map(geo))); }
-    if (k === 0) { g.fillStyle = gray(.6); g.fill(polyPath(AUS.map(geo))); g.fill(polyPath(TAS.map(geo))); }
-    if (k === 1) CITIES.forEach((p, n) => { if (tau < t1 + n * .5) return; const [x, y] = geo(p); g.fillStyle = gray(.95); g.beginPath(); g.arc(x, y, 22, 0, TAU); g.fill(); });
-  }, { tau });
-  CITIES.forEach((p, n) => { const [x, y] = geo(p), q = sm(t1 + .1 + n * .5, t1 + .5 + n * .5, tau, easeOut); if (q > 0) dashedRing(c, x, y, 26 + 34 * q, PAL.ink, 80 + n, [8, 6], 2.2); });
-  hand(c, typed('16 to 25,', sm(0, .5, tau)), W * .06, CY - 70, { size: 120 }); hand(c, typed('seeking a diagnosis.', sm(.5, 1.3, tau)), W * .06, CY + 50, { size: 84 });
-  if (tau >= t1) hand(c, 'Sydney · Melbourne · Brisbane', W * .06, CY + 150, { size: 50, ink2: null, ink: PAL.inks[0] });
-}
-function cardSolution(c, tau, i) {
-  usePalette('risoPop'); const d = D('solution'), px = W * .28, py = CY + 40, cx = W * .74, cys = [-2, -1, 0, 1, 2].map(m => CY + 40 + m * 140), pick = 2, tm = d * .45;
-  risoCard(c, (g, k) => {
-    if (k === 2) { if (tau >= tm + .6) glow(g, cx, cys[pick], 40, 300, .95); g.fillStyle = '#fff'; cys.forEach(y => { g.beginPath(); g.arc(cx, y, 44, 0, TAU); g.fill(); }); }
-    if (k === 1) { g.fillStyle = gray(.9); g.beginPath(); g.arc(px, py, 74, 0, TAU); g.fill(); }
-    if (k === 0) cys.forEach(y => { g.fillStyle = gray(.85); g.beginPath(); g.arc(cx, y, 44, 0, TAU); g.fill(); });
-  }, { tau });
-  c.save(); c.strokeStyle = PAL.ink; c.lineWidth = 1.8; c.globalAlpha = .4; c.lineCap = 'round'; cys.forEach((y, m) => { const q = sm(.8 + m * .25, 1.2 + m * .25, tau); if (q > 0) selfDraw(c, [[px + 80, py], [cx - 54, y]], q, 90 + m, 2); }); c.restore();
-  const q = sm(tm, tm + .8, tau, easeOut); if (q > 0) { c.strokeStyle = PAL.accents[0]; c.lineWidth = 7; c.lineCap = 'round'; selfDraw(c, [[px + 80, py], [(px + cx) / 2, py - 10], [cx - 58, cys[pick]]], q, 96, 3); if (q >= 1) dashedRing(c, cx, cys[pick], 78, PAL.accents[0], 97, [10, 7], 3); }
-  head(c, 'Matching, not triage.', { p: sm(0, .7, tau) });
-  sub(c, 'Not the next free slot. The right person.', { p: sm(d * .62, d * .78, tau) });
-}
-// three matches on life experience: a patient and a clinician face each other, the life around the patient printed behind
+// an icon on a paper disc with a label under it, popping in over q
+function badgeIcon(c, name, x, y, text, q, seed, o = {}) { if (q <= 0) return; c.save(); resetT(c); c.translate(x, y); c.scale(.6 + .4 * q, .6 + .4 * q); icon(c, name, 0, 0, o.s || .8, { badge: o.r || 74, seed, text: o.text }); c.restore(); if (text) hand(c, text, x, y + (o.r || 74) + 44, { size: o.size || 32, align: 'center', ink2: null, al: q }); }
+
+// ===================== PEOPLE =====================
 const PAIRS = [
   { id: 'pair1', head: 'A new parent, postpartum.', sub: 'matched with a GP who has perinatal experience.', pl: 'new parent, postpartum', cl: [['perinatal experience']], scene: 'pram',
     patient: () => ({ skin: SKIN().light, hair: PAL.ink, top: PAL.fills[5], style: 'bun', tired: true, baby: true }), pose: { mood: -.05, brow: -.45 },
@@ -299,211 +246,375 @@ const PAIRS = [
     patient: () => ({ skin: SKIN().light, hair: PAL.ink, top: PAL.fills[1], style: 'hood' }), pose: { mood: -.5, brow: -.9, thought: true },
     clinician: () => ({ skin: SKIN().deep, hair: PAL.ink, top: PAL.light, style: 'curly', coat: true, steth: true, wave: true }), cpose: { mood: .9, brow: .6, speech: true } },
 ];
-function lifeScene(g, k, name, x, y) {   // silhouettes on the plates: the life around the patient
+const YOUNG = [
+  () => ({ skin: SKIN().light, hair: PAL.ink, top: PAL.fills[1], style: 'curly' }),
+  () => ({ skin: SKIN().deep, hair: PAL.ink, top: PAL.fills[3], style: 'short', glasses: true }),
+  () => ({ skin: SKIN().tan, hair: PAL.ink, top: PAL.fills[5], style: 'long' }),
+  () => ({ skin: SKIN().mid, hair: PAL.fills[1], top: PAL.fills[0], style: 'bun' }),
+  () => ({ skin: SKIN().light, hair: PAL.ink, top: PAL.fills[4], style: 'hood' }),
+];
+const DOCS = [PAIRS[0].clinician, PAIRS[1].clinician, PAIRS[2].clinician,
+  () => ({ skin: SKIN().light, hair: PAL.chalkDim, top: PAL.light, style: 'short', coat: true, steth: true, glasses: true }),
+  () => ({ skin: SKIN().mid, hair: PAL.ink, top: PAL.light, style: 'bun', coat: true, steth: true })];
+const CAST = () => [[PAIRS[0].patient, { mood: .7, brow: .3 }], [PAIRS[0].clinician, { mood: .7, brow: .5 }], [PAIRS[1].patient, { mood: .7, brow: .3 }], [PAIRS[1].clinician, { mood: .6, brow: .4 }], [PAIRS[2].patient, { mood: .7, brow: .2 }], [PAIRS[2].clinician, { mood: .9, brow: .6 }]];
+
+// ===================== CARDS =====================
+function cardTitle(c, tau, i) {
+  usePalette('risoPop'); const dx = CX - 420, dy = CY + 30, d = D('hook');
+  risoCard(c, (g, k) => {
+    if (k === 2) { glow(g, dx, dy - 40, 80, 640, .9); doorPath(g, dx, dy, 300, 540); g.fillStyle = '#fff'; g.fill(); }
+    if (k === 0) { doorPath(g, dx, dy, 300, 540); g.fillStyle = gray(.6); g.fill(); doorPath(g, dx, dy, 226, 466); g.fillStyle = '#fff'; g.fill(); }
+    if (k === 1) { doorPath(g, dx, dy, 226, 466); g.fillStyle = gray(.9); g.fill(); g.fillStyle = '#fff'; g.beginPath(); g.arc(dx + 66, dy + 30, 14, 0, TAU); g.fill(); }
+  }, { tau });
+  hand(c, 'ADHDme', CX - 140, CY - 20, { size: 230 });
+  hand(c, typed('The front door to', sm(d * .5, d * .66, tau)), CX - 130, CY + 80, { size: 66, ink2: null }); hand(c, typed('ADHD care in Australia.', sm(d * .62, d * .84, tau)), CX - 130, CY + 156, { size: 66, ink2: null });
+}
+function cardMaze(c, tau, i) {
+  usePalette('risoPop'); const { s, cols, rows } = MZ, ox = (W - cols * s) / 2, oy = (H - rows * s) / 2;
+  risoCard(c, (g, k) => {
+    if (k === 2) glow(g, CX, CY, 100, 900, .8);
+    if (k === 0) { g.fillStyle = gray(.6); const t = 12;
+      for (let y = 0; y < rows; y++) for (let x = 0; x < cols; x++) { const px = ox + x * s, py = oy + y * s; if (MAZE.right[y * cols + x]) g.fillRect(px + s - t / 2, py - t / 2, t, s + t); if (MAZE.below[y * cols + x]) g.fillRect(px - t / 2, py + s - t / 2, s + t, t); }
+      g.fillRect(ox - t / 2, oy - t / 2, cols * s + t, t); g.fillRect(ox - t / 2, oy - t / 2, t, rows * s + t);
+      g.fillStyle = '#fff'; g.beginPath(); g.roundRect(CX - 700, CY - 190, 1400, 360, 40); g.fill(); }
+    if (k === 1) { g.fillStyle = gray(.9); g.beginPath(); g.arc(ox + s / 2, oy + s / 2, 28, 0, TAU); g.fill(); doorPath(g, ox + (cols - .5) * s, oy + (rows - .5) * s + 8, 46, 74); g.fill(); }
+  }, { tau });
+  head(c, 'Getting ADHD care', { y: CY - 60, size: 130, p: sm(0, TYPE, tau) }); head(c, 'is a maze.', { y: CY + 90, size: 130, p: sm(TYPE, TYPE + .9, tau) });
+}
+function cardGiveUp(c, tau, i) {
+  usePalette('risoPop'); const a = typed('So people give up', sm(0, TYPE, tau)), b = typed('before the first booking.', sm(TYPE, TYPE + 1.3, tau));
+  risoCard(c, (g, k) => { if (k === 1) { g.fillStyle = gray(.85); g.beginPath(); g.ellipse(CX, CY + 20, 620, 330, -.08, 0, TAU); g.fill(); ko(g, a, CX, CY - 40, 130); ko(g, b, CX, CY + 110, 100); } if (k === 2) glow(g, CX + 500, CY - 260, 40, 500, .7); }, { tau });
+  hand(c, a, CX, CY - 40, { size: 130, align: 'center', ink2: null }); hand(c, b, CX, CY + 110, { size: 100, align: 'center', ink2: null });
+}
+function cardPain1(c, tau, i) {
+  usePalette('risoPop'); const sw = Math.sin(tau * 2.4) * .035;
+  risoCard(c, (g, k) => {
+    if (k === 2) glow(g, CX, CY, 100, 760, .6);
+    g.save(); g.translate(CX - 232, -10); g.rotate(sw); g.translate(-(CX - 232), 10);
+    if (k === 0) { g.fillStyle = gray(.7); g.fillRect(CX - 236, -10, 8, CY - 140); }
+    if (k === 1) { g.fillStyle = gray(.85); g.beginPath(); g.moveTo(CX - 300, CY - 150); g.lineTo(CX + 150, CY - 150); g.lineTo(CX + 300, CY); g.lineTo(CX + 150, CY + 150); g.lineTo(CX - 300, CY + 150); g.closePath(); g.fill(); g.fillStyle = '#fff'; g.beginPath(); g.arc(CX - 228, CY, 22, 0, TAU); g.fill(); ko(g, '$?', CX + 10, CY + 78, 220); }
+    g.restore();
+  }, { tau });
+  label(c, 'Cost is hidden', sm(.3, TYPE, tau));
+}
+function cardPain2(c, tau, i) {
+  usePalette('risoPop'); const d = D('pain2'), py = CY - 300 + 70 * sm(d * .15, d * .7, tau, easeOut);
+  risoCard(c, (g, k) => {
+    if (k === 2) { glow(g, CX, CY - 200, 60, 420, .8); g.fillStyle = '#fff'; g.beginPath(); g.arc(CX, py, 130, 0, TAU); g.fill(); }
+    if (k === 1) { g.fillStyle = gray(.85); g.fillRect(CX - 200, CY - 40, 400, 360); g.fillStyle = '#fff'; g.beginPath(); g.moveTo(CX, CY + 40); g.lineTo(CX + 130, CY + 250); g.lineTo(CX - 130, CY + 250); g.closePath(); g.fill(); }
+    if (k === 0) { g.fillStyle = gray(.9); g.beginPath(); g.arc(CX, py, 130, 0, TAU); g.fill(); }
+  }, { tau });
+  label(c, 'Wrong fit', sm(.3, TYPE, tau));
+}
+function cardPain3(c, tau, i) {
+  usePalette('risoPop'); const d = D('pain3'), shown = 1 + Math.min(2, Math.floor(tau / (d * .22)));
+  risoCard(c, (g, k) => {
+    for (let m = 0; m < shown; m++) { const x = CX - 560 + m * 400, y = CY - 250;
+      if (k === 0) { g.fillStyle = gray(.22); g.fillRect(x, y, 320, 420); squiggleText(g, x + 30, y + 70, 260, 6 - m, { color: '#000', seed: 70 + m, lineH: 44 + m * 16, amp: 6 + m * 6, width: 5 }); }
+      if (k === 1 && m === 1) { g.fillStyle = gray(.85); g.beginPath(); g.arc(x + 270, y + 50, 46, 0, TAU); g.fill(); }
+      if (k === 2 && m === 2) { g.fillStyle = gray(.85); g.fillRect(x, y, 320, 70); }
+    }
+  }, { tau });
+  label(c, 'No standard', sm(.3, TYPE, tau));
+}
+function cardPain4(c, tau, i) {
+  usePalette('risoPop'); const d = D('pain4'), level = lerp(.75, .12, sm(d * .15, d * .75, tau));
+  risoCard(c, (g, k) => {
+    if (k === 2) { glow(g, CX - 200, CY + 40, 80, 520, .6); bellPath(g, CX + 300, CY - 40, 1.7); g.fillStyle = '#fff'; g.fill(); }
+    if (k === 1) { g.fillStyle = gray(.85); g.beginPath(); g.roundRect(CX - 330, CY - 160, 260, 400, 30); g.fill(); g.fillRect(CX - 280, CY - 230, 160, 80); g.fillStyle = '#fff'; g.fillRect(CX - 305, CY - 135, 210, 300); g.fillStyle = gray(.85); g.fillRect(CX - 305, CY + 165 - 300 * level, 210, 300 * level); }
+    if (k === 0) { bellPath(g, CX + 300, CY - 40, 1.7); g.fillStyle = gray(.8); g.fill(); g.beginPath(); g.arc(CX + 300, CY + 95, 24, 0, TAU); g.fill(); }
+  }, { tau });
+  const q = sm(d * .55, d * .8, tau, easeOut); if (q > 0) { c.strokeStyle = PAL.ink; c.lineWidth = 16; c.lineCap = 'round'; selfDraw(c, [[CX + 170, CY - 190], [CX + 430, CY + 110]], q, 75, 3); selfDraw(c, [[CX + 430, CY - 190], [CX + 170, CY + 110]], q, 76, 3); }
+  label(c, 'Scripts lapse', sm(.3, TYPE, tau));
+}
+function cardWho(c, tau, i) {
+  usePalette('risoPop'); const m = MAP(), d = D('who'), t1 = d * .3, t2 = d * .5;
+  risoCard(c, (g, k) => {
+    if (k === 2) { glow(g, m.x + m.w * .55, m.y + m.h * .5, 100, 600, .8); g.fillStyle = '#fff'; g.fill(polyPath(AUS.map(geo))); g.fill(polyPath(TAS.map(geo))); }
+    if (k === 0) { g.fillStyle = gray(.6); g.fill(polyPath(AUS.map(geo))); g.fill(polyPath(TAS.map(geo))); }
+    if (k === 1) { CITIES.forEach((p, n) => { if (tau < t1 + n * .6) return; const [x, y] = geo(p); g.fillStyle = gray(.95); g.beginPath(); g.arc(x, y, 22, 0, TAU); g.fill(); }); if (tau >= t2) { g.fillStyle = gray(.18); g.beginPath(); g.roundRect(W * .04, CY + 150, W * .46, 300, 60); g.fill(); } }
+  }, { tau });
+  CITIES.forEach((p, n) => { const [x, y] = geo(p), q = sm(t1 + .1 + n * .6, t1 + .6 + n * .6, tau, easeOut); if (q > 0) dashedRing(c, x, y, 26 + 34 * q, PAL.ink, 80 + n, [8, 6], 2.2); });
+  YOUNG.forEach((look, n) => { const q = sm(t2 + n * .35, t2 + .4 + n * .35, tau, easeOut); if (q <= 0) return; c.save(); resetT(c); c.translate(W * .1 + n * W * .085, CY + 330); c.scale(.5 * (.8 + .2 * q), .5 * (.8 + .2 * q)); bust(c, 0, 0, 1, look(), { mood: .1, brow: 0, blink: blinkAt(i, n * 2) }, 300 + n * 10); c.restore(); });
+  hand(c, typed('16 to 25,', sm(0, TYPE * .7, tau)), W * .06, CY - 200, { size: 120 }); hand(c, typed('seeking a diagnosis.', sm(TYPE * .6, TYPE * 1.8, tau)), W * .06, CY - 80, { size: 84 });
+  if (tau >= t1) hand(c, 'Sydney · Melbourne · Brisbane', W * .06, CY + 20, { size: 50, ink2: null, ink: PAL.inks[0] });
+}
+function cardSolution(c, tau, i) {
+  usePalette('risoPop'); const d = D('solution'), px = W * .24, py = CY + 130, cx = W * .76, cys = [-2, -1, 0, 1, 2].map(m => CY + 60 + m * 150), pick = 2, tm = d * .5;
+  risoCard(c, (g, k) => {
+    if (k === 2 && tau >= tm + .8) glow(g, cx, cys[pick] - 20, 40, 260, .95);
+    if (k === 1) { g.fillStyle = gray(.2); g.beginPath(); g.arc(px, py - 80, 230, 0, TAU); g.fill(); }
+  }, { tau });
+  bust(c, px, py, .95, YOUNG[2](), { mood: .1, brow: -.1, blink: blinkAt(i) }, 320);
+  DOCS.forEach((look, m) => { const q = sm(.6 + m * .3, 1.0 + m * .3, tau, easeOut); if (q <= 0) return; bust(c, cx, cys[m] + 40, .36 * (.8 + .2 * q), look(), { mood: .5, brow: .3, blink: blinkAt(i, m * 3) }, 500 + m * 10); });
+  c.save(); c.strokeStyle = PAL.ink; c.lineWidth = 1.8; c.globalAlpha = .4; c.lineCap = 'round'; cys.forEach((y, m) => { const q = sm(2.2 + m * .3, 2.7 + m * .3, tau); if (q > 0) selfDraw(c, [[px + 120, py - 90], [cx - 80, y]], q, 90 + m, 2); }); c.restore();
+  const q = sm(tm, tm + .9, tau, easeOut); if (q > 0) { c.strokeStyle = PAL.accents[0]; c.lineWidth = 7; c.lineCap = 'round'; selfDraw(c, [[px + 120, py - 90], [(px + cx) / 2, py - 120], [cx - 80, cys[pick]]], q, 96, 3); if (q >= 1) dashedRing(c, cx, cys[pick] - 20, 90, PAL.accents[0], 97, [10, 7], 3); }
+  head(c, 'Matching, not triage.', { p: sm(0, TYPE, tau) });
+  sub(c, 'Not the next free slot. The right person, for you.', { p: sm(d * .66, d * .66 + TYPE2, tau) });
+}
+function lifeScene(g, k, name, x, y) {
   if (name === 'pram' && k === 1) { g.fillStyle = gray(.6); g.beginPath(); g.roundRect(x - 330, y + 10, 170, 80, 24); g.fill(); g.beginPath(); g.arc(x - 200, y + 10, 62, Math.PI, TAU); g.fill(); g.fillRect(x - 336, y - 64, 10, 84); for (const wx of [x - 300, x - 190]) { g.beginPath(); g.arc(wx, y + 108, 22, 0, TAU); g.fill(); g.fillStyle = '#fff'; g.beginPath(); g.arc(wx, y + 108, 7, 0, TAU); g.fill(); g.fillStyle = gray(.6); } }
-  if (name === 'pram' && k === 2) { g.fillStyle = gray(.95); g.beginPath(); g.arc(x - 300, y - 250, 46, 0, TAU); g.fill(); g.fillStyle = '#fff'; g.beginPath(); g.arc(x - 282, y - 262, 40, 0, TAU); g.fill(); }   // a night-feed moon
+  if (name === 'pram' && k === 2) { g.fillStyle = gray(.95); g.beginPath(); g.arc(x - 300, y - 250, 46, 0, TAU); g.fill(); g.fillStyle = '#fff'; g.beginPath(); g.arc(x - 282, y - 262, 40, 0, TAU); g.fill(); }
   if (name === 'home' && k === 1) { g.fillStyle = gray(.28); g.fillRect(x - 380, y - 90, 230, 180); g.beginPath(); g.moveTo(x - 400, y - 90); g.lineTo(x - 265, y - 200); g.lineTo(x - 130, y - 90); g.closePath(); g.fill(); g.fillStyle = '#fff'; g.fillRect(x - 330, y - 50, 60, 60); }
-  if (name === 'home' && k === 2) { g.fillStyle = gray(.95); g.fillRect(x - 330, y - 50, 60, 60); }   // a lit window
-  if (name === 'crowd' && k === 0) { g.fillStyle = gray(.3); [[-330, -40], [-250, -110], [-160, -150], [-70, -170], [30, -160]].forEach(([dx, dy], n) => { g.beginPath(); g.arc(x + dx, y + dy - 60, 34, 0, TAU); g.fill(); g.beginPath(); g.roundRect(x + dx - 60, y + dy - 10, 120, 90, 30); g.fill(); }); }
+  if (name === 'home' && k === 2) { g.fillStyle = gray(.95); g.fillRect(x - 330, y - 50, 60, 60); }
+  if (name === 'crowd' && k === 0) { g.fillStyle = gray(.3); [[-330, -40], [-250, -110], [-160, -150], [-70, -170], [30, -160]].forEach(([dx, dy]) => { g.beginPath(); g.arc(x + dx, y + dy - 60, 34, 0, TAU); g.fill(); g.beginPath(); g.roundRect(x + dx - 60, y + dy - 10, 120, 90, 30); g.fill(); }); }
 }
 function cardPair(n, c, tau, i) {
-  usePalette('risoPop'); const P = PAIRS[n], d = D(P.id), px = W * .27, py = CY + 96, qx = W * .73, qy = CY + 96, tm = d * .42, ts = d * .66, s = 1.05;
+  usePalette('risoPop'); const P = PAIRS[n], d = D(P.id), px = W * .27, py = CY + 96, qx = W * .73, qy = CY + 96, tm = d * .45, ts = d * .66, s = 1.05;
   risoCard(c, (g, k) => {
-    if (k === 2) { if (tau >= tm + .7) glow(g, qx, qy - 60, 80, 440, .9); lifeScene(g, k, P.scene, px, py); }
+    if (k === 2) { if (tau >= tm + .9) glow(g, qx, qy - 60, 80, 440, .9); lifeScene(g, k, P.scene, px, py); }
     if (k === 1) { g.fillStyle = gray(.2); g.beginPath(); g.arc(px, py - 60, 250, 0, TAU); g.fill(); lifeScene(g, k, P.scene, px, py); }
     if (k === 0) { g.fillStyle = gray(.16); g.beginPath(); g.arc(qx, qy - 60, 250, 0, TAU); g.fill(); lifeScene(g, k, P.scene, px, py); }
   }, { tau });
-  if (P.scene === 'home') {   // the family behind her, and the things that go unsaid
+  if (P.scene === 'home') {
     bust(c, px - 200, py + 60, .62, { skin: SKIN().tan, hair: PAL.ink, top: tint(PAL.fills[5], .4), style: 'short', faceless: true }, {}, 420);
     bust(c, px + 200, py + 60, .62, { skin: SKIN().tan, hair: PAL.ink, top: tint(PAL.fills[4], .5), style: 'long', faceless: true }, {}, 430);
-    const q = sm(d * .18, d * .3, tau, easeOut); if (q > 0) { bubble(c, px + 250, py - 250, 70, 46, 440, cc => { cc.fillStyle = PAL.ink; for (let k = -1; k <= 1; k++) { cc.beginPath(); cc.arc(k * 22, 4, 6, 0, TAU); cc.fill(); } }, q); if (q >= 1) tail(c, [px + 214, py - 150], [px + 236, py - 210], 441); }
+    const q = sm(d * .2, d * .32, tau, easeOut); if (q > 0) { bubble(c, px + 250, py - 250, 70, 46, 440, cc => { cc.fillStyle = PAL.ink; for (let k = -1; k <= 1; k++) { cc.beginPath(); cc.arc(k * 22, 4, 6, 0, TAU); cc.fill(); } }, q); if (q >= 1) tail(c, [px + 214, py - 150], [px + 236, py - 210], 441); }
   }
   bust(c, px, py, s, P.patient(), { ...P.pose, blink: blinkAt(i) }, 400 + n * 10);
   bust(c, qx, qy, s, P.clinician(), { ...P.cpose, blink: blinkAt(i, 5) }, 500 + n * 10);
-  if (P.pose.thought) { const q = sm(d * .15, d * .3, tau, easeOut), bx = px - 250, by = py - 300; bubbleTrail(c, [px - 70, py - 190], [bx + 110, by + 70], 450, q);
-    bubble(c, bx, by, 130, 80, 451, cc => { const cap = roundRectPath(-92, -18, 88, 36, 18); cc.save(); cc.clip(cap); cc.fillStyle = PAL.fills[1]; cc.fillRect(-92, -18, 44, 36); cc.fillStyle = PAL.fills[0]; cc.fillRect(-48, -18, 44, 36); cc.restore(); cc.strokeStyle = PAL.ink; cc.lineWidth = 2; wob(cc, [[-92, -18], [-4, -18], [-4, 18], [-92, 18]], 1, 452, true); wob(cc, [[-48, -18], [-48, 18]], .6, 453); hand(cc, '?', 60, 34, { size: 96, ink: PAL.blush, ink2: PAL.accents[2], align: 'center' }); }, q); }
-  if (P.cpose.speech) { const q = sm(tm + .9, tm + 1.3, tau, easeOut), bx = qx + 250, by = qy - 300;
-    bubble(c, bx, by, 120, 74, 460, cc => { cc.strokeStyle = PAL.accents[0]; cc.lineWidth = 3; cc.fillStyle = PAL.accents[0]; cc.fill(polyPath(heartPts(-40, 6, 1.5))); cc.strokeStyle = PAL.inks[0]; cc.lineWidth = 6; cc.lineCap = 'round'; wob(cc, [[14, 4], [34, 24], [70, -18]], 1.2, 461); }, q); if (q >= 1) tail(c, [qx + 120, qy - 160], [bx - 50, by + 60], 462); }
+  if (P.pose.thought) { const q = sm(d * .18, d * .32, tau, easeOut), bx = px - 250, by = py - 300; bubbleTrail(c, [px - 70, py - 190], [bx + 110, by + 70], 450, q);
+    bubble(c, bx, by, 130, 80, 451, cc => { const cap = roundRectPath(-92, -18, 88, 36, 18); cc.save(); cc.clip(cap); cc.fillStyle = PAL.fills[1]; cc.fillRect(-92, -18, 44, 36); cc.fillStyle = PAL.fills[0]; cc.fillRect(-48, -18, 44, 36); cc.restore(); cc.strokeStyle = PAL.ink; cc.lineWidth = 2; wob(cc, roundRectPts(-92, -18, 88, 36, 18), 1, 452, true); wob(cc, [[-48, -18], [-48, 18]], .6, 453); hand(cc, '?', 60, 34, { size: 96, ink: PAL.blush, ink2: PAL.accents[2], align: 'center' }); }, q); }
+  if (P.cpose.speech) { const q = sm(tm + 1.0, tm + 1.5, tau, easeOut), bx = qx + 250, by = qy - 300;
+    bubble(c, bx, by, 120, 74, 460, cc => { cc.fillStyle = PAL.accents[0]; cc.fill(polyPath(heartPts(-40, 6, 1.5))); cc.strokeStyle = PAL.inks[0]; cc.lineWidth = 6; cc.lineCap = 'round'; wob(cc, [[14, 4], [34, 24], [70, -18]], 1.2, 461); }, q); if (q >= 1) tail(c, [qx + 120, qy - 160], [bx - 50, by + 60], 462); }
   const pw = 560, ph = 74;
   c.fillStyle = PAL.fills[0]; pill(c, px, py + 212, pw, ph); surface(c, roundRectPath(px - pw / 2, py + 212 - ph / 2, pw, ph, ph / 2), [px - pw / 2, py + 175, pw, ph], { finish: 'riso', seed: 470 + n, density: .22, cell: 6, color: PAL.inks[1] }); hand(c, P.pl, px, py + 228, { size: 42, align: 'center', ink2: null });
   c.fillStyle = PAL.fills[1]; pill(c, qx, qy + 212, pw, ph); surface(c, roundRectPath(qx - pw / 2, qy + 212 - ph / 2, pw, ph, ph / 2), [qx - pw / 2, qy + 175, pw, ph], { finish: 'riso', seed: 480 + n, density: .22, cell: 6, color: PAL.inks[0] }); mixed(c, P.cl, qx, qy + 228, 42, { ink2: null });
-  const q = sm(tm, tm + .8, tau, easeOut); if (q > 0) { c.strokeStyle = PAL.accents[0]; c.lineWidth = 8; c.lineCap = 'round'; selfDraw(c, [[px + 200, py - 60], [CX, py - 90], [qx - 200, qy - 60]], q, 490 + n, 3); }
+  const q = sm(tm, tm + 1.0, tau, easeOut); if (q > 0) { c.strokeStyle = PAL.accents[0]; c.lineWidth = 8; c.lineCap = 'round'; selfDraw(c, [[px + 200, py - 60], [CX, py - 90], [qx - 200, qy - 60]], q, 490 + n, 3); }
   if (q >= 1) { seedDot(c, px + 200, py - 60, 10, PAL.accents[0], null); seedDot(c, qx - 200, qy - 60, 10, PAL.accents[0], null); dashedRing(c, qx, qy - 60, 262, PAL.accents[0], 495 + n, [12, 8], 3); }
-  head(c, P.head, { size: 90, p: sm(0, .8, tau) });
-  sub(c, P.sub, { p: sm(ts, ts + 1.0, tau), size: 48 });
+  head(c, P.head, { size: 90, p: sm(0, TYPE, tau) });
+  sub(c, P.sub, { p: sm(ts, ts + TYPE2, tau), size: 48 });
 }
-function cardPairs(c, tau, i) {   // the three matches as small portraits, cross-matched
-  usePalette('risoPop'); const d = D('pairs'), rows = [CY - 170, CY + 10, CY + 190], to = [2, 0, 1], t0 = n => .3 + n * d * .14;
+function cardPairs(c, tau, i) {
+  usePalette('risoPop'); const d = D('pairs'), rows = [CY - 170, CY + 10, CY + 190], to = [2, 0, 1], t0 = n => .4 + n * d * .16;
   risoCard(c, (g, k) => { rows.forEach((y, n) => { if (tau < t0(n)) return; if (k === 1) { g.fillStyle = gray(.28); pill(g, W * .3, y, 470, 80); } if (k === 0) { g.fillStyle = gray(.28); pill(g, W * .7, rows[to[n]], 470, 80); } }); }, { tau });
   PAIRS.forEach((P, n) => { if (tau < t0(n)) return; const y = rows[n], yc = rows[to[n]];
     bust(c, W * .12, y + 60, .42, P.patient(), { ...P.pose, blink: blinkAt(i, n) }, 600 + n * 10); hand(c, P.pl, W * .3 + 50, y + 14, { size: 36, align: 'center', ink2: null });
     bust(c, W * .88, yc + 60, .42, P.clinician(), { ...P.cpose, blink: blinkAt(i, n + 5) }, 650 + n * 10); mixed(c, P.cl, W * .7 - 50, yc + 14, 36, { ink2: null });
-    const q = sm(t0(n) + .4, t0(n) + .9, tau, easeOut); if (q > 0) { c.strokeStyle = PAL.accents[0]; c.lineWidth = 6; c.lineCap = 'round'; selfDraw(c, [[W * .3 + 250, y], [CX, (y + yc) / 2], [W * .7 - 250, yc]], q, 680 + n, 3); }
+    const q = sm(t0(n) + .5, t0(n) + 1.1, tau, easeOut); if (q > 0) { c.strokeStyle = PAL.accents[0]; c.lineWidth = 6; c.lineCap = 'round'; selfDraw(c, [[W * .3 + 250, y], [CX, (y + yc) / 2], [W * .7 - 250, yc]], q, 680 + n, 3); }
     if (q >= 1) { seedDot(c, W * .3 + 246, y, 8, PAL.accents[0], null); seedDot(c, W * .7 - 246, yc, 8, PAL.accents[0], null); } });
-  head(c, 'Matched on life, not just availability.', { size: 84, p: sm(0, .8, tau) });
-  sub(c, 'Postpartum. Cultural background. Stigma. The things a directory never asks.', { p: sm(d * .5, d * .72, tau), size: 46 });
+  head(c, 'Matched on life, not just availability.', { size: 84, p: sm(0, TYPE, tau) });
+  sub(c, 'Postpartum. Cultural background. Stigma. The things a directory never asks.', { p: sm(d * .55, d * .55 + TYPE2, tau), size: 46 });
 }
-function cardHow1(c, tau, i) {   // published cost bands, one band at a time
-  usePalette('risoPop'); const d = D('how1');
-  risoCard(c, (g, k) => { [[2, 900, .9], [1, 640, .85], [0, 400, .8]].forEach(([plate, w, v], m) => { if (k !== plate || tau < d * .15 + m * .35) return; const y = CY - 200 + m * 150; g.fillStyle = gray(v); g.beginPath(); g.roundRect(CX - 450, y, w, 112, 20); g.fill(); ko(g, ['$', '$$', '$$$'][m], CX - 420, y + 88, 84, 'left'); }); }, { tau });
-  head(c, 'Published cost bands.', { p: sm(0, .6, tau) }); sub(c, 'Free for patients. No platform fee on top.', { p: sm(d * .5, d * .68, tau) });
+// how the match is made
+const ASK = [['baby', 'stage of life'], ['speech', 'background and language'], ['fear', 'what you fear'], ['plain', 'how you like to be spoken to'], ['tag', 'cost'], ['phone', 'telehealth'], ['clock', 'when']];
+const KNOW = [['mic', 'interviewed first'], ['baby', 'what they have seen'], ['match', 'who they do best with'], ['plain', 'how they speak'], ['checklist', 'how they run a consult'], ['steth', 'scope'], ['calendar', 'availability']];
+// seven icons in a grid of three columns beside a portrait, popping in one by one as the narrator names them
+function gridOf(c, items, cols, rows, tau, t0, step, seed) {
+  items.forEach(([name, text], n) => { const q = sm(t0 + n * step, t0 + n * step + .6, tau, easeOut); if (q <= 0) return; const row = Math.floor(n / 3), col = n % 3, x = row === 2 ? cols[1] : cols[col], y = rows[row];
+    badgeIcon(c, name, x, y, text, q, seed + n * 10, { size: 27, r: 64, s: .72 }); });
 }
-function cardHow2(c, tau, i) {   // standard diagnosis templates
-  usePalette('risoPop'); const d = D('how2'), x = CX - 300, y = CY - 250;
-  risoCard(c, (g, k) => {
-    if (k === 0) { g.fillStyle = gray(.22); g.fillRect(x, y, 600, 520); for (let m = 0; m < 3; m++) { g.fillStyle = '#fff'; g.fillRect(x + 50, y + 130 + m * 130, 70, 70); squiggleText(g, x + 160, y + 180 + m * 130, 380, 1, { color: '#000', seed: 100 + m, lineH: 30, amp: 7, width: 5 }); } }
-    if (k === 2) { g.fillStyle = gray(.85); g.fillRect(x, y, 600, 84); }
-  }, { tau });
-  for (let m = 0; m < 3; m++) { const q = sm(d * .2 + m * .4, d * .2 + .3 + m * .4, tau, easeOut); if (q <= 0) continue; const bx = x + 50, by = y + 130 + m * 130; c.strokeStyle = PAL.accents[0]; c.lineWidth = 7; c.lineCap = 'round'; selfDraw(c, [[bx + 12, by + 38], [bx + 30, by + 60], [bx + 66, by + 10]], q, 110 + m, 2); }
-  head(c, 'Standard diagnosis templates.', { p: sm(0, .6, tau) }); sub(c, 'The same assessment from every clinician.', { p: sm(d * .5, d * .68, tau) });
+function cardAlgo1(c, tau, i) {
+  usePalette('risoPop'); const d = D('algo1'), px = W * .22, py = CY + 150;
+  risoCard(c, (g, k) => { if (k === 1) { g.fillStyle = gray(.18); g.beginPath(); g.arc(px, py - 90, 230, 0, TAU); g.fill(); } if (k === 2) glow(g, W * .66, CY + 30, 60, 640, .5); }, { tau });
+  bust(c, px, py, 1.0, YOUNG[0](), { mood: .2, brow: 0, blink: blinkAt(i) }, 340);
+  gridOf(c, ASK, [W * .49, W * .67, W * .85], [CY - 200, CY + 10, CY + 220], tau, d * .2, (d * .7) / ASK.length, 720);
+  head(c, 'We ask about your life.', { p: sm(0, TYPE, tau) });
+  sub(c, 'Not your postcode.', { p: sm(TYPE + .2, TYPE + 1.2, tau) });
 }
-function cardHow3(c, tau, i) {   // script-expiry alerts: the bell rings on twos
-  usePalette('risoPop'); const d = D('how3'), bx = CX, by = CY - 30, ringing = tau >= d * .3 && tau < d * .3 + .8, rot = ringing ? (flicker(i) ? .07 : -.07) : 0;
-  risoCard(c, (g, k) => {
-    if (k === 2) glow(g, bx, by, 60, 520, .9);
-    if (k === 1) { g.save(); g.translate(bx, by - 120); g.rotate(rot); g.translate(-bx, -(by - 120)); bellPath(g, bx, by, 1.8); g.fillStyle = gray(.85); g.fill(); g.beginPath(); g.arc(bx, by + 118, 26, 0, TAU); g.fill(); g.restore(); }
-    if (k === 0) { g.fillStyle = gray(.8); g.beginPath(); g.roundRect(CX - 130, CY + 230, 260, 84, 42); g.fill(); g.fillStyle = '#fff'; g.beginPath(); g.roundRect(CX - 130, CY + 230, 130, 84, 42); g.fill(); g.fillStyle = gray(.8); g.fillRect(CX - 60, CY + 230, 60, 84); }
-  }, { tau });
-  const q = sm(d * .15, d * .35, tau, easeOut); if (q > 0) { dashedRing(c, bx, by, 210 * q, PAL.accents[0], 120, [12, 8], 3); dashedRing(c, bx, by, 265 * q, alpha(PAL.accents[0], .5), 121, [12, 10], 2.4); }
-  if (ringing || pulse(i, 8, 3)) aster(c, bx, by - 150, 6, 10, PAL.accents[2], 122 + (i % 6), 1, PAL.accents[2], PAL.ink);
-  head(c, 'Script-expiry alerts.', { p: sm(0, .6, tau) }); sub(c, 'No lapse at handover between prescribers.', { p: sm(d * .5, d * .68, tau) });
+function cardAlgo2(c, tau, i) {
+  usePalette('risoPop'); const d = D('algo2'), px = W * .78, py = CY + 150;
+  risoCard(c, (g, k) => { if (k === 0) { g.fillStyle = gray(.16); g.beginPath(); g.arc(px, py - 90, 230, 0, TAU); g.fill(); } if (k === 2) glow(g, W * .34, CY + 30, 60, 640, .5); }, { tau });
+  bust(c, px, py, 1.0, DOCS[3](), { mood: .5, brow: .4, blink: blinkAt(i) }, 350);
+  gridOf(c, KNOW, [W * .15, W * .33, W * .51], [CY - 200, CY + 10, CY + 220], tau, d * .2, (d * .7) / KNOW.length, 760);
+  head(c, 'We know every clinician the same way.', { size: 92, p: sm(0, TYPE, tau) });
+  sub(c, 'Interviewed first. Notes and outcomes later, with consent.', { p: sm(TYPE + .2, TYPE + 1.6, tau) });
+}
+function cardAlgo3(c, tau, i) {
+  usePalette('risoPop'); const d = D('algo3'), lx = W * .27, rx = W * .73, top = CY - 230, tL = d * .12, tR = d * .5, tE = d * .82;
+  risoCard(c, (g, k) => { if (k === 0) { g.fillStyle = gray(.14); g.beginPath(); g.roundRect(lx - 380, top - 70, 760, 560, 50); g.fill(); } if (k === 1) { g.fillStyle = gray(.14); g.beginPath(); g.roundRect(rx - 380, top - 70, 760, 560, 50); g.fill(); } }, { tau });
+  c.fillStyle = PAL.fills[1]; pill(c, lx, top - 20, 300, 60); hand(c, 'rules', lx, top - 5, { size: 42, align: 'center', ink: PAL.light, ink2: null });
+  c.fillStyle = PAL.fills[0]; pill(c, rx, top - 20, 420, 60); hand(c, 'language model', rx, top - 5, { size: 42, align: 'center', ink: PAL.light, ink2: null });
+  const factors = [['baby', .9], ['speech', .75], ['fear', .85], ['plain', .6], ['tag', .5]];
+  factors.forEach(([name, w], n) => { const q = sm(tL + n * .45, tL + n * .45 + .6, tau, easeOut); if (q <= 0) return; const y = top + 60 + n * 74;
+    icon(c, name, lx - 300, y, .38, { seed: 800 + n * 10 }); c.fillStyle = tint(PAL.fills[1], .55); c.fillRect(lx - 230, y - 15, 480 * w * q, 30); c.strokeStyle = PAL.ink; c.lineWidth = 2; wob(c, [[lx - 230, y - 15], [lx - 230 + 480 * w * q, y - 15], [lx - 230 + 480 * w * q, y + 15], [lx - 230, y + 15]], 1.2, 810 + n, true); });
+  const qS = sm(tL + 2.8, tL + 3.3, tau, easeOut); if (qS > 0) { c.save(); resetT(c); c.translate(lx, top + 430); c.scale(qS, qS); dashedRing(c, 0, 0, 44, PAL.inks[0], 820, [8, 6], 2.4); hand(c, 'score', 0, 10, { size: 30, align: 'center', ink2: null }); c.restore(); }
+  const qN = sm(tR, tR + .6, tau, easeOut), qB = sm(tR + 1.0, tR + 1.6, tau, easeOut), qM = sm(tR + 2.0, tR + 2.6, tau, easeOut);
+  if (qN > 0) { badgeIcon(c, 'notes', rx - 220, top + 130, 'what you wrote', qN, 830, { r: 64, s: .72, size: 28 }); }
+  arrow(c, [[rx - 136, top + 130], [rx - 30, top + 130]], sm(tR + .7, tR + 1.0, tau), 831, PAL.inks[0]);
+  if (qB > 0) badgeIcon(c, 'brain', rx + 60, top + 130, 'reads the nuance', qB, 840, { r: 64, s: .72, size: 28 });
+  if (qM > 0) { bubble(c, rx + 100, top + 360, 240, 62, 850, cc => { squiggleText(cc, -190, -8, 380, 2, { seed: 851, lineH: 24, amp: 6, width: 2, color: PAL.ink }); }, qM); if (qM >= 1) tail(c, [rx + 70, top + 210], [rx + 50, top + 305], 852); }
+  const qE = sm(tE, tE + .8, tau, easeOut); if (qE > 0) { [lx, rx].forEach((x, n) => { c.save(); resetT(c); c.translate(x, top + 540); c.scale(qE, qE); c.fillStyle = PAL.fills[2]; pill(c, 0, 0, 420, 56); hand(c, 'the same match', 0, 13, { size: 38, align: 'center', ink2: null }); c.restore(); }); hand(c, 'vs', CX, top + 250, { size: 90, ink: PAL.blush, ink2: PAL.accents[2], align: 'center' }); }
+  head(c, 'Two models, side by side.', { p: sm(0, TYPE, tau) });
+  sub(c, 'Transparent rules, and a language model that reads nuance. We test which earns its place.', { p: sm(d * .7, d * .7 + TYPE2, tau), size: 44 });
+}
+const SIGNALS = [['plain', 'communication'], ['match', 'collaboration'], ['checklist', 'structure'], ['steth', 'scope'], ['tag', 'price and availability']];
+function cardAlgo4(c, tau, i) {
+  usePalette('risoPop'); const d = D('algo4'), cx = CX - 120, cy = CY - 40, R = 250, tS = d * .18, step = d * .1, tN = d * .78;
+  risoCard(c, (g, k) => { if (k === 2) glow(g, cx, cy, 60, 460, .6); if (k === 0 && tau >= tN) glow(g, W * .86, CY + 40, 40, 260, .5); }, { tau });
+  dottedArc(c, cx, cy, R - 60, PAL.chalkDim, 900, 12, 1.6);
+  bust(c, cx - 62, cy + 50, .42, YOUNG[3](), { mood: .4, brow: .2, blink: blinkAt(i) }, 360); bust(c, cx + 62, cy + 50, .42, DOCS[4](), { mood: .6, brow: .4, blink: blinkAt(i, 4) }, 370);
+  SIGNALS.forEach(([name, text], n) => { const a = -Math.PI * .3 + n / 5 * TAU, x = cx + Math.cos(a) * R, y = cy + Math.sin(a) * R, q = sm(tS + n * step, tS + n * step + .5, tau, easeOut); if (q <= 0) return; badgeIcon(c, name, x, y, text, q, 910 + n * 10, { size: 27, r: 62, s: .7 }); arrow(c, [[x + Math.cos(a + Math.PI / 2) * 52, y + Math.sin(a + Math.PI / 2) * 52], [cx + Math.cos(a + .6) * (R - 24), cy + Math.sin(a + .6) * (R - 24)]], sm(tS + n * step + .4, tS + n * step + .9, tau), 920 + n, PAL.accents[0], 3); });
+  const qN = sm(tN, tN + .8, tau, easeOut); if (qN > 0) { arrow(c, [[cx + R + 40, cy], [W * .86 - 120, CY + 40]], qN, 930, PAL.inks[0], 5); c.save(); resetT(c); c.translate(W * .86, CY + 40); c.scale(qN, qN); bust(c, -50, 60, .42, YOUNG[3](), { mood: .8, brow: .4 }, 380); bust(c, 50, 60, .42, DOCS[4](), { mood: .8, brow: .5 }, 390); hand(c, 'next match', 0, 150, { size: 34, align: 'center', ink2: null }); c.restore(); }
+  const qX = sm(d * .12, d * .12 + .5, tau, easeOut); if (qX > 0) { badgeIcon(c, 'starx', W * .1, CY - 60, 'not a star score', qX, 940, { size: 28 }); }
+  head(c, 'Every consult makes the next match better.', { size: 88, p: sm(0, TYPE, tau) });
+  sub(c, 'Five fit signals, after every consultation. A fit profile, not a star score.', { p: sm(d * .7, d * .7 + TYPE2, tau), size: 44 });
+}
+function cardValue(c, tau, i) {
+  usePalette('risoPop'); const d = D('value'), xs = [W * .2, W * .5, W * .8], ts = [d * .08, d * .38, d * .62];
+  risoCard(c, (g, k) => xs.forEach((x, n) => { if (tau < ts[n]) return; g.fillStyle = gray(.16); if (k === [1, 2, 0][n]) { g.beginPath(); g.arc(x, CY + 40, 250, 0, TAU); g.fill(); } }), { tau });
+  const q0 = sm(ts[0], ts[0] + .7, tau, easeOut); if (q0 > 0) { badgeIcon(c, 'match', xs[0], CY - 150, null, q0, 950); c.save(); resetT(c); c.translate(xs[0], CY + 90); c.scale(q0, q0); bust(c, -70, 60, .48, YOUNG[1](), { mood: .7, brow: .3, blink: blinkAt(i) }, 960); bust(c, 70, 60, .48, DOCS[1](), { mood: .7, brow: .4, blink: blinkAt(i, 3) }, 970); c.restore(); hand(c, 'they fit, before you meet', xs[0], CY + 320, { size: 38, align: 'center', ink2: null, al: q0 }); }
+  const q1 = sm(ts[1], ts[1] + .7, tau, easeOut); if (q1 > 0) { badgeIcon(c, 'clock', xs[1] - 90, CY - 130, null, q1, 980); badgeIcon(c, 'coin', xs[1] + 90, CY - 130, null, q1, 990); c.save(); resetT(c); c.translate(xs[1], CY + 90); c.scale(q1, q1); bust(c, 0, 60, .48, YOUNG[4](), { mood: .6, brow: .2, blink: blinkAt(i, 2) }, 1000); c.restore(); hand(c, 'faster and cheaper', xs[1], CY + 320, { size: 38, align: 'center', ink2: null, al: q1 }); hand(c, 'than the psychiatrist-only route', xs[1], CY + 362, { size: 30, align: 'center', ink2: null, al: q1 }); }
+  const q2 = sm(ts[2], ts[2] + .7, tau, easeOut); if (q2 > 0) { badgeIcon(c, 'calendar', xs[2], CY - 150, null, q2, 1010, { text: '6 · 12 · 24' }); c.save(); resetT(c); c.translate(xs[2], CY + 90); c.scale(q2, q2); [-120, 0, 120].forEach((dx, n) => bust(c, dx, 60, .42, DOCS[0](), { mood: .7, brow: .5, blink: blinkAt(i, n * 4) }, 1020 + n)); c.restore(); hand(c, 'the same clinician stays', xs[2], CY + 320, { size: 38, align: 'center', ink2: null, al: q2 }); }
+  head(c, 'What that changes.', { p: sm(0, TYPE, tau) });
+}
+function cardHow(c, tau, i) {
+  usePalette('risoPop'); const d = D('how'), items = [['tag', 'cost bands, published', 2], ['checklist', 'standard templates', 0], ['bell', 'script alerts', 1]], xs = [W * .22, W * .5, W * .78], ts = [d * .1, d * .35, d * .58];
+  risoCard(c, (g, k) => items.forEach(([, , plate], n) => { if (k !== plate || tau < ts[n]) return; g.fillStyle = gray(.3); g.beginPath(); g.arc(xs[n], CY + 20, 200, 0, TAU); g.fill(); }), { tau });
+  items.forEach(([name, text], n) => badgeIcon(c, name, xs[n], CY - 10, text, sm(ts[n], ts[n] + .7, tau, easeOut), 1100 + n * 10, { r: 96, s: 1.1, size: 40 }));
+  const q = sm(d * .8, d * .8 + .6, tau, easeOut); if (q > 0) { c.save(); resetT(c); c.translate(CX, CY + 330); c.scale(q, q); c.fillStyle = PAL.fills[0]; pill(c, 0, 0, 520, 76); hand(c, 'free for patients', 0, 16, { size: 48, align: 'center', ink2: null }); c.restore(); }
+  head(c, 'Published. Standard. Safe.', { p: sm(0, TYPE, tau) });
 }
 function cardWhyNow(c, tau, i) {
   usePalette('risoPop'); const d = D('whynow'); night(c, PAL.night, 61);
   for (let k = 0; k < 3; k++) grain(c, rectPath(0, 0, W, H), [0, 0, W, H], 220, PAL.accents[k], .7, 62 + k, 2.4);
-  const y = CY + 90; c.strokeStyle = PAL.chalkDim; c.lineWidth = 2.5; selfDraw(c, [[W * .18, y], [W * .82, y]], sm(d * .2, d * .32, tau), 65, 2);
-  [[W * .3, 'QLD', 'live since Dec 2025', d * .38], [W * .55, 'NSW', '2026', d * .6], [W * .74, 'VIC', '2026', d * .72]].forEach(([x, big, small, t0], n) => {
-    const q = sm(t0, t0 + .4, tau, easeOut); if (tau >= t0 - .3) dashedRing(c, x, y, 62, PAL.chalkDim, 66 + n, [8, 6], 1.6); if (q <= 0) return;
+  const y = CY + 90; c.strokeStyle = PAL.chalkDim; c.lineWidth = 2.5; selfDraw(c, [[W * .18, y], [W * .82, y]], sm(d * .25, d * .38, tau), 65, 2);
+  [[W * .3, 'QLD', 'live since Dec 2025', d * .42], [W * .55, 'NSW', '2026', d * .64], [W * .74, 'VIC', '2026', d * .76]].forEach(([x, big, small, t0], n) => {
+    const q = sm(t0, t0 + .5, tau, easeOut); if (tau >= t0 - .3) dashedRing(c, x, y, 62, PAL.chalkDim, 66 + n, [8, 6], 1.6); if (q <= 0) return;
     aster(c, x, y, 14, 16, PAL.accents[2], 70 + n, q, PAL.night, PAL.chalk);
     hand(c, big, x, y - 100, { size: 72, align: 'center', ink: PAL.chalk, ink2: PAL.accents[0], al: q }); hand(c, small, x, y + 150, { size: 40, align: 'center', ink: PAL.chalkDim, ink2: null, al: q });
   });
-  head(c, 'Why now?', { y: H * .2, size: 120, ink: PAL.accents[2], ink2: PAL.accents[0], p: sm(0, .5, tau) }); sub(c, 'GPs can now diagnose ADHD. The pathway is opening state by state.', { y: H * .33, size: 54, ink: PAL.chalk, p: sm(.6, 1.8, tau) });
+  head(c, 'Why now?', { y: H * .2, size: 120, ink: PAL.accents[2], ink2: PAL.accents[0], p: sm(0, TYPE * .7, tau) }); sub(c, 'GPs can now diagnose ADHD. The pathway is opening state by state.', { y: H * .33, size: 54, ink: PAL.chalk, p: sm(TYPE, TYPE + 2.0, tau) });
 }
 function cardMarket(c, tau, i) {
-  usePalette('risoPop'); const d = D('market'), r = rng(140), count = sm(d * .45, d * .8, tau, easeOut);
+  usePalette('risoPop'); const d = D('market'), r = rng(140), count = sm(d * .45, d * .82, tau, easeOut);
   const pts = []; for (let row = 0; row < 8; row++) for (let col = 0; col < 18; col++) pts.push([CX + 90 + col * 46 + (r() - .5) * 10, CY - 260 + row * 62 + (r() - .5) * 10]);
   risoCard(c, (g, k) => {
     if (k === 2) glow(g, W * .27, CY, 80, 620, .7);
     if (k === 0) pts.forEach(([x, y]) => { g.fillStyle = gray(.7); g.beginPath(); g.arc(x, y, 10, 0, TAU); g.fill(); });
     if (k === 1) pts.forEach(([x, y], n) => { if (n % 4 || n / pts.length > count) return; g.fillStyle = gray(.95); g.beginPath(); g.arc(x, y, 13, 0, TAU); g.fill(); });
   }, { tau });
-  const pop = sm(.4, .9, tau, easeOut), n = Math.round(250 * count);
-  if (tau >= .4) { c.save(); resetT(c); c.translate(W * .27, CY - 110); c.scale(.6 + .4 * pop, .6 + .4 * pop); hand(c, '>1M', 0, 0, { size: 230, align: 'center' }); c.restore(); }
-  if (tau >= 1.0) hand(c, 'Australians with ADHD', W * .27, CY - 30, { size: 50, align: 'center', ink2: null });
+  const pop = sm(.5, 1.1, tau, easeOut), n = Math.round(250 * count);
+  if (tau >= .5) { c.save(); resetT(c); c.translate(W * .27, CY - 110); c.scale(.6 + .4 * pop, .6 + .4 * pop); hand(c, '>1M', 0, 0, { size: 230, align: 'center' }); c.restore(); }
+  if (tau >= 1.2) hand(c, 'Australians with ADHD', W * .27, CY - 30, { size: 50, align: 'center', ink2: null });
   if (tau >= d * .45) hand(c, `${n}K`, W * .27, CY + 200, { size: 230, align: 'center', ink: PAL.inks[0] });
-  if (tau >= d * .8) hand(c, 'actively seeking care', W * .27, CY + 280, { size: 50, align: 'center', ink2: null });
+  if (tau >= d * .82) hand(c, 'seeking care right now', W * .27, CY + 280, { size: 50, align: 'center', ink2: null });
 }
 function cardModel(c, tau, i) {
   usePalette(DUO); const d = D('model'), px = W * .2, cx = W * .8, y = CY + 40;
-  risoCard(c, (g, k) => {
-    g.fillStyle = gray(.9); g.beginPath(); g.arc(k ? cx : px, y, 84, 0, TAU); g.fill();
-    doorPath(g, CX, y, 220, 380); g.fillStyle = gray(.7); g.fill(); doorPath(g, CX, y, 150, 300); g.fillStyle = '#fff'; g.fill();
-  }, { inks: PAL.inks, tau });
-  const q1 = sm(d * .2, d * .32, tau, easeOut), q2 = sm(d * .4, d * .52, tau, easeOut);
-  c.strokeStyle = PAL.ink; c.lineWidth = 6; c.lineCap = 'round'; if (q1 > 0) selfDraw(c, [[px + 110, y], [CX - 140, y]], q1, 130, 2.5); if (q2 > 0) selfDraw(c, [[CX + 140, y], [cx - 110, y]], q2, 131, 2.5);
-  if (q1 >= 1) hand(c, 'free', px, y - 120, { size: 64, align: 'center', ink2: null });
-  if (q2 >= 1) { c.save(); c.translate(cx, y - 130); c.scale(1.2, 1.2); tagPath(c, 0, 0, 1); c.fillStyle = PAL.blush; c.fill(); c.strokeStyle = PAL.ink; c.lineWidth = 2; wob(c, [[-48, -30], [14, -30], [50, 0], [14, 30], [-48, 30]], 1.5, 132, true); c.restore(); hand(c, '$', cx + 4, y - 108, { size: 60, align: 'center', ink: PAL.paper, ink2: null }); }
-  head(c, 'Free for patients.', { size: 110, p: sm(0, .6, tau) }); sub(c, 'Clinicians subscribe for matched patient flow.', { size: 54, p: sm(d * .55, d * .72, tau) });
+  risoCard(c, (g, k) => { doorPath(g, CX, y, 220, 380); g.fillStyle = gray(.7); g.fill(); doorPath(g, CX, y, 150, 300); g.fillStyle = '#fff'; g.fill(); g.fillStyle = gray(.2); g.beginPath(); g.arc(k ? cx : px, y - 40, 190, 0, TAU); g.fill(); }, { inks: PAL.inks, tau });
+  usePalette('risoPop'); bust(c, px, y + 90, .8, YOUNG[1](), { mood: .5, brow: .2, blink: blinkAt(i) }, 1200); bust(c, cx, y + 90, .8, DOCS[0](), { mood: .6, brow: .4, blink: blinkAt(i, 5) }, 1210); usePalette(DUO);   // the people keep their colours on the two-ink card
+  const q1 = sm(d * .2, d * .34, tau, easeOut), q2 = sm(d * .42, d * .56, tau, easeOut);
+  arrow(c, [[px + 130, y - 60], [CX - 140, y - 60]], q1, 1220, PAL.ink, 6); arrow(c, [[CX + 140, y - 60], [cx - 130, y - 60]], q2, 1221, PAL.ink, 6);
+  if (q1 >= 1) hand(c, 'free', px, y - 220, { size: 64, align: 'center', ink2: null });
+  if (q2 >= 1) { c.save(); c.translate(cx, y - 240); c.scale(1.2, 1.2); tagPath(c, 0, 0, 1); c.fillStyle = PAL.blush; c.fill(); c.strokeStyle = PAL.ink; c.lineWidth = 2; wob(c, [[-48, -30], [14, -30], [50, 0], [14, 30], [-48, 30]], 1.5, 132, true); c.restore(); hand(c, '$', cx + 4, y - 218, { size: 60, align: 'center', ink: PAL.paper, ink2: null }); }
+  head(c, 'Free for patients.', { size: 110, p: sm(0, TYPE, tau) }); sub(c, 'Clinicians subscribe for matched patient flow.', { size: 54, p: sm(d * .6, d * .6 + TYPE2, tau) });
 }
 function cardTraction(c, tau, i) {
   usePalette('risoPop'); const d = D('traction'), items = [[W * .25, 2, 'Live', 'adhdme.au', -.08], [W * .5, 1, '2 GPs', 'in Sydney', .05], [W * .75, 0, '2 models', 'of matching in test', -.04]];
   const t0 = n => d * .15 + n * d * .2;
-  risoCard(c, (g, k) => items.forEach(([x, plate], n) => { if (k !== plate || tau < t0(n)) return; g.fillStyle = gray(.35); g.beginPath(); g.arc(x, CY + 40, 190, 0, TAU); g.fill(); }), { tau });
-  items.forEach(([x, , big, small, rot], n) => { const q = sm(t0(n), t0(n) + .4, tau, easeOut); if (q <= 0) return;
-    c.save(); resetT(c); c.translate(x, CY + 40); c.rotate(rot); c.scale(.7 + .3 * q, .7 + .3 * q);
-    dashedRing(c, 0, 0, 196, PAL.ink, 150 + n, [12, 8], 3); hand(c, big, 0, 10, { size: 100, align: 'center' }); hand(c, small, 0, 70, { size: 40, align: 'center', ink2: null }); c.restore(); });
-  head(c, 'Live today.', { p: sm(0, .6, tau) });
+  risoCard(c, (g, k) => items.forEach(([x, plate], n) => { if (k !== plate || tau < t0(n)) return; g.fillStyle = gray(.35); g.beginPath(); g.arc(x, CY + 10, 180, 0, TAU); g.fill(); }), { tau });
+  items.forEach(([x, , big, small, rot], n) => { const q = sm(t0(n), t0(n) + .5, tau, easeOut); if (q <= 0) return;
+    c.save(); resetT(c); c.translate(x, CY + 10); c.rotate(rot); c.scale(.7 + .3 * q, .7 + .3 * q);
+    dashedRing(c, 0, 0, 186, PAL.ink, 150 + n, [12, 8], 3); hand(c, big, 0, 10, { size: 100, align: 'center' }); hand(c, small, 0, 70, { size: 40, align: 'center', ink2: null }); c.restore(); });
+  const q = sm(t0(1) + .6, t0(1) + 1.1, tau, easeOut); if (q > 0) { c.save(); resetT(c); c.translate(W * .5, CY + 300); c.scale(q, q); bust(c, -80, 40, .34, DOCS[0](), { mood: .7, brow: .5, blink: blinkAt(i) }, 1300); bust(c, 80, 40, .34, DOCS[1](), { mood: .6, brow: .4, blink: blinkAt(i, 4) }, 1310); c.restore(); }
+  head(c, 'Live today.', { p: sm(0, TYPE, tau) });
 }
-const CARDS = [cardTitle, cardPain1, cardPain2, cardPain3, cardPain4, cardWho, cardSolution, (c, t, i) => cardPair(0, c, t, i), (c, t, i) => cardPair(1, c, t, i), (c, t, i) => cardPair(2, c, t, i), cardPairs, cardHow1, cardHow2, cardHow3, cardWhyNow, cardMarket, cardModel, cardTraction];
-const FINAL = CARDS.map(fn => (c) => fn(c, 99, 0));   // finished cards for the badge gallery
+const CARDS = [cardTitle, cardPain1, cardPain2, cardPain3, cardPain4, cardWho, cardSolution, (c, t, i) => cardPair(0, c, t, i), (c, t, i) => cardPair(1, c, t, i), (c, t, i) => cardPair(2, c, t, i), cardPairs, cardAlgo1, cardAlgo2, cardAlgo3, cardAlgo4, cardValue, cardHow, cardWhyNow, cardMarket, cardModel, cardTraction];
+const FINAL = CARDS.map(fn => (c) => fn(c, 99, 0));
 
 // ===================== SCENES =====================
 const L1 = layer();
 function sceneHook(c, tau, i) {
   usePalette('risoPop'); paper(c); const [ax, ay] = ANCHOR(), d = D('hook');
   for (let b = 0; b * 8 / 12 <= tau; b++) { const r = (tau + 1 / 12 - b * 8 / 12) * 240; if (r > 8 && r < 1700) crayon(c, ellPts(ax, ay, r, r, 0, Math.max(48, r / 5 | 0)), b % 2 ? PAL.accents[0] : PAL.accents[1], 4, 40 + b, true); }
-  const p = sm(d * .3, d * .55, tau, easeOut), R = 30 + p * 1400;
+  const p = sm(d * .28, d * .5, tau, easeOut), R = 30 + p * 1400;
   if (p > 0) { iris(c, CX, CY, R, cc => cardTitle(cc, tau, i)); c.strokeStyle = PAL.ink; c.lineWidth = 3; wob(c, ellPts(CX, CY, R, R, 0, 140), 2, 41, true); }
   mark(c);
 }
 const PROBLEM = ['maze', 'pain1', 'pain2', 'pain3', 'pain4', 'giveup'], PROBLEM_FN = { maze: cardMaze, pain1: cardPain1, pain2: cardPain2, pain3: cardPain3, pain4: cardPain4, giveup: cardGiveUp };
 function sceneProblem(c, tau, i) { const [id, t] = beatAt(PROBLEM, tau); PROBLEM_FN[id](c, t, i); mark(c); }
-function sceneWho(c, tau, i) { cardWho(c, tau, i); mark(c); }
-function sceneSolution(c, tau, i) { cardSolution(c, tau, i); mark(c); }
 const MATCH = ['pair1', 'pair2', 'pair3', 'pairs'];
 function sceneMatching(c, tau, i) { const [id, t] = beatAt(MATCH, tau); if (id === 'pairs') cardPairs(c, t, i); else cardPair(MATCH.indexOf(id), c, t, i); mark(c); }
-const HOW = ['how1', 'how2', 'how3'], HOW_FN = { how1: cardHow1, how2: cardHow2, how3: cardHow3 };
-function sceneHow(c, tau, i) { const [id, t] = beatAt(HOW, tau); HOW_FN[id](c, t, i); mark(c); }
-function sceneWhyNow(c, tau, i) { cardWhyNow(c, tau, i); mark(c, true); }
-function sceneMarket(c, tau, i) { cardMarket(c, tau, i); mark(c); }
-function sceneModel(c, tau, i) { cardModel(c, tau, i); mark(c); }
-function sceneTraction(c, tau, i) { cardTraction(c, tau, i); mark(c); }
+const ALGO = ['algo1', 'algo2', 'algo3', 'algo4'], ALGO_FN = { algo1: cardAlgo1, algo2: cardAlgo2, algo3: cardAlgo3, algo4: cardAlgo4 };
+function sceneAlgo(c, tau, i) { const [id, t] = beatAt(ALGO, tau); ALGO_FN[id](c, t, i); mark(c); }
+const one = fn => (c, tau, i) => { fn(c, tau, i); mark(c); };
 function sceneGallery(c, tau, i) {
   const d = D('gallery'), g = L1.getContext('2d'); usePalette('risoPop'); paper(g); dotScreen(g, rectPath(0, 0, W, H), [0, 0, W, H], { cell: 9, color: PAL.inks[2], density: .16, angle: .26, jitter: .3, seed: 50 });
-  badges(g, FINAL, { cx: CX, cy: CY, r0: 60, gap: 150, size: 62, progress: sm(0, .8, tau, easeOut), seed: 51 });
-  usePalette('risoPop'); paper(c); const [ax, ay] = ANCHOR(), s = 1 - sm(d - .8, d, tau, easeIn) * .985;
+  badges(g, FINAL, { cx: CX, cy: CY, r0: 60, gap: 150, size: 60, progress: sm(0, 1.0, tau, easeOut), seed: 51 });
+  usePalette('risoPop'); paper(c); const [ax, ay] = ANCHOR(), s = 1 - sm(d - .9, d, tau, easeIn) * .985;
   c.save(); resetT(c); c.translate(ax, ay); c.scale(s, s); c.translate(-ax, -ay); c.drawImage(L1, 0, 0, W, H); c.restore();
   mark(c);
 }
 function sceneClose(c, tau, i) {
-  usePalette('risoPop'); paper(c); const [ax, ay] = ANCHOR();
-  ripples(c, ax, ay, [520, 700, 900], alpha(PAL.accents[1], .3), 160, 3.5);
-  head(c, 'The right ADHD doctor', { y: CY - 90, size: 130, p: sm(.2, 1.4, tau) }); head(c, 'should not be hard to find.', { y: CY + 60, size: 130, p: sm(1.2, 2.8, tau) });
+  usePalette('risoPop'); paper(c); const [ax, ay] = ANCHOR(), d = D('close');
+  ripples(c, ax, ay, [560, 760, 980], alpha(PAL.accents[1], .25), 160, 3.5);
+  head(c, 'The right ADHD doctor', { y: CY - 230, size: 116, p: sm(.2, .2 + TYPE, tau) }); head(c, 'should not be hard to find.', { y: CY - 100, size: 116, p: sm(1.2, 1.2 + TYPE, tau) });
+  head(c, 'Now, they are not.', { y: CY + 50, size: 96, ink: PAL.accents[0], ink2: PAL.accents[1], p: sm(d * .5, d * .5 + 1.0, tau) });
+  CAST().forEach(([look, pose], n) => { const q = sm(d * .3 + n * .3, d * .3 + n * .3 + .5, tau, easeOut); if (q <= 0) return; c.save(); resetT(c); c.translate(W * (.15 + n * .14), H * .84); c.scale(.46 * (.8 + .2 * q), .46 * (.8 + .2 * q)); bust(c, 0, 0, 1, look(), { ...pose, blink: blinkAt(i, n * 2) }, 1400 + n * 10); c.restore(); });
   mark(c);
 }
 function sceneSignoff(c, tau, i) {
   usePalette('risoPop'); paper(c); const [ax, ay] = ANCHOR();
   ripples(c, ax, ay, [420, 560, 720], alpha(PAL.accents[0], .3), 170, 3.5);
-  signOff(c, 'ADHDme', 'adhdme.au', { x: CX, y: CY - 30, size: 150, ink2: PAL.accents[0], progressA: sm(0, .8, tau), progressB: sm(.8, 1.6, tau) });
+  signOff(c, 'ADHDme', 'adhdme.au', { x: CX, y: CY - 30, size: 150, ink2: PAL.accents[0], progressA: sm(0, 1.0, tau), progressB: sm(1.0, 2.0, tau) });
   mark(c);
 }
 
 // ===================== FILM =====================
 const SCENES = [
-  ['hook', ['hook'], sceneHook], ['problem', PROBLEM, sceneProblem], ['who', ['who'], sceneWho], ['solution', ['solution'], sceneSolution],
-  ['matching', MATCH, sceneMatching], ['how', HOW, sceneHow], ['whynow', ['whynow'], sceneWhyNow], ['market', ['market'], sceneMarket],
-  ['model', ['model'], sceneModel], ['traction', ['traction'], sceneTraction], ['gallery', ['gallery'], sceneGallery], ['close', ['close'], sceneClose], ['signoff', ['signoff'], sceneSignoff],
+  ['hook', ['hook'], sceneHook], ['problem', PROBLEM, sceneProblem], ['who', ['who'], one(cardWho)], ['solution', ['solution'], one(cardSolution)],
+  ['matching', MATCH, sceneMatching], ['algo', ALGO, sceneAlgo], ['value', ['value'], one(cardValue)], ['how', ['how'], one(cardHow)],
+  ['whynow', ['whynow'], (c, tau, i) => { cardWhyNow(c, tau, i); mark(c, true); }], ['market', ['market'], one(cardMarket)],
+  ['model', ['model'], one(cardModel)], ['traction', ['traction'], one(cardTraction)], ['gallery', ['gallery'], sceneGallery], ['close', ['close'], sceneClose], ['signoff', ['signoff'], sceneSignoff],
 ];
 const TIMELINE = SCENES.map(([name, ids, fn]) => ({ name, dur: ids.reduce((a, id) => a + D(id), 0), fn }));
 const T = { end: TIMELINE.reduce((a, s) => a + s.dur, 0) };
 
 // ===================== SCORE: THE MUSIC =====================
-// Written from the same timeline: pads on a chord loop, a bass, a plucked arpeggio from the solution on, soft drums
-// through the middle, accents on the cuts. build-pitch.sh ducks it under the narration.
+// Written from the same timeline. Bars re-anchor on every narrative beat, so downbeats land on the cuts.
+// Sections carry a key, a chord loop and a texture; the value beat lifts the key a whole tone.
 function score(ac, t0, dest) {
   const master = ac.createGain(); master.gain.value = .5; master.connect(dest);
-  const irN = Math.ceil(ac.sampleRate * 2.4), ir = ac.createBuffer(2, irN, ac.sampleRate), rr = rng(99);
+  const irN = Math.ceil(ac.sampleRate * 2.6), ir = ac.createBuffer(2, irN, ac.sampleRate), rr = rng(99);
   for (let ch = 0; ch < 2; ch++) { const dd = ir.getChannelData(ch); for (let k = 0; k < irN; k++) dd[k] = (rr() * 2 - 1) * Math.pow(1 - k / irN, 3); }
-  const conv = ac.createConvolver(); conv.buffer = ir; const wet = ac.createGain(); wet.gain.value = .32; conv.connect(wet); wet.connect(master);
+  const conv = ac.createConvolver(); conv.buffer = ir; const wet = ac.createGain(); wet.gain.value = .34; conv.connect(wet); wet.connect(master);
   const send = g => { const gn = ac.createGain(); gn.gain.value = g; gn.connect(master); gn.connect(conv); return gn; };
-  const lp = ac.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 1000; lp.Q.value = .6; lp.connect(send(1));
-  const arpBus = send(.9), bassBus = ac.createGain(); bassBus.connect(master); const drumBus = ac.createGain(); drumBus.gain.value = .8; drumBus.connect(master);
-  const beat = 60 / 72, bar = beat * 4, hz = m => 440 * Math.pow(2, (m - 69) / 12);
-  const CH = { C: [60, 64, 67], G: [55, 59, 62], Am: [57, 60, 64], F: [53, 57, 60], Dm: [50, 53, 57], Em: [52, 55, 59] };
+  const lp = ac.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 800; lp.Q.value = .6; lp.connect(send(1));
+  const arpBus = send(.9), leadBus = send(1), bassBus = ac.createGain(); bassBus.connect(master); const drumBus = ac.createGain(); drumBus.gain.value = .8; drumBus.connect(master);
+  const beat = 60 / 66, bar = beat * 4, hz = m => 440 * Math.pow(2, (m - 69) / 12);
+  const DEG = { I: [0, 4, 7], V: [-5, -1, 2], vi: [-3, 0, 4], IV: [-7, -3, 0], ii: [2, 5, 9] };
   const pad = (notes, t, d, g) => notes.forEach(m => [-7, 7].forEach(det => { const o = ac.createOscillator(), e = ac.createGain(); o.type = 'sawtooth'; o.frequency.value = hz(m); o.detune.value = det;
-    e.gain.setValueAtTime(0, t0 + t); e.gain.linearRampToValueAtTime(g, t0 + t + 1.0); e.gain.setValueAtTime(g, t0 + t + d - .5); e.gain.linearRampToValueAtTime(0, t0 + t + d + .4); o.connect(e); e.connect(lp); o.start(t0 + t); o.stop(t0 + t + d + .5); }));
+    e.gain.setValueAtTime(0, t0 + t); e.gain.linearRampToValueAtTime(g, t0 + t + Math.min(1.2, d * .4)); e.gain.setValueAtTime(g, t0 + t + Math.max(0, d - .5)); e.gain.linearRampToValueAtTime(0, t0 + t + d + .5); o.connect(e); e.connect(lp); o.start(t0 + t); o.stop(t0 + t + d + .6); }));
   const pluck = (m, t, d, g, type = 'triangle', bus = arpBus) => { const o = ac.createOscillator(), e = ac.createGain(); o.type = type; o.frequency.value = hz(m); e.gain.setValueAtTime(0, t0 + t); e.gain.linearRampToValueAtTime(g, t0 + t + .015); e.gain.exponentialRampToValueAtTime(.0008, t0 + t + d); o.connect(e); e.connect(bus); o.start(t0 + t); o.stop(t0 + t + d + .05); };
+  const lead = (m, t, d, g) => [0, 6].forEach(det => { const o = ac.createOscillator(), e = ac.createGain(); o.type = 'sine'; o.frequency.value = hz(m); o.detune.value = det; e.gain.setValueAtTime(0, t0 + t); e.gain.linearRampToValueAtTime(g, t0 + t + .08); e.gain.setValueAtTime(g, t0 + t + d * .6); e.gain.exponentialRampToValueAtTime(.0008, t0 + t + d); o.connect(e); e.connect(leadBus); o.start(t0 + t); o.stop(t0 + t + d + .05); });
   const bass = (m, t, d, g) => pluck(m - 24, t, d, g, 'sine', bassBus);
   const kick = (t, g) => { const o = ac.createOscillator(), e = ac.createGain(); o.type = 'sine'; o.frequency.setValueAtTime(120, t0 + t); o.frequency.exponentialRampToValueAtTime(44, t0 + t + .12); e.gain.setValueAtTime(g, t0 + t); e.gain.exponentialRampToValueAtTime(.0008, t0 + t + .3); o.connect(e); e.connect(drumBus); o.start(t0 + t); o.stop(t0 + t + .32); };
   const hat = (t, g) => noiseBurst(ac, drumBus, t0, t, .045, g, 3);
-  const prog = t => t < B.who.start ? ['Am', 'F', 'C', 'G'] : t < B.close.start ? ['C', 'G', 'Am', 'F'] : ['F', 'G', 'C', 'C'];
-  const level = t => t < B.who.start ? .04 : t < B.pair1.start ? .05 : t < B.gallery.start ? .06 : t < B.signoff.start ? .05 : .045;
-  for (let t = 0, n = 0; t < T.end; t += bar, n++) {
-    const p = prog(t), ch = CH[p[n % 4]], root = ch[0], g = level(t);
-    pad(ch, t, bar, g);
-    bass(root, t, beat * 1.7, .2); bass(root, t + beat * 2, beat * 1.7, .14); if (n % 2) bass(root + 7, t + beat * 3.5, beat * .5, .1);
-    if (t >= B.solution.start - .2 && t < B.close.start) [ch[0], ch[2], ch[1] + 12, ch[0] + 12, ch[2], ch[1] + 12, ch[0] + 12, ch[2] + 12].forEach((m, k) => pluck(m, t + k * beat / 2, .4, t < B.pair1.start ? .035 : .05));
-    if (t >= B.how1.start - .2 && t < B.traction.start) { kick(t, .55); kick(t + beat * 2, .4); kick(t + beat * 2.5, .25); for (let k = 0; k < 4; k++) hat(t + k * beat + beat / 2, .05); }
-  }
+  const SECT = id => {
+    if (id === 'hook') return { key: 60, loop: ['I', 'IV', 'I', 'IV'], lvl: .045, arp: 0, drums: 0, lp: 800 };
+    if (['maze', 'pain1', 'pain2', 'pain3', 'pain4', 'giveup'].includes(id)) return { key: 60, loop: ['vi', 'IV', 'I', 'V'], lvl: .04, arp: 0, drums: 0, lp: 700, minor: true };
+    if (['who', 'solution'].includes(id)) return { key: 60, loop: ['I', 'V', 'vi', 'IV'], lvl: .05, arp: id === 'solution' ? .035 : 0, drums: 0, lp: 1000 };
+    if (id.startsWith('pair')) return { key: 60, loop: ['I', 'V', 'vi', 'IV'], lvl: .055, arp: .04, drums: .45, lp: 1100, lead: true };
+    if (id.startsWith('algo')) return { key: 60, loop: ['vi', 'IV', 'I', 'V'], lvl: .055, arp: .05, drums: .8, lp: 1300 };
+    if (id === 'value') return { key: 62, loop: ['I', 'V', 'vi', 'IV'], lvl: .062, arp: .05, drums: .8, lp: 1500, lead: true };
+    if (['how', 'whynow', 'market', 'model', 'traction'].includes(id)) return { key: 62, loop: ['I', 'V', 'vi', 'IV'], lvl: .06, arp: .05, drums: 1, lp: 1400 };
+    if (id === 'gallery') return { key: 62, loop: ['IV', 'I', 'IV', 'I'], lvl: .05, arp: .04, drums: 0, lp: 1000 };
+    if (id === 'close') return { key: 62, loop: ['IV', 'V', 'I', 'I'], lvl: .05, arp: 0, drums: 0, lp: 900, lead: true };
+    return { key: 62, loop: ['I', 'I', 'I', 'I'], lvl: .05, arp: 0, drums: 0, lp: 800 };
+  };
+  ORDER.forEach(id => { const b = B[id], S = SECT(id); lp.frequency.linearRampToValueAtTime(S.lp, t0 + b.start + .5);
+    for (let t = b.start, n = 0; t < b.start + b.dur - .05; t += bar, n++) {
+      const dur = Math.min(bar, b.start + b.dur - t), ch = DEG[S.loop[n % 4]].map(x => x + S.key), root = ch[0];
+      pad(ch, t, dur, S.lvl);
+      bass(root, t, beat * 1.7, .2); if (dur > beat * 2.2) bass(root, t + beat * 2, beat * 1.7, .14);
+      if (S.arp) [ch[0], ch[2], ch[1] + 12, ch[0] + 12, ch[2], ch[1] + 12, ch[0] + 12, ch[2] + 12].forEach((m, k) => { if (k * beat / 2 < dur - .1) pluck(m, t + k * beat / 2, .4, S.arp); });
+      if (S.drums) { kick(t, .55 * S.drums); if (dur > beat * 2.2) { kick(t + beat * 2, .4 * S.drums); kick(t + beat * 2.5, .22 * S.drums); } for (let k = 0; k < 4; k++) if (k * beat + beat / 2 < dur) hat(t + k * beat + beat / 2, .05 * S.drums); }
+    }
+    if (S.lead) { const m0 = S.key + 12; [[4, 0], [7, 1], [9, 2], [7, 3], [4, 4.5]].forEach(([dg, q]) => lead(m0 + dg, b.start + 1.0 + q * beat, beat * .9, .07)); }
+  });
   // accents on the cuts and reveals
-  pluck(84, B.hook.start + D('hook') * .55, 1.2, .16, 'sine'); pluck(88, B.hook.start + D('hook') * .55 + .25, 1.2, .12, 'sine');
+  pluck(84, B.hook.start + D('hook') * .5, 1.2, .16, 'sine'); pluck(88, B.hook.start + D('hook') * .5 + .3, 1.2, .12, 'sine');
   ['pain1', 'pain2', 'pain3', 'pain4'].forEach((id, k) => pluck(69 + [0, 2, 4, 7][k], B[id].start, .35, .08, 'square'));
-  pluck(45, B.giveup.start, 1.6, .18, 'sine');
-  pluck(84, B.solution.start + D('solution') * .45 + .8, 1.0, .16, 'sine');
-  ['pair1', 'pair2', 'pair3'].forEach(id => { const t = B[id].start + D(id) * .42 + .8; pluck(84, t, .9, .16, 'sine'); pluck(91, t + .18, 1.2, .12, 'sine'); });
-  pluck(96, B.market.start + .5, 1.4, .14, 'sine'); pluck(88, B.market.start + D('market') * .45, 1.2, .12, 'sine');
-  [0, 1, 2].forEach(k => pluck(72 + [0, 4, 7][k], B.traction.start + D('traction') * (.15 + k * .2), 1.0, .16, 'triangle'));
-  pluck(60, B.close.start, 3.0, .12, 'sine'); pluck(67, B.close.start + .5, 2.6, .1, 'sine'); pluck(72, B.signoff.start, 3.0, .14, 'sine'); pluck(76, B.signoff.start + .4, 2.6, .1, 'sine');
+  pluck(45, B.giveup.start, 1.8, .18, 'sine');
+  pluck(84, B.solution.start + D('solution') * .5 + .9, 1.0, .16, 'sine');
+  ['pair1', 'pair2', 'pair3'].forEach(id => { const t = B[id].start + D(id) * .45 + 1.0; pluck(84, t, .9, .16, 'sine'); pluck(91, t + .2, 1.2, .12, 'sine'); });
+  ['algo1', 'algo2'].forEach(id => { const S = 7, d = D(id); for (let n = 0; n < S; n++) pluck(72 + [0, 2, 4, 7, 9, 12, 14][n], B[id].start + d * .2 + n * (d * .72) / S, .3, .07, 'square'); });
+  for (let n = 0; n < 5; n++) pluck(72 + [0, 4, 7, 11, 12][n], B.algo4.start + D('algo4') * (.18 + n * .1), .4, .08, 'square');
+  for (let n = 0; n < 8; n++) pluck(62 + n * 2, B.whynow.start + D('whynow') - 1.6 + n * .2, .3, .05 + n * .01, 'square');   // a riser into the market
+  pluck(98, B.market.start + .5, 1.6, .14, 'sine'); kick(B.market.start + .5, .8); pluck(93, B.market.start + D('market') * .45, 1.2, .12, 'sine');
+  [0, 1, 2].forEach(k => pluck(74 + [0, 4, 7][k], B.traction.start + D('traction') * (.15 + k * .2), 1.0, .16, 'triangle'));
+  pluck(62, B.close.start, 3.0, .12, 'sine'); pluck(69, B.close.start + .6, 2.6, .1, 'sine'); pluck(74, B.signoff.start, 3.4, .14, 'sine'); pluck(78, B.signoff.start + .4, 3.0, .1, 'sine'); pluck(50, B.signoff.start, 3.6, .16, 'sine');
 }
 
 Promise.all(['40px "Bradley Hand"', '40px "Noto Devanagari"', '40px "Noto Urdu"'].map(f => document.fonts.load(f).catch(() => {}))).then(() =>

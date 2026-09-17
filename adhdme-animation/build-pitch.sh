@@ -13,5 +13,5 @@ node score.mjs adhdme-pitch.html --out out/score-pitch.wav          # the music,
 # music ducked under the narration, then both mixed
 ffmpeg -v error -y -i out/adhdme-pitch.mp4 -i out/score-pitch.wav -i out/voice.wav \
   -filter_complex "[2:a]asplit=2[v1][v2];[1:a][v1]sidechaincompress=threshold=0.02:ratio=6:attack=40:release=600:makeup=1[m];[m]volume=0.9[m2];[m2][v2]amix=inputs=2:duration=first:normalize=0[a]" \
-  -map 0:v -map "[a]" -c:v copy -c:a aac -b:a 192k -shortest out/adhdme-pitch-final.mp4
+  -map 0:v -map "[a]" -c:v libx264 -crf 23 -preset slow -pix_fmt yuv420p -movflags +faststart -c:a aac -b:a 192k -shortest out/adhdme-pitch-final.mp4   # crf 23 keeps the halftone under ~25 MB
 echo "out/adhdme-pitch-final.mp4"
