@@ -9,7 +9,7 @@ to 24 fps ("on twos"), and a soundtrack generated from the same timeline.
 | film | file | look | what it is |
 |---|---|---|---|
 | Explainer | `adhdme.html` | ink on warm paper, with blueprint interludes | 28.75 s. Sam, a patient, tries to find a GP; the deck's problem, solution, assessment, fit loop and patient value |
-| Pitch | `adhdme-pitch.html` | riso print: cream stock, fluorescent inks, halftone plates, drawn people and icons | 2 min 47 s, no narrator: the lettering carries the script over an arpeggio-led music bed that lands its bars on the cuts. A YC-style pitch: hook, problem, who, solution, three matches on life experience shown as faces, how the match is made (four beats), what that changes, how it works, why now, market, model, traction, close. Content from the Value Proposition Canvas plus the deck's numbers |
+| Pitch | `adhdme-pitch.html` | riso print: cream stock, fluorescent inks, halftone plates, drawn people and icons | 2 min 47 s, no voice: the lettering carries the script over an arpeggio-and-synth score that lands its bars on the cuts. A YC-style pitch: hook, problem, who, solution, three matches on life experience shown as faces, how the match is made (four beats), what that changes, how it works, why now, market, model, traction, close. Content from the Value Proposition Canvas plus the deck's numbers |
 
 Outputs with sound: `out/adhdme-final.mp4` and `out/adhdme-pitch-final.mp4`, 1920x1080, 24 fps.
 Contact sheets (two tiles per second) sit next to them.
@@ -19,8 +19,7 @@ Contact sheets (two tiles per second) sit next to them.
 | `core.js` | the skill's shared core (palettes, finishes, marks, reveals, player). Not edited. |
 | `render.mjs` | headless Chrome renderer: grid sheet, spot frames, mp4 and contact sheet |
 | `score.mjs` | renders a film's Web Audio score to WAV headlessly, so no browser click is needed |
-| `build-pitch.sh` | the whole pitch build: frames, music, mux (`--narrated` adds a voice) |
-| `voice.py`, `adhdme-pitch-narration.json` | the optional narrated cut: a script with one line per beat, synthesised with piper into a voice track and a speech-timed beat sheet (`adhdme-pitch-voice.js`, generated, not committed) that the film uses when present |
+| `build-pitch.sh` | the whole pitch build: frames, music, mux (`--score` re-mixes the last render when only the music changed) |
 | `fonts/Caveat[wght].ttf` | the explainer's hand-lettering face (SIL Open Font License, `fonts/OFL.txt`) |
 | `fonts/CaveatBrush-Regular.ttf` | the pitch's bold marker face (SIL Open Font License) |
 | `fonts/NotoSansDevanagari…`, `fonts/NotoNastaliqUrdu…` | the Hindi and Urdu on the clinician's label (SIL Open Font License) |
@@ -51,14 +50,6 @@ node score.mjs adhdme-pitch.html --out out/score-pitch.wav    # the music, from 
 ffmpeg -i out/adhdme-pitch.mp4 -i out/score-pitch.wav -map 0:v -map 1:a -af loudnorm=I=-16:TP=-1.5:LRA=11 ...   # see build-pitch.sh
 ```
 
-A narrated cut is still one flag away: `./build-pitch.sh --narrated` synthesises
-`adhdme-pitch-narration.json` with piper, re-times every beat to max(its visual minimum, lead +
-speech + pad), and ducks the music under the voice. It needs Python 3 with numpy and
-`pip install piper-tts`, plus a piper voice in `voices/` (the script names `en-us-ryan-high`
-from [piper's v0.0.2 release](https://github.com/rhasspy/piper/releases/tag/v0.0.2); any piper
-voice works, set `model` in the narration file; with network access to Microsoft's endpoint,
-`"engine": "edge"` uses `edge-tts` and an Australian neural voice instead).
-
 The explainer builds the same way: `node render.mjs adhdme.html --ar 16:9 --width 1920`,
 `node score.mjs adhdme.html`, then `ffmpeg -i out/adhdme.mp4 -i out/score.wav -c:v copy -c:a aac -shortest out/adhdme-final.mp4`.
 Both films are designed for 16:9. Scenes place everything relative to the frame centre, so
@@ -67,8 +58,8 @@ shrinking before a square or vertical cut is usable. Pass `--width 3840` for a 4
 
 ## The pitch, scene by scene
 
-Times are from `BEAT_SHEET`; there is no narration, so the last column is what is lettered on
-the card.
+Times are from `BEAT_SHEET`; there is no voice, so the last column is what is lettered on the
+card.
 
 | t | beat | what it shows | on the card |
 |---|---|---|---|
@@ -97,12 +88,13 @@ the card.
 | 2:42 | signoff | The logo draws itself over the closing ripples; adhdme.au beneath. | adhdme.au |
 
 The music is written in `score()` from the same timeline and re-anchors its bars on every
-beat, so downbeats land on the cuts. A plucked arpeggio carries the whole film over soft pads
-and a sine bass: quarter notes in the hook, a minor loop through the problem, eighths from the
-segment on, a second arpeggio an octave up on the off-beats through the matches and the
-engine, a key change up a whole tone for the value, a riser into the market, and the arpeggio
-thinning back to quarter notes for the close. No drums, no lead line. `build-pitch.sh`
-normalises it to about -16 LUFS.
+beat, so downbeats land on the cuts. It is arpeggio and synths: a triangle pluck with a
+dotted-eighth echo carries the whole film over a pad of three detuned saws through a lowpass
+that slowly breathes, and a square synth bass rounded by its own filter. Quarter notes in the
+hook, a minor loop through the problem, eighths from the segment on, a second arpeggio an
+octave up on the off-beats through the matches and the engine, a key change up a whole tone
+for the value, a riser into the market, and the arpeggio thinning back to quarter notes for
+the close. No drums, no lead line, no voice. `build-pitch.sh` normalises it to about -16 LUFS.
 
 ## The explainer, scene by scene
 
@@ -125,22 +117,17 @@ normalises it to about -16 LUFS.
 
 A critical appraisal of the current cut, most valuable first.
 
-- **A voice, if one is wanted.** The cut is music only; the lettering is the script. If a
-  narrated version is wanted later, `--narrated` builds one from the same beats, but the
-  synthetic US voice it uses was only the best one reachable from the build machine. An
-  Australian voice matters for an Australian company: `"engine": "edge"` in the narration
-  file gives Microsoft's en-AU neural voices where that endpoint is reachable, and a human
-  voice actor reading the script would be better still (voice.py's timing step works
-  unchanged from recorded clips).
 - **Length.** 2 min 47 s against a 2 min 30 s target, with every card holding long enough to
   read its lines twice. `BEAT_SHEET` is the length control: taking half a second off each of
   the four pain cards and the summary of the pairs, and a second off each engine card, lands
   it at 2 min 40 s; dropping the "why now" beat gets it under 2 min 35 s.
-- **The music.** The bed is oscillators and a generated reverb, written in the film. It lands
-  its accents on the cuts, but it lacks the warmth of sampled instruments. A next step is a
-  real harp or felt-piano sample set playing the same arpeggio through the same timeline, and
-  a limiter after the loudness normalisation. Light foley on the cuts (a paper flip, the thump
-  of a stamp) would sell the print idea.
+- **The music.** The score is raw Web Audio oscillators, two filters, a delay and a generated
+  reverb, written in the film. It lands its accents on the cuts and the synth character is
+  deliberate, but the oscillators are unaliased ideal waveforms with no drift. Next steps that
+  keep it synth: a touch of oscillator drift and a chorus on the pad, a proper analogue-style
+  filter envelope on the bass instead of a fixed cutoff, a sidechain pump on the pad from the
+  bass so the arpeggio sits in front, and a limiter after the loudness normalisation. Light
+  foley on the cuts (a paper flip, the thump of a stamp) would sell the print idea.
 - **Claims and compliance.** "Faster and cheaper than the psychiatrist-only route" and the
   market numbers should carry an on-screen source or be softened; the deck's own tone rule
   is "no claims", and Australian health-advertising rules apply to anything public. The
@@ -184,8 +171,8 @@ A critical appraisal of the current cut, most valuable first.
 - The postpartum match is a woman who could be the mother herself: the same skin tone and
   the same bun, with the coat, the stethoscope and the heart badge as the only difference.
   The other two matches are drawn on shared background and on manner.
-- The pitch has no narrator. Every sub line types in as soon as its picture has made its
-  point (the match line landing, the models arriving), so each card is read, not heard.
+- The pitch has no voice. Every sub line types in as soon as its picture has made its point
+  (the match line landing, the models arriving), so each card is read, not heard.
 - Both are explainers, so each shot carries one short hand-lettered line in two inks. The skill
   reserves lettering for the sign-off; that deviation is noted in each file's brief.
 - Where the Value Proposition Canvas and the deck differ on money, the pitch follows the canvas:

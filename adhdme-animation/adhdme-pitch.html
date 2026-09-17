@@ -19,12 +19,11 @@
 </style>
 <canvas id="c" width="1920" height="1080"></canvas>
 <script src="core.js"></script>
-<script>if (new URLSearchParams(location.search).has('narrated')) document.write('<script src="adhdme-pitch-voice.js"><\/script>');</script><!-- a narrated cut's speech timing (build-pitch.sh --narrated, or open ?narrated=1 after voice.py); otherwise the beat sheet below sets the timing -->
 <script>
 'use strict';
 // ============================================================
 // ADHDme, the pitch: a riso-printed startup pitch drawn frame by frame on Canvas 2D on top of core.js
-// (hand-drawn-canvas-animation skill), with its own music and no narrator. No images, no libraries, no Math.random.
+// (hand-drawn-canvas-animation skill), with its own synth score and no voice. No images, no libraries, no Math.random.
 // ============================================================
 
 // ===================== BRIEF & BEAT SHEET =====================
@@ -47,12 +46,13 @@
 //          icon() for two dozen marks: baby, moon, house, family, languages, plain speech, a pill with a
 //          question, tag, phone, clock, calendar, checklist, stethoscope, heart, microphone, match rings,
 //          a network, notes, a crossed star, coin, bell, pin, magnifier.
-// Sound:  music only. score() writes it from the same timeline and re-anchors its bars on every cut, so
-//         downbeats land on the picture. A plucked arpeggio carries the whole film over soft pads and a sine
-//         bass: quarter notes in the hook, a minor loop through the problem, eighths from the segment on, a
-//         second arpeggio an octave up through the matches and the engine, a key change up a whole tone for
-//         the value, a riser into the market, and the arpeggio thinning back to quarter notes for the close.
-//         No drums, no lead line. (voice.py and "build-pitch.sh --narrated" still make a narrated cut.)
+// Sound:  arpeggio and synths, no voice. score() writes the music from the same timeline and re-anchors its
+//         bars on every cut, so downbeats land on the picture. A plucked arpeggio with a dotted-eighth echo
+//         carries the whole film over a three-oscillator saw pad whose filter slowly breathes, and a square
+//         synth bass: quarter notes in the hook, a minor loop through the problem, eighths from the segment
+//         on, a second arpeggio an octave up through the matches and the engine, a key change up a whole tone
+//         for the value, a riser into the market, the arpeggio thinning back to quarter notes for the close.
+//         No drums, no lead line.
 //
 // beat       what changes
 // hook       ripples from the dot; an iris opens on the title card
@@ -76,11 +76,10 @@
 // signoff    ADHDme / adhdme.au
 
 // ===================== TIMELINE =====================
-// The beat sheet, in seconds. The film is silent apart from the music, so each card holds long enough for its
-// lines to be read twice. (For a narrated cut, voice.py writes adhdme-pitch-voice.js with BEATS timed to the
-// speech; when that file is present it takes over.)
+// The beat sheet, in seconds. There is no voice: the lettering is the script, so each card holds long enough for
+// its lines to be read twice, and the music re-anchors its bars on these cuts.
 const BEAT_SHEET = [['hook', 6.5], ['maze', 5], ['pain1', 4], ['pain2', 4], ['pain3', 4], ['pain4', 4], ['giveup', 4], ['who', 6.5], ['solution', 7], ['pair1', 8.5], ['pair2', 8.5], ['pair3', 8.5], ['pairs', 6.5], ['algo1', 8.5], ['algo2', 8], ['algo3', 8.5], ['algo4', 8.5], ['value', 8.5], ['how', 7.5], ['whynow', 6.5], ['market', 7], ['model', 6.5], ['traction', 6], ['gallery', 4], ['close', 6.5], ['signoff', 4]];
-const B = (() => { const list = typeof BEATS !== 'undefined' ? BEATS : (() => { let t = 0; return BEAT_SHEET.map(([id, dur]) => { const b = { id, start: t, dur, speech: 0 }; t += dur; return b; }); })(); return Object.fromEntries(list.map(b => [b.id, b])); })();
+const B = (() => { let t = 0; return Object.fromEntries(BEAT_SHEET.map(([id, dur]) => { const b = { id, start: t, dur }; t += dur; return [id, b]; })); })();
 const ORDER = Object.keys(B);
 const D = id => B[id].dur;
 function beatAt(ids, tau) { let acc = 0; for (const id of ids) { if (tau < acc + D(id)) return [id, tau - acc]; acc += D(id); } const id = ids[ids.length - 1]; return [id, tau - (acc - D(id))]; }
@@ -420,7 +419,7 @@ function cardPairs(c, tau, i) {
 // how the match is made
 const ASK = [['baby', 'stage of life'], ['speech', 'background and language'], ['fear', 'what you fear'], ['plain', 'how you like to be spoken to'], ['tag', 'cost'], ['phone', 'telehealth'], ['clock', 'when']];
 const KNOW = [['mic', 'interviewed first'], ['baby', 'what they have seen'], ['match', 'who they do best with'], ['plain', 'how they speak'], ['checklist', 'how they run a consult'], ['steth', 'scope'], ['calendar', 'availability']];
-// seven icons in a grid of three columns beside a portrait, popping in one by one as the narrator names them
+// seven icons in a grid of three columns beside a portrait, popping in one by one
 function gridOf(c, items, cols, rows, tau, t0, step, seed) {
   items.forEach(([name, text], n) => { const q = sm(t0 + n * step, t0 + n * step + .6, tau, easeOut); if (q <= 0) return; const row = Math.floor(n / 3), col = n % 3, x = row === 2 ? cols[1] : cols[col], y = rows[row];
     badgeIcon(c, name, x, y, text, q, seed + n * 10, { size: 27, r: 64, s: .72 }); });
@@ -586,40 +585,46 @@ const T = { end: TIMELINE.reduce((a, s) => a + s.dur, 0) };
 
 // ===================== SCORE: THE MUSIC =====================
 // Written from the same timeline. Bars re-anchor on every narrative beat, so downbeats land on the cuts.
-// A plucked arpeggio carries the film: each section sets its key, chord loop, arpeggio rate (notes per beat),
-// a second arpeggio an octave up, the pad level and the filter. The value beat lifts the key a whole tone.
+// Arpeggio and synths: a triangle pluck with a dotted-eighth echo, a three-saw pad through a breathing lowpass,
+// a square bass through its own filter. Each section sets its key, chord loop, arpeggio rate (notes per beat),
+// a second arpeggio an octave up, the pad level and the filter cutoff. The value beat lifts the key a whole tone.
 function score(ac, t0, dest) {
   const master = ac.createGain(); master.gain.value = .5; master.connect(dest);
   const irN = Math.ceil(ac.sampleRate * 2.6), ir = ac.createBuffer(2, irN, ac.sampleRate), rr = rng(99);
   for (let ch = 0; ch < 2; ch++) { const dd = ir.getChannelData(ch); for (let k = 0; k < irN; k++) dd[k] = (rr() * 2 - 1) * Math.pow(1 - k / irN, 3); }
   const conv = ac.createConvolver(); conv.buffer = ir; const wet = ac.createGain(); wet.gain.value = .34; conv.connect(wet); wet.connect(master);
   const send = g => { const gn = ac.createGain(); gn.gain.value = g; gn.connect(master); gn.connect(conv); return gn; };
-  const lp = ac.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 800; lp.Q.value = .6; lp.connect(send(1));
-  const arpBus = send(.9), highBus = send(1.1), bassBus = ac.createGain(); bassBus.connect(master);
   const beat = 60 / 66, bar = beat * 4, hz = m => 440 * Math.pow(2, (m - 69) / 12);
+  const lp = ac.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 800; lp.Q.value = .8; lp.connect(send(1));   // the pad's filter
+  const lfo = ac.createOscillator(), lfoAmt = ac.createGain(); lfo.frequency.value = .07; lfoAmt.gain.value = 170; lfo.connect(lfoAmt); lfoAmt.connect(lp.frequency); lfo.start(t0);   // it breathes
+  const arpBus = send(.9), highBus = send(1.1), bassBus = ac.createGain(); bassBus.connect(master);
+  const bassLp = ac.createBiquadFilter(); bassLp.type = 'lowpass'; bassLp.frequency.value = 230; bassLp.Q.value = 1.2; bassLp.connect(bassBus);   // rounds the square bass
+  const echo = ac.createDelay(2), fb = ac.createGain(), echoTone = ac.createBiquadFilter(), echoOut = ac.createGain();   // a dotted-eighth echo on the arpeggio
+  echo.delayTime.value = beat * .75; fb.gain.value = .3; echoTone.type = 'lowpass'; echoTone.frequency.value = 2200; echoOut.gain.value = .36;
+  arpBus.connect(echo); echo.connect(echoTone); echoTone.connect(fb); fb.connect(echo); echoTone.connect(echoOut); echoOut.connect(master); echoOut.connect(conv);
   const DEG = { I: [0, 4, 7], V: [-5, -1, 2], vi: [-3, 0, 4], IV: [-7, -3, 0], ii: [2, 5, 9] };
-  const pad = (notes, t, d, g) => notes.forEach(m => [-7, 7].forEach(det => { const o = ac.createOscillator(), e = ac.createGain(); o.type = 'sawtooth'; o.frequency.value = hz(m); o.detune.value = det;
-    e.gain.setValueAtTime(0, t0 + t); e.gain.linearRampToValueAtTime(g, t0 + t + Math.min(1.2, d * .4)); e.gain.setValueAtTime(g, t0 + t + Math.max(0, d - .5)); e.gain.linearRampToValueAtTime(0, t0 + t + d + .5); o.connect(e); e.connect(lp); o.start(t0 + t); o.stop(t0 + t + d + .6); }));
+  const pad = (notes, t, d, g) => notes.forEach(m => [-9, 0, 9].forEach(det => { const o = ac.createOscillator(), e = ac.createGain(); o.type = 'sawtooth'; o.frequency.value = hz(m); o.detune.value = det;   // three detuned saws a note
+    e.gain.setValueAtTime(0, t0 + t); e.gain.linearRampToValueAtTime(g * .7, t0 + t + Math.min(1.2, d * .4)); e.gain.setValueAtTime(g * .7, t0 + t + Math.max(0, d - .5)); e.gain.linearRampToValueAtTime(0, t0 + t + d + .5); o.connect(e); e.connect(lp); o.start(t0 + t); o.stop(t0 + t + d + .6); }));
   const pluck = (m, t, d, g, type = 'triangle', bus = arpBus) => { const o = ac.createOscillator(), e = ac.createGain(); o.type = type; o.frequency.value = hz(m); e.gain.setValueAtTime(0, t0 + t); e.gain.linearRampToValueAtTime(g, t0 + t + .015); e.gain.exponentialRampToValueAtTime(.0008, t0 + t + d); o.connect(e); e.connect(bus); o.start(t0 + t); o.stop(t0 + t + d + .05); };
-  const bass = (m, t, d, g) => pluck(m - 24, t, d, g, 'sine', bassBus);
+  const bass = (m, t, d, g) => { const o = ac.createOscillator(), e = ac.createGain(); o.type = 'square'; o.frequency.value = hz(m - 24); e.gain.setValueAtTime(0, t0 + t); e.gain.linearRampToValueAtTime(g, t0 + t + .012); e.gain.exponentialRampToValueAtTime(g * .5, t0 + t + .3); e.gain.exponentialRampToValueAtTime(.0008, t0 + t + d); o.connect(e); e.connect(bassLp); o.start(t0 + t); o.stop(t0 + t + d + .05); };
   // key, chord loop, pad level, arpeggio level and rate (notes per beat), the octave-up arpeggio, filter cutoff
   const SECT = id => {
-    if (id === 'hook') return { key: 60, loop: ['I', 'IV', 'I', 'IV'], lvl: .035, arp: .05, rate: 1, high: 0, lp: 900 };
-    if (['maze', 'pain1', 'pain2', 'pain3', 'pain4', 'giveup'].includes(id)) return { key: 60, loop: ['vi', 'IV', 'I', 'V'], lvl: .035, arp: .05, rate: 1, high: 0, lp: 800 };
-    if (['who', 'solution'].includes(id)) return { key: 60, loop: ['I', 'V', 'vi', 'IV'], lvl: .04, arp: .05, rate: 2, high: 0, lp: 1100 };
-    if (id.startsWith('pair')) return { key: 60, loop: ['I', 'V', 'vi', 'IV'], lvl: .045, arp: .055, rate: 2, high: .022, lp: 1200 };
-    if (id.startsWith('algo')) return { key: 60, loop: ['vi', 'IV', 'I', 'V'], lvl: .045, arp: .06, rate: 2, high: .026, lp: 1300 };
-    if (id === 'value') return { key: 62, loop: ['I', 'V', 'vi', 'IV'], lvl: .05, arp: .065, rate: 2, high: .03, lp: 1500 };
-    if (['how', 'whynow', 'market', 'model', 'traction'].includes(id)) return { key: 62, loop: ['I', 'V', 'vi', 'IV'], lvl: .045, arp: .06, rate: 2, high: .024, lp: 1400 };
-    if (id === 'gallery') return { key: 62, loop: ['IV', 'I', 'IV', 'I'], lvl: .04, arp: .05, rate: 2, high: 0, lp: 1100 };
-    if (id === 'close') return { key: 62, loop: ['IV', 'V', 'I', 'I'], lvl: .04, arp: .045, rate: 1, high: 0, lp: 1000 };
-    return { key: 62, loop: ['I', 'I', 'I', 'I'], lvl: .04, arp: .04, rate: 1, high: 0, lp: 900 };
+    if (id === 'hook') return { key: 60, loop: ['I', 'IV', 'I', 'IV'], lvl: .045, arp: .05, rate: 1, high: 0, lp: 900 };
+    if (['maze', 'pain1', 'pain2', 'pain3', 'pain4', 'giveup'].includes(id)) return { key: 60, loop: ['vi', 'IV', 'I', 'V'], lvl: .045, arp: .05, rate: 1, high: 0, lp: 800 };
+    if (['who', 'solution'].includes(id)) return { key: 60, loop: ['I', 'V', 'vi', 'IV'], lvl: .05, arp: .05, rate: 2, high: 0, lp: 1100 };
+    if (id.startsWith('pair')) return { key: 60, loop: ['I', 'V', 'vi', 'IV'], lvl: .055, arp: .055, rate: 2, high: .022, lp: 1200 };
+    if (id.startsWith('algo')) return { key: 60, loop: ['vi', 'IV', 'I', 'V'], lvl: .055, arp: .06, rate: 2, high: .026, lp: 1300 };
+    if (id === 'value') return { key: 62, loop: ['I', 'V', 'vi', 'IV'], lvl: .062, arp: .065, rate: 2, high: .03, lp: 1500 };
+    if (['how', 'whynow', 'market', 'model', 'traction'].includes(id)) return { key: 62, loop: ['I', 'V', 'vi', 'IV'], lvl: .055, arp: .06, rate: 2, high: .024, lp: 1400 };
+    if (id === 'gallery') return { key: 62, loop: ['IV', 'I', 'IV', 'I'], lvl: .05, arp: .05, rate: 2, high: 0, lp: 1100 };
+    if (id === 'close') return { key: 62, loop: ['IV', 'V', 'I', 'I'], lvl: .05, arp: .045, rate: 1, high: 0, lp: 1000 };
+    return { key: 62, loop: ['I', 'I', 'I', 'I'], lvl: .05, arp: .04, rate: 1, high: 0, lp: 900 };
   };
   ORDER.forEach(id => { const b = B[id], S = SECT(id); lp.frequency.linearRampToValueAtTime(S.lp, t0 + b.start + .5);
     for (let t = b.start, n = 0; t < b.start + b.dur - .05; t += bar, n++) {
       const dur = Math.min(bar, b.start + b.dur - t), ch = DEG[S.loop[n % 4]].map(x => x + S.key), root = ch[0];
       pad(ch, t, dur, S.lvl);
-      bass(root, t, beat * 1.7, .2); if (dur > beat * 2.2) bass(root, t + beat * 2, beat * 1.7, .14);
+      bass(root, t, beat * 1.7, .13); if (dur > beat * 2.2) bass(root, t + beat * 2, beat * 1.7, .09);
       const step = beat / S.rate, pat = S.rate === 2 ? [ch[0], ch[2], ch[1] + 12, ch[0] + 12, ch[2], ch[1] + 12, ch[0] + 12, ch[2] + 12] : [ch[0], ch[2], ch[1] + 12, ch[2]];
       pat.forEach((m, k) => { if (k * step < dur - .1) pluck(m, t + k * step, S.rate === 2 ? .4 : .75, S.arp); });
       if (S.high) pat.forEach((m, k) => { if (k * step + step / 2 < dur - .1) pluck(m + 12, t + k * step + step / 2, .3, S.high, 'sine', highBus); });   // an octave up, on the off-beats

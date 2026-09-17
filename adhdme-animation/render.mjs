@@ -21,7 +21,7 @@ import {pathToFileURL} from 'node:url';
 
 const argv = process.argv.slice(2);
 const file = argv.find(a => a.endsWith('.html'));
-if (!file) { console.error('usage: node render.mjs film.html [--only 0,12,24] [--out dir] [--query k=v]'); process.exit(2); }
+if (!file) { console.error('usage: node render.mjs film.html [--only 0,12,24] [--out dir]'); process.exit(2); }
 const flag = name => { const k = argv.indexOf(name); return k >= 0 ? argv[k + 1] : undefined; };
 const only = flag('--only')?.split(',').map(Number).filter(Number.isFinite);
 const grid = flag('--grid') ? +flag('--grid') || 24 : 0;
@@ -44,7 +44,7 @@ function findChrome() {
   throw new Error('No Chrome found. Set CHROME=/path/to/chrome');
 }
 
-const url = pathToFileURL(path.resolve(file)).href + `?bare=1&frame=0&ar=${encodeURIComponent(ar)}` + (width ? `&w=${width}` : '') + (flag('--query') ? '&' + flag('--query') : '');   // --query narrated=1 etc., passed to the page
+const url = pathToFileURL(path.resolve(file)).href + `?bare=1&frame=0&ar=${encodeURIComponent(ar)}` + (width ? `&w=${width}` : '');
 // Chrome will not start as root with its sandbox on (containers, CI); drop it only in that case.
 const asRoot = typeof process.getuid === 'function' && process.getuid() === 0;
 const browser = await puppeteer.launch({executablePath: findChrome(), headless: true, args: asRoot ? ['--no-sandbox', '--disable-setuid-sandbox'] : []});
