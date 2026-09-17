@@ -15,13 +15,13 @@
 // Needs: puppeteer-core next to this script (npm i), ffmpeg on PATH for the full render.
 import puppeteer from 'puppeteer-core';
 import {execFileSync} from 'node:child_process';
-import {existsSync, mkdirSync, writeFileSync} from 'node:fs';
+import {existsSync, mkdirSync, readdirSync, unlinkSync, writeFileSync} from 'node:fs';
 import path from 'node:path';
 import {pathToFileURL} from 'node:url';
 
 const argv = process.argv.slice(2);
 const file = argv.find(a => a.endsWith('.html'));
-if (!file) { console.error('usage: node render.mjs film.html [--only 0,12,24] [--out dir]'); process.exit(2); }
+if (!file) { console.error('usage: node render.mjs film.html [--only 0,12,24] [--out dir] [--query k=v]'); process.exit(2); }
 const flag = name => { const k = argv.indexOf(name); return k >= 0 ? argv[k + 1] : undefined; };
 const only = flag('--only')?.split(',').map(Number).filter(Number.isFinite);
 const grid = flag('--grid') ? +flag('--grid') || 24 : 0;
@@ -44,7 +44,7 @@ function findChrome() {
   throw new Error('No Chrome found. Set CHROME=/path/to/chrome');
 }
 
-const url = pathToFileURL(path.resolve(file)).href + `?bare=1&frame=0&ar=${encodeURIComponent(ar)}` + (width ? `&w=${width}` : '');
+const url = pathToFileURL(path.resolve(file)).href + `?bare=1&frame=0&ar=${encodeURIComponent(ar)}` + (width ? `&w=${width}` : '') + (flag('--query') ? '&' + flag('--query') : '');   // --query narrated=1 etc., passed to the page
 // Chrome will not start as root with its sandbox on (containers, CI); drop it only in that case.
 const asRoot = typeof process.getuid === 'function' && process.getuid() === 0;
 const browser = await puppeteer.launch({executablePath: findChrome(), headless: true, args: asRoot ? ['--no-sandbox', '--disable-setuid-sandbox'] : []});
@@ -62,6 +62,8 @@ try {
   total = N; console.log(`${name}: ${N} drawn frames, logical ${size.W}x${size.H}, output ${size.w}x${size.h}`);
   if (grid) { const sheet = path.join(outDir, `${name}-grid.jpg`); save(sheet, await page.evaluate(n => window.__grid(n, 240), grid)); console.log(`grid: ${sheet}`); }
   const list = grid ? [] : only ? only.filter(i => i >= 0 && i < N) : [...Array(N).keys()];
+  // a full render of a film that got shorter must not leave the old tail behind for ffmpeg to pick up
+  if (!grid && !only) for (const f of readdirSync(frames)) if (/^\d{4}\.png$/.test(f) && parseInt(f, 10) >= N) unlinkSync(path.join(frames, f));
   const t0 = Date.now();
   let done = 0;
   for (const [k, i] of list.entries()) {

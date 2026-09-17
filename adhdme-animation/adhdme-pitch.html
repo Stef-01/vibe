@@ -19,24 +19,23 @@
 </style>
 <canvas id="c" width="1920" height="1080"></canvas>
 <script src="core.js"></script>
-<script src="adhdme-pitch-voice.js"></script>
+<script>if (new URLSearchParams(location.search).has('narrated')) document.write('<script src="adhdme-pitch-voice.js"><\/script>');</script><!-- a narrated cut's speech timing (build-pitch.sh --narrated, or open ?narrated=1 after voice.py); otherwise the beat sheet below sets the timing -->
 <script>
 'use strict';
 // ============================================================
-// ADHDme, the pitch: a narrated, riso-printed startup pitch drawn frame by frame on Canvas 2D on top
-// of core.js (hand-drawn-canvas-animation skill). No images, no libraries, no Math.random.
+// ADHDme, the pitch: a riso-printed startup pitch drawn frame by frame on Canvas 2D on top of core.js
+// (hand-drawn-canvas-animation skill), with its own music and no narrator. No images, no libraries, no Math.random.
 // ============================================================
 
 // ===================== BRIEF & BEAT SHEET =====================
 // BRIEF
-// Subject: ADHDme as a YC-style pitch with a narrator: hook, problem, who, solution, three matches on life
-//          experience shown as faces, how the match is made (what we ask, what we know about each clinician,
-//          two models side by side, the feedback loop), what that changes, how it works, why now, market,
-//          model, traction, close. Content from the Value Proposition Canvas with numbers from the deck.
-// Format: 16:9, output width 1920, drawn 12 fps, output 24 fps. Length follows the narration: every beat
-//         lasts max(its visual minimum, lead + speech + pad), computed by voice.py into adhdme-pitch-voice.js.
-// Pace:   slow. Headlines type over 1.2 s, sub lines over 1.6 s, reveals spread across each beat, and every
-//         card holds long enough to read twice.
+// Subject: ADHDme as a YC-style pitch told in lettering and music: hook, problem, who, solution, three matches
+//          on life experience shown as faces, how the match is made (what we ask, what we know about each
+//          clinician, two models side by side, the feedback loop), what that changes, how it works, why now,
+//          market, model, traction, close. Content from the Value Proposition Canvas with numbers from the deck.
+// Format: 16:9, output width 1920, drawn 12 fps, output 24 fps, 2 min 47 s from the beat sheet below.
+// Pace:   slow. Headlines type over 1.2 s, sub lines over 1.6 s as soon as the picture has made its point,
+//         reveals spread across each beat, and every card holds long enough to read twice.
 // Look:   riso throughout: cream stock, fluorescent inks printed as halftone plates with knockouts, each
 //         card's plates arriving in print order. People are drawn: skin, hair and clothes as flat fills under
 //         a riso dot screen, features in navy line. Icons are small drawn marks on paper discs.
@@ -48,12 +47,12 @@
 //          icon() for two dozen marks: baby, moon, house, family, languages, plain speech, a pill with a
 //          question, tag, phone, clock, calendar, checklist, stethoscope, heart, microphone, match rings,
 //          a network, notes, a crossed star, coin, bell, pin, magnifier.
-// Sound:  voice.py narrates each beat with piper. score() writes the music from the same timeline and
-//         re-anchors its bars on every cut, so downbeats land on the picture: warm pads in the hook, a minor
-//         loop through the problem, a major loop from the segment on with an arpeggio from the solution,
-//         a lead motif on the matches, drums through the matching engine, a key change up for the value,
-//         a riser into the market, pads alone for the gallery and the close. build-pitch.sh ducks it under
-//         the voice.
+// Sound:  music only. score() writes it from the same timeline and re-anchors its bars on every cut, so
+//         downbeats land on the picture. A plucked arpeggio carries the whole film over soft pads and a sine
+//         bass: quarter notes in the hook, a minor loop through the problem, eighths from the segment on, a
+//         second arpeggio an octave up through the matches and the engine, a key change up a whole tone for
+//         the value, a riser into the market, and the arpeggio thinning back to quarter notes for the close.
+//         No drums, no lead line. (voice.py and "build-pitch.sh --narrated" still make a narrated cut.)
 //
 // beat       what changes
 // hook       ripples from the dot; an iris opens on the title card
@@ -76,9 +75,12 @@
 // close      the tagline; the six people stand together, smiling
 // signoff    ADHDme / adhdme.au
 
-// ===================== TIMELINE FROM THE NARRATION =====================
-const FALLBACK = [['hook', 6.5], ['maze', 5], ['pain1', 4.5], ['pain2', 4.5], ['pain3', 4], ['pain4', 4.5], ['giveup', 4], ['who', 8], ['solution', 7], ['pair1', 8], ['pair2', 10], ['pair3', 9], ['pairs', 6], ['algo1', 10], ['algo2', 8], ['algo3', 10], ['algo4', 10], ['value', 10], ['how', 9], ['whynow', 9], ['market', 7], ['model', 6.5], ['traction', 7], ['gallery', 4], ['close', 7], ['signoff', 4]];
-const B = (() => { const list = typeof BEATS !== 'undefined' ? BEATS : (() => { let t = 0; return FALLBACK.map(([id, dur]) => { const b = { id, start: t, dur, speech: 0 }; t += dur; return b; }); })(); return Object.fromEntries(list.map(b => [b.id, b])); })();
+// ===================== TIMELINE =====================
+// The beat sheet, in seconds. The film is silent apart from the music, so each card holds long enough for its
+// lines to be read twice. (For a narrated cut, voice.py writes adhdme-pitch-voice.js with BEATS timed to the
+// speech; when that file is present it takes over.)
+const BEAT_SHEET = [['hook', 6.5], ['maze', 5], ['pain1', 4], ['pain2', 4], ['pain3', 4], ['pain4', 4], ['giveup', 4], ['who', 6.5], ['solution', 7], ['pair1', 8.5], ['pair2', 8.5], ['pair3', 8.5], ['pairs', 6.5], ['algo1', 8.5], ['algo2', 8], ['algo3', 8.5], ['algo4', 8.5], ['value', 8.5], ['how', 7.5], ['whynow', 6.5], ['market', 7], ['model', 6.5], ['traction', 6], ['gallery', 4], ['close', 6.5], ['signoff', 4]];
+const B = (() => { const list = typeof BEATS !== 'undefined' ? BEATS : (() => { let t = 0; return BEAT_SHEET.map(([id, dur]) => { const b = { id, start: t, dur, speech: 0 }; t += dur; return b; }); })(); return Object.fromEntries(list.map(b => [b.id, b])); })();
 const ORDER = Object.keys(B);
 const D = id => B[id].dur;
 function beatAt(ids, tau) { let acc = 0; for (const id of ids) { if (tau < acc + D(id)) return [id, tau - acc]; acc += D(id); } const id = ids[ids.length - 1]; return [id, tau - (acc - D(id))]; }
@@ -256,7 +258,8 @@ function badgeIcon(c, name, x, y, text, q, seed, o = {}) { if (q <= 0) return; c
 const PAIRS = [
   { id: 'pair1', head: 'A new parent, postpartum.', sub: 'matched with a GP who has perinatal experience.', pl: 'new parent, postpartum', cl: [['perinatal experience']], scene: 'pram',
     patient: () => ({ skin: SKIN().light, hair: PAL.ink, top: PAL.fills[5], style: 'bun', tired: true, baby: true }), pose: { mood: -.05, brow: -.45 },
-    clinician: () => ({ skin: SKIN().mid, hair: PAL.ink, top: PAL.light, style: 'short', coat: true, steth: true, badge: true }), cpose: { mood: .7, brow: .5 } },
+    // a woman who could be her: the same skin, the same bun; the coat, the stethoscope and the heart badge are the difference
+    clinician: () => ({ skin: SKIN().light, hair: PAL.ink, top: PAL.light, style: 'bun', coat: true, steth: true, badge: true }), cpose: { mood: .7, brow: .5 } },
   { id: 'pair2', head: 'A South Asian family. Stigma at home.', sub: 'matched with a doctor of the same background, in Hindi and Urdu.', pl: 'not talked about at home', cl: [['same background · '], ['हिंदी', '"Noto Devanagari"', .8], [' · '], ['اردو', '"Noto Urdu"', .8]], scene: 'home',
     patient: () => ({ skin: SKIN().tan, hair: PAL.ink, top: PAL.fills[3], style: 'long', bindi: true }), pose: { mood: -.2, brow: -.3 },
     clinician: () => ({ skin: SKIN().tan, hair: PAL.ink, top: PAL.light, style: 'crop', beard: true, glasses: true, coat: true, steth: true, tag: true }), cpose: { mood: .6, brow: .4 } },
@@ -273,7 +276,7 @@ const YOUNG = [
 ];
 const DOCS = [PAIRS[0].clinician, PAIRS[1].clinician, PAIRS[2].clinician,
   () => ({ skin: SKIN().light, hair: PAL.chalkDim, top: PAL.light, style: 'short', coat: true, steth: true, glasses: true }),
-  () => ({ skin: SKIN().mid, hair: PAL.ink, top: PAL.light, style: 'bun', coat: true, steth: true })];
+  () => ({ skin: SKIN().mid, hair: PAL.ink, top: PAL.light, style: 'long', coat: true, steth: true })];
 const CAST = () => [[PAIRS[0].patient, { mood: .7, brow: .3 }], [PAIRS[0].clinician, { mood: .7, brow: .5 }], [PAIRS[1].patient, { mood: .7, brow: .3 }], [PAIRS[1].clinician, { mood: .6, brow: .4 }], [PAIRS[2].patient, { mood: .7, brow: .2 }], [PAIRS[2].clinician, { mood: .9, brow: .6 }]];
 
 // ===================== CARDS =====================
@@ -368,7 +371,7 @@ function cardSolution(c, tau, i) {
   c.save(); c.strokeStyle = PAL.ink; c.lineWidth = 1.8; c.globalAlpha = .4; c.lineCap = 'round'; cys.forEach((y, m) => { const q = sm(2.2 + m * .3, 2.7 + m * .3, tau); if (q > 0) selfDraw(c, [[px + 120, py - 90], [cx - 80, y]], q, 90 + m, 2); }); c.restore();
   const q = sm(tm, tm + .9, tau, easeOut); if (q > 0) { c.strokeStyle = PAL.accents[0]; c.lineWidth = 7; c.lineCap = 'round'; selfDraw(c, [[px + 120, py - 90], [(px + cx) / 2, py - 120], [cx - 80, cys[pick]]], q, 96, 3); if (q >= 1) dashedRing(c, cx, cys[pick] - 20, 90, PAL.accents[0], 97, [10, 7], 3); }
   head(c, 'Matching, not triage.', { p: sm(0, TYPE, tau) });
-  sub(c, 'Not the next free slot. The right person, for you.', { x: W * .36, size: 44, p: sm(d * .66, d * .66 + TYPE2, tau) });   // left of the clinician column
+  sub(c, 'Not the next free slot. The right person, for you.', { x: W * .36, size: 44, p: sm(tm + .7, tm + .7 + TYPE2, tau) });   // left of the clinician column, as the match lands
 }
 function lifeScene(g, k, name, x, y) {
   if (name === 'pram' && k === 1) { g.fillStyle = gray(.6); g.beginPath(); g.roundRect(x - 330, y + 10, 170, 80, 24); g.fill(); g.beginPath(); g.arc(x - 200, y + 10, 62, Math.PI, TAU); g.fill(); g.fillRect(x - 336, y - 64, 10, 84); for (const wx of [x - 300, x - 190]) { g.beginPath(); g.arc(wx, y + 108, 22, 0, TAU); g.fill(); g.fillStyle = '#fff'; g.beginPath(); g.arc(wx, y + 108, 7, 0, TAU); g.fill(); g.fillStyle = gray(.6); } }
@@ -378,7 +381,7 @@ function lifeScene(g, k, name, x, y) {
   if (name === 'crowd' && k === 0) { g.fillStyle = gray(.3); [[-330, -40], [-250, -110], [-160, -150], [-70, -170], [30, -160]].forEach(([dx, dy]) => { g.beginPath(); g.arc(x + dx, y + dy - 60, 34, 0, TAU); g.fill(); g.beginPath(); g.roundRect(x + dx - 60, y + dy - 10, 120, 90, 30); g.fill(); }); }
 }
 function cardPair(n, c, tau, i) {
-  usePalette('risoPop'); const P = PAIRS[n], d = D(P.id), px = W * .27, py = CY + 96, qx = W * .73, qy = CY + 96, tm = d * .45, ts = d * .66, s = 1.05;
+  usePalette('risoPop'); const P = PAIRS[n], d = D(P.id), px = W * .27, py = CY + 96, qx = W * .73, qy = CY + 96, tm = d * .45, ts = tm + 1.1, s = 1.05;   // the sub line types as the match line lands
   risoCard(c, (g, k) => {
     if (k === 2) { if (tau >= tm + .9) glow(g, qx, qy - 60, 80, 440, .9); lifeScene(g, k, P.scene, px, py); }
     if (k === 1) { g.fillStyle = gray(.2); g.beginPath(); g.arc(px, py - 60, 250, 0, TAU); g.fill(); lifeScene(g, k, P.scene, px, py); }
@@ -412,7 +415,7 @@ function cardPairs(c, tau, i) {
     const q = sm(t0(n) + .5, t0(n) + 1.1, tau, easeOut); if (q > 0) { c.strokeStyle = PAL.accents[0]; c.lineWidth = 6; c.lineCap = 'round'; selfDraw(c, [[W * .3 + 250, y], [CX, (y + yc) / 2], [W * .7 - 250, yc]], q, 680 + n, 3); }
     if (q >= 1) { seedDot(c, W * .3 + 246, y, 8, PAL.accents[0], null); seedDot(c, W * .7 - 246, yc, 8, PAL.accents[0], null); } });
   head(c, 'Matched on life, not just availability.', { size: 84, p: sm(0, TYPE, tau) });
-  sub(c, 'Postpartum. Cultural background. Stigma. The things a directory never asks.', { p: sm(d * .55, d * .55 + TYPE2, tau), size: 46 });
+  sub(c, 'Postpartum. Cultural background. Stigma. The things a directory never asks.', { p: sm(d * .5, d * .5 + TYPE2, tau), size: 46 });
 }
 // how the match is made
 const ASK = [['baby', 'stage of life'], ['speech', 'background and language'], ['fear', 'what you fear'], ['plain', 'how you like to be spoken to'], ['tag', 'cost'], ['phone', 'telehealth'], ['clock', 'when']];
@@ -454,7 +457,7 @@ function cardAlgo3(c, tau, i) {
   if (qM > 0) { bubble(c, rx + 100, top + 360, 240, 62, 850, cc => { squiggleText(cc, -190, -8, 380, 2, { seed: 851, lineH: 24, amp: 6, width: 2, color: PAL.ink }); }, qM); if (qM >= 1) tail(c, [rx + 70, top + 210], [rx + 50, top + 305], 852); }
   const qE = sm(tE, tE + .8, tau, easeOut); if (qE > 0) { [lx, rx].forEach((x, n) => { c.save(); resetT(c); c.translate(x, top + 540); c.scale(qE, qE); c.fillStyle = PAL.fills[2]; pill(c, 0, 0, 420, 56); hand(c, 'the same match', 0, 13, { size: 38, align: 'center', ink2: null }); c.restore(); }); hand(c, 'vs', CX, top + 250, { size: 90, ink: PAL.blush, ink2: PAL.accents[2], align: 'center' }); }
   head(c, 'Two models, side by side.', { p: sm(0, TYPE, tau) });
-  sub(c, 'Transparent rules, and a language model that reads nuance. We test which earns its place.', { p: sm(d * .7, d * .7 + TYPE2, tau), size: 44 });
+  sub(c, 'Transparent rules, and a language model that reads nuance. We test which earns its place.', { p: sm(d * .55, d * .55 + TYPE2, tau), size: 44 });
 }
 const SIGNALS = [['plain', 'communication'], ['match', 'collaboration'], ['checklist', 'structure'], ['steth', 'scope'], ['tag', 'price and availability']];
 function cardAlgo4(c, tau, i) {
@@ -466,7 +469,7 @@ function cardAlgo4(c, tau, i) {
   const qN = sm(tN, tN + .8, tau, easeOut); if (qN > 0) { arrow(c, [[cx + R + 40, cy], [W * .86 - 120, CY + 40]], qN, 930, PAL.inks[0], 5); c.save(); resetT(c); c.translate(W * .86, CY + 40); c.scale(qN, qN); bust(c, -50, 60, .42, YOUNG[3](), { mood: .8, brow: .4 }, 380); bust(c, 50, 60, .42, DOCS[4](), { mood: .8, brow: .5 }, 390); hand(c, 'next match', 0, 150, { size: 34, align: 'center', ink2: null }); c.restore(); }
   const qX = sm(d * .12, d * .12 + .5, tau, easeOut); if (qX > 0) { badgeIcon(c, 'starx', W * .1, CY - 60, 'not a star score', qX, 940, { size: 28 }); }
   head(c, 'Every consult makes the next match better.', { size: 88, p: sm(0, TYPE, tau) });
-  sub(c, 'Five fit signals, after every consultation. A fit profile, not a star score.', { p: sm(d * .7, d * .7 + TYPE2, tau), size: 44 });
+  sub(c, 'Five fit signals, after every consultation. A fit profile, not a star score.', { p: sm(d * .55, d * .55 + TYPE2, tau), size: 44 });
 }
 function cardValue(c, tau, i) {
   usePalette('risoPop'); const d = D('value'), xs = [W * .2, W * .5, W * .8], ts = [d * .08, d * .38, d * .62];
@@ -516,7 +519,7 @@ function cardModel(c, tau, i) {
   arrow(c, [[px + 130, y - 60], [CX - 140, y - 60]], q1, 1220, PAL.ink, 6); arrow(c, [[CX + 140, y - 60], [cx - 130, y - 60]], q2, 1221, PAL.ink, 6);
   if (q1 >= 1) hand(c, 'free', px, y - 220, { size: 64, align: 'center', ink2: null });
   if (q2 >= 1) { c.save(); c.translate(cx, y - 240); c.scale(1.2, 1.2); tagPath(c, 0, 0, 1); c.fillStyle = PAL.blush; c.fill(); c.strokeStyle = PAL.ink; c.lineWidth = 2; wob(c, [[-48, -30], [14, -30], [50, 0], [14, 30], [-48, 30]], 1.5, 132, true); c.restore(); hand(c, '$', cx + 4, y - 218, { size: 60, align: 'center', ink: PAL.paper, ink2: null }); }
-  head(c, 'Free for patients.', { size: 110, p: sm(0, TYPE, tau) }); sub(c, 'Clinicians subscribe for matched patient flow.', { size: 54, p: sm(d * .6, d * .6 + TYPE2, tau) });
+  head(c, 'Free for patients.', { size: 110, p: sm(0, TYPE, tau) }); sub(c, 'Clinicians subscribe for matched patient flow.', { size: 54, p: sm(d * .5, d * .5 + TYPE2, tau) });
 }
 function cardTraction(c, tau, i) {
   usePalette('risoPop'); const d = D('traction'), items = [[W * .25, 2, 'Live', 'adhdme.au', -.08], [W * .5, 1, '2 GPs', 'in Sydney', .05], [W * .75, 0, '2 models', 'of matching in test', -.04]];
@@ -583,7 +586,8 @@ const T = { end: TIMELINE.reduce((a, s) => a + s.dur, 0) };
 
 // ===================== SCORE: THE MUSIC =====================
 // Written from the same timeline. Bars re-anchor on every narrative beat, so downbeats land on the cuts.
-// Sections carry a key, a chord loop and a texture; the value beat lifts the key a whole tone.
+// A plucked arpeggio carries the film: each section sets its key, chord loop, arpeggio rate (notes per beat),
+// a second arpeggio an octave up, the pad level and the filter. The value beat lifts the key a whole tone.
 function score(ac, t0, dest) {
   const master = ac.createGain(); master.gain.value = .5; master.connect(dest);
   const irN = Math.ceil(ac.sampleRate * 2.6), ir = ac.createBuffer(2, irN, ac.sampleRate), rr = rng(99);
@@ -591,37 +595,35 @@ function score(ac, t0, dest) {
   const conv = ac.createConvolver(); conv.buffer = ir; const wet = ac.createGain(); wet.gain.value = .34; conv.connect(wet); wet.connect(master);
   const send = g => { const gn = ac.createGain(); gn.gain.value = g; gn.connect(master); gn.connect(conv); return gn; };
   const lp = ac.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 800; lp.Q.value = .6; lp.connect(send(1));
-  const arpBus = send(.9), leadBus = send(1), bassBus = ac.createGain(); bassBus.connect(master); const drumBus = ac.createGain(); drumBus.gain.value = .8; drumBus.connect(master);
+  const arpBus = send(.9), highBus = send(1.1), bassBus = ac.createGain(); bassBus.connect(master);
   const beat = 60 / 66, bar = beat * 4, hz = m => 440 * Math.pow(2, (m - 69) / 12);
   const DEG = { I: [0, 4, 7], V: [-5, -1, 2], vi: [-3, 0, 4], IV: [-7, -3, 0], ii: [2, 5, 9] };
   const pad = (notes, t, d, g) => notes.forEach(m => [-7, 7].forEach(det => { const o = ac.createOscillator(), e = ac.createGain(); o.type = 'sawtooth'; o.frequency.value = hz(m); o.detune.value = det;
     e.gain.setValueAtTime(0, t0 + t); e.gain.linearRampToValueAtTime(g, t0 + t + Math.min(1.2, d * .4)); e.gain.setValueAtTime(g, t0 + t + Math.max(0, d - .5)); e.gain.linearRampToValueAtTime(0, t0 + t + d + .5); o.connect(e); e.connect(lp); o.start(t0 + t); o.stop(t0 + t + d + .6); }));
   const pluck = (m, t, d, g, type = 'triangle', bus = arpBus) => { const o = ac.createOscillator(), e = ac.createGain(); o.type = type; o.frequency.value = hz(m); e.gain.setValueAtTime(0, t0 + t); e.gain.linearRampToValueAtTime(g, t0 + t + .015); e.gain.exponentialRampToValueAtTime(.0008, t0 + t + d); o.connect(e); e.connect(bus); o.start(t0 + t); o.stop(t0 + t + d + .05); };
-  const lead = (m, t, d, g) => [0, 6].forEach(det => { const o = ac.createOscillator(), e = ac.createGain(); o.type = 'sine'; o.frequency.value = hz(m); o.detune.value = det; e.gain.setValueAtTime(0, t0 + t); e.gain.linearRampToValueAtTime(g, t0 + t + .08); e.gain.setValueAtTime(g, t0 + t + d * .6); e.gain.exponentialRampToValueAtTime(.0008, t0 + t + d); o.connect(e); e.connect(leadBus); o.start(t0 + t); o.stop(t0 + t + d + .05); });
   const bass = (m, t, d, g) => pluck(m - 24, t, d, g, 'sine', bassBus);
-  const kick = (t, g) => { const o = ac.createOscillator(), e = ac.createGain(); o.type = 'sine'; o.frequency.setValueAtTime(120, t0 + t); o.frequency.exponentialRampToValueAtTime(44, t0 + t + .12); e.gain.setValueAtTime(g, t0 + t); e.gain.exponentialRampToValueAtTime(.0008, t0 + t + .3); o.connect(e); e.connect(drumBus); o.start(t0 + t); o.stop(t0 + t + .32); };
-  const hat = (t, g) => noiseBurst(ac, drumBus, t0, t, .045, g, 3);
+  // key, chord loop, pad level, arpeggio level and rate (notes per beat), the octave-up arpeggio, filter cutoff
   const SECT = id => {
-    if (id === 'hook') return { key: 60, loop: ['I', 'IV', 'I', 'IV'], lvl: .045, arp: 0, drums: 0, lp: 800 };
-    if (['maze', 'pain1', 'pain2', 'pain3', 'pain4', 'giveup'].includes(id)) return { key: 60, loop: ['vi', 'IV', 'I', 'V'], lvl: .04, arp: 0, drums: 0, lp: 700, minor: true };
-    if (['who', 'solution'].includes(id)) return { key: 60, loop: ['I', 'V', 'vi', 'IV'], lvl: .05, arp: id === 'solution' ? .035 : 0, drums: 0, lp: 1000 };
-    if (id.startsWith('pair')) return { key: 60, loop: ['I', 'V', 'vi', 'IV'], lvl: .055, arp: .04, drums: .45, lp: 1100, lead: true };
-    if (id.startsWith('algo')) return { key: 60, loop: ['vi', 'IV', 'I', 'V'], lvl: .055, arp: .05, drums: .8, lp: 1300 };
-    if (id === 'value') return { key: 62, loop: ['I', 'V', 'vi', 'IV'], lvl: .062, arp: .05, drums: .8, lp: 1500, lead: true };
-    if (['how', 'whynow', 'market', 'model', 'traction'].includes(id)) return { key: 62, loop: ['I', 'V', 'vi', 'IV'], lvl: .06, arp: .05, drums: 1, lp: 1400 };
-    if (id === 'gallery') return { key: 62, loop: ['IV', 'I', 'IV', 'I'], lvl: .05, arp: .04, drums: 0, lp: 1000 };
-    if (id === 'close') return { key: 62, loop: ['IV', 'V', 'I', 'I'], lvl: .05, arp: 0, drums: 0, lp: 900, lead: true };
-    return { key: 62, loop: ['I', 'I', 'I', 'I'], lvl: .05, arp: 0, drums: 0, lp: 800 };
+    if (id === 'hook') return { key: 60, loop: ['I', 'IV', 'I', 'IV'], lvl: .035, arp: .05, rate: 1, high: 0, lp: 900 };
+    if (['maze', 'pain1', 'pain2', 'pain3', 'pain4', 'giveup'].includes(id)) return { key: 60, loop: ['vi', 'IV', 'I', 'V'], lvl: .035, arp: .05, rate: 1, high: 0, lp: 800 };
+    if (['who', 'solution'].includes(id)) return { key: 60, loop: ['I', 'V', 'vi', 'IV'], lvl: .04, arp: .05, rate: 2, high: 0, lp: 1100 };
+    if (id.startsWith('pair')) return { key: 60, loop: ['I', 'V', 'vi', 'IV'], lvl: .045, arp: .055, rate: 2, high: .022, lp: 1200 };
+    if (id.startsWith('algo')) return { key: 60, loop: ['vi', 'IV', 'I', 'V'], lvl: .045, arp: .06, rate: 2, high: .026, lp: 1300 };
+    if (id === 'value') return { key: 62, loop: ['I', 'V', 'vi', 'IV'], lvl: .05, arp: .065, rate: 2, high: .03, lp: 1500 };
+    if (['how', 'whynow', 'market', 'model', 'traction'].includes(id)) return { key: 62, loop: ['I', 'V', 'vi', 'IV'], lvl: .045, arp: .06, rate: 2, high: .024, lp: 1400 };
+    if (id === 'gallery') return { key: 62, loop: ['IV', 'I', 'IV', 'I'], lvl: .04, arp: .05, rate: 2, high: 0, lp: 1100 };
+    if (id === 'close') return { key: 62, loop: ['IV', 'V', 'I', 'I'], lvl: .04, arp: .045, rate: 1, high: 0, lp: 1000 };
+    return { key: 62, loop: ['I', 'I', 'I', 'I'], lvl: .04, arp: .04, rate: 1, high: 0, lp: 900 };
   };
   ORDER.forEach(id => { const b = B[id], S = SECT(id); lp.frequency.linearRampToValueAtTime(S.lp, t0 + b.start + .5);
     for (let t = b.start, n = 0; t < b.start + b.dur - .05; t += bar, n++) {
       const dur = Math.min(bar, b.start + b.dur - t), ch = DEG[S.loop[n % 4]].map(x => x + S.key), root = ch[0];
       pad(ch, t, dur, S.lvl);
       bass(root, t, beat * 1.7, .2); if (dur > beat * 2.2) bass(root, t + beat * 2, beat * 1.7, .14);
-      if (S.arp) [ch[0], ch[2], ch[1] + 12, ch[0] + 12, ch[2], ch[1] + 12, ch[0] + 12, ch[2] + 12].forEach((m, k) => { if (k * beat / 2 < dur - .1) pluck(m, t + k * beat / 2, .4, S.arp); });
-      if (S.drums) { kick(t, .55 * S.drums); if (dur > beat * 2.2) { kick(t + beat * 2, .4 * S.drums); kick(t + beat * 2.5, .22 * S.drums); } for (let k = 0; k < 4; k++) if (k * beat + beat / 2 < dur) hat(t + k * beat + beat / 2, .05 * S.drums); }
+      const step = beat / S.rate, pat = S.rate === 2 ? [ch[0], ch[2], ch[1] + 12, ch[0] + 12, ch[2], ch[1] + 12, ch[0] + 12, ch[2] + 12] : [ch[0], ch[2], ch[1] + 12, ch[2]];
+      pat.forEach((m, k) => { if (k * step < dur - .1) pluck(m, t + k * step, S.rate === 2 ? .4 : .75, S.arp); });
+      if (S.high) pat.forEach((m, k) => { if (k * step + step / 2 < dur - .1) pluck(m + 12, t + k * step + step / 2, .3, S.high, 'sine', highBus); });   // an octave up, on the off-beats
     }
-    if (S.lead) { const m0 = S.key + 12; [[4, 0], [7, 1], [9, 2], [7, 3], [4, 4.5]].forEach(([dg, q]) => lead(m0 + dg, b.start + 1.0 + q * beat, beat * .9, .07)); }
   });
   // accents on the cuts and reveals
   pluck(84, B.hook.start + D('hook') * .5, 1.2, .16, 'sine'); pluck(88, B.hook.start + D('hook') * .5 + .3, 1.2, .12, 'sine');
@@ -632,7 +634,7 @@ function score(ac, t0, dest) {
   ['algo1', 'algo2'].forEach(id => { const S = 7, d = D(id); for (let n = 0; n < S; n++) pluck(72 + [0, 2, 4, 7, 9, 12, 14][n], B[id].start + d * .2 + n * (d * .72) / S, .3, .07, 'square'); });
   for (let n = 0; n < 5; n++) pluck(72 + [0, 4, 7, 11, 12][n], B.algo4.start + D('algo4') * (.18 + n * .1), .4, .08, 'square');
   for (let n = 0; n < 8; n++) pluck(62 + n * 2, B.whynow.start + D('whynow') - 1.6 + n * .2, .3, .05 + n * .01, 'square');   // a riser into the market
-  pluck(98, B.market.start + .5, 1.6, .14, 'sine'); kick(B.market.start + .5, .8); pluck(93, B.market.start + D('market') * .45, 1.2, .12, 'sine');
+  pluck(98, B.market.start + .5, 1.6, .14, 'sine'); pluck(93, B.market.start + D('market') * .45, 1.2, .12, 'sine');
   [0, 1, 2].forEach(k => pluck(74 + [0, 4, 7][k], B.traction.start + D('traction') * (.15 + k * .2), 1.0, .16, 'triangle'));
   pluck(62, B.close.start, 3.0, .12, 'sine'); pluck(69, B.close.start + .6, 2.6, .1, 'sine'); pluck(74, B.signoff.start, 3.4, .14, 'sine'); pluck(78, B.signoff.start + .4, 3.0, .1, 'sine'); pluck(50, B.signoff.start, 3.6, .16, 'sine');
 }

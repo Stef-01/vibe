@@ -70,6 +70,7 @@ adhdme-animation/out/*-grid.jpg
 adhdme-animation/out/adhdme.mp4
 adhdme-animation/out/adhdme-pitch.mp4
 
-# ADHDme narration: piper voice models (large) and per-line clips are rebuilt by voice.py
+# ADHDme narration (the optional narrated cut): piper voice models (large), per-line clips and the speech timing are rebuilt by voice.py
 adhdme-animation/voices/
 adhdme-animation/out/voice/
+adhdme-animation/adhdme-pitch-voice.js

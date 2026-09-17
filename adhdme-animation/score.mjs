@@ -4,6 +4,7 @@
 // Usage:
 //   node score.mjs film.html                      -> out/score.wav
 //   node score.mjs film.html --out path/score.wav
+//   node score.mjs film.html --query narrated=1   extra query string for the page (a film can read it)
 // Then mux it under the silent render from render.mjs:
 //   ffmpeg -i out/film.mp4 -i out/score.wav -c:v copy -c:a aac -shortest out/film-final.mp4
 //
@@ -33,7 +34,7 @@ function findChrome() {
   throw new Error('No Chrome found. Set CHROME=/path/to/chrome');
 }
 
-const url = pathToFileURL(path.resolve(file)).href + '?bare=1&frame=0';
+const url = pathToFileURL(path.resolve(file)).href + '?bare=1&frame=0' + (flag('--query') ? '&' + flag('--query') : '');   // --query narrated=1 etc., passed to the page
 const asRoot = typeof process.getuid === 'function' && process.getuid() === 0;
 const browser = await puppeteer.launch({executablePath: findChrome(), headless: true, args: asRoot ? ['--no-sandbox', '--disable-setuid-sandbox'] : []});
 try {
