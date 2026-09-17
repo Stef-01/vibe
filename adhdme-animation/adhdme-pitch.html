@@ -46,13 +46,9 @@
 //          icon() for two dozen marks: baby, moon, house, family, languages, plain speech, a pill with a
 //          question, tag, phone, clock, calendar, checklist, stethoscope, heart, microphone, match rings,
 //          a network, notes, a crossed star, coin, bell, pin, magnifier.
-// Sound:  arpeggio and synths, no voice. score() writes the music from the same timeline and re-anchors its
-//         bars on every cut, so downbeats land on the picture. A plucked arpeggio with a dotted-eighth echo
-//         carries the whole film over a three-oscillator saw pad whose filter slowly breathes, and a square
-//         synth bass: quarter notes in the hook, a minor loop through the problem, eighths from the segment
-//         on, a second arpeggio an octave up through the matches and the engine, a key change up a whole tone
-//         for the value, a riser into the market, the arpeggio thinning back to quarter notes for the close.
-//         No drums, no lead line.
+// Sound:  arpeggio and synths, no voice, written as a song: intro, verse, pre-chorus, chorus with a melody
+//         that varies on each match, a second verse on new chords for the engine, the chorus again up a
+//         whole tone for the value, a bridge and a breakdown, a last chorus, an outro. See score().
 //
 // beat       what changes
 // hook       ripples from the dot; an iris opens on the title card
@@ -60,11 +56,10 @@
 // who        Australia prints in, three cities ring; five young people arrive in a row
 // solution   a patient faces five clinicians; lines draw; the fit lights up
 // pair1..3   a patient and a clinician face each other with the life around the patient printed behind; the line lands
-// pairs      the three pairs as small portraits, cross-matched
-// algo1      what we ask: a patient with seven life factors arriving around them, one as each is named
-// algo2      what we know: a clinician with seven things we learn in the interview
-// algo3      two models side by side: rules that score factors as bars; a language model that reads notes; the same match
-// algo4      the loop: a consultation, five fit signals, the next match better; a crossed star
+// algo1      what we ask: a patient with the four things about their life that decide a match, arriving beside them
+// algo2      what we know: a clinician with the four things the interview covers
+// algo3      two models side by side: rules that score the four factors as bars; a language model that reads what you wrote
+// algo4      the loop: a consultation ringed by five fit signals, feeding the next match
 // value      three columns: they fit before you meet; faster and cheaper; the same clinician at 6, 12, 24 months
 // how        cost bands, templates, alerts, free for patients
 // whynow     starfield timeline: QLD live, NSW and VIC 2026
@@ -78,7 +73,7 @@
 // ===================== TIMELINE =====================
 // The beat sheet, in seconds. There is no voice: the lettering is the script, so each card holds long enough for
 // its lines to be read twice, and the music re-anchors its bars on these cuts.
-const BEAT_SHEET = [['hook', 6.5], ['maze', 5], ['pain1', 4], ['pain2', 4], ['pain3', 4], ['pain4', 4], ['giveup', 4], ['who', 6.5], ['solution', 7], ['pair1', 8.5], ['pair2', 8.5], ['pair3', 8.5], ['pairs', 6.5], ['algo1', 8.5], ['algo2', 8], ['algo3', 8.5], ['algo4', 8.5], ['value', 8.5], ['how', 7.5], ['whynow', 6.5], ['market', 7], ['model', 6.5], ['traction', 6], ['gallery', 4], ['close', 6.5], ['signoff', 4]];
+const BEAT_SHEET = [['hook', 6.5], ['maze', 5], ['pain1', 4], ['pain2', 4], ['pain3', 4], ['pain4', 4], ['giveup', 4], ['who', 6.5], ['solution', 7], ['pair1', 8.5], ['pair2', 8.5], ['pair3', 8.5], ['algo1', 8.5], ['algo2', 8], ['algo3', 8.5], ['algo4', 8.5], ['value', 8.5], ['how', 7.5], ['whynow', 6.5], ['market', 7], ['model', 6.5], ['traction', 6], ['gallery', 4], ['close', 6.5], ['signoff', 4]];
 const B = (() => { let t = 0; return Object.fromEntries(BEAT_SHEET.map(([id, dur]) => { const b = { id, start: t, dur }; t += dur; return [id, b]; })); })();
 const ORDER = Object.keys(B);
 const D = id => B[id].dur;
@@ -162,7 +157,8 @@ const MAZE = (() => { const { cols, rows } = MZ, r = rng(55), vis = Array(cols *
 const AUS = [[114.0,-22.0],[113.6,-24.5],[114.6,-28.5],[115.0,-31.5],[115.7,-33.5],[115.0,-34.5],[117.5,-35.0],[120.0,-33.9],[124.0,-33.0],[128.0,-32.0],[131.5,-31.5],[134.0,-32.5],[135.6,-34.8],[137.5,-35.6],[138.5,-35.6],[140.5,-38.0],[143.5,-38.8],[146.0,-39.0],[147.5,-38.0],[150.0,-37.5],[150.2,-35.8],[151.2,-33.9],[153.0,-31.0],[153.6,-28.2],[153.2,-25.5],[150.9,-22.9],[149.0,-21.0],[146.5,-19.0],[145.5,-16.5],[144.5,-14.5],[143.5,-12.0],[142.5,-10.7],[141.6,-12.7],[141.4,-15.5],[140.8,-17.5],[139.0,-17.6],[137.0,-16.0],[136.5,-14.0],[136.0,-12.2],[133.5,-11.5],[131.0,-12.2],[129.5,-14.5],[127.5,-14.0],[126.0,-14.5],[124.5,-16.0],[123.0,-17.0],[121.5,-19.0],[119.0,-20.0],[116.5,-20.7],[114.5,-21.7]];
 const TAS = [[145.0,-40.8],[148.2,-40.9],[147.8,-43.2],[146.0,-43.5],[144.7,-41.3]];
 const CITIES = [[151.2,-33.9], [145.0,-37.8], [153.0,-27.5]];
-const MAP = () => ({ x: W * .56, y: H * .13, w: 720, h: 590 });
+const MAP = () => ({ x: W * .54, y: H * .15, w: 640, h: 525 });
+const CITY_NAMES = ['Sydney', 'Melbourne', 'Brisbane'];
 const geo = ([lon, lat]) => { const m = MAP(); return [m.x + (lon - 112) / 42 * m.w, m.y + (-lat - 10) / 34 * m.h]; };
 
 // ===================== PUPPET: A PORTRAIT =====================
@@ -247,6 +243,7 @@ function icon(c, name, x, y, s = 1, o = {}) {
     case 'bell': { const p = new Path2D(); p.moveTo(-36, 22); p.quadraticCurveTo(-36, -32, 0, -38); p.quadraticCurveTo(36, -32, 36, 22); p.lineTo(48, 34); p.lineTo(-48, 34); p.closePath(); sh(p, [[-36, 22], [-30, -20], [0, -38], [30, -20], [36, 22], [48, 34], [-48, 34]], [-48, -38, 96, 72], PAL.fills[2], 10, { density: .3 }); c.fillStyle = PAL.inks[0]; c.beginPath(); c.arc(0, 44, 9, 0, TAU); c.fill(); break; }
     case 'pin': { const p = new Path2D(); p.arc(0, -20, 30, Math.PI * .75, Math.PI * 2.25); p.lineTo(0, 40); p.closePath(); sh(p, [...arcPts(0, -20, 30, 30, Math.PI * .75, Math.PI * 2.25, 20), [0, 40]], [-30, -50, 60, 90], PAL.fills[0], 10, { density: .3 }); c.fillStyle = o.badge ? PAL.light : PAL.paper; c.beginPath(); c.arc(0, -20, 11, 0, TAU); c.fill(); break; }
     case 'magnifier': sh(circPath(-8, -8, 34), ellPts(-8, -8, 34, 34, 0, 30), [-42, -42, 68, 68], PAL.light, 10, { density: .1, color: PAL.inks[2] }); stroke([[16, 16], [44, 44]], 8); break;
+    case 'target': sh(circPath(0, 0, 44), ellPts(0, 0, 44, 44, 0, 32), [-44, -44, 88, 88], PAL.light, 10, { density: .1, color: PAL.inks[2] }); stroke(ellPts(0, 0, 28, 28, 0, 26), 2.4, PAL.inks[0], true); sh(circPath(0, 0, 12), ellPts(0, 0, 12, 12, 0, 16), [-12, -12, 24, 24], PAL.fills[0], 12, { density: .3 }); break;   // scope: what a clinician covers
   }
   c.restore();
 }
@@ -255,14 +252,14 @@ function badgeIcon(c, name, x, y, text, q, seed, o = {}) { if (q <= 0) return; c
 
 // ===================== PEOPLE =====================
 const PAIRS = [
-  { id: 'pair1', head: 'A new parent, postpartum.', sub: 'matched with a GP who has perinatal experience.', pl: 'new parent, postpartum', cl: [['perinatal experience']], scene: 'pram',
+  { id: 'pair1', head: 'A new parent, postpartum.', cl: [['perinatal experience']], scene: 'pram',
     patient: () => ({ skin: SKIN().light, hair: PAL.ink, top: PAL.fills[5], style: 'bun', tired: true, baby: true }), pose: { mood: -.05, brow: -.45 },
     // a woman who could be her: the same skin, the same bun; the coat, the stethoscope and the heart badge are the difference
     clinician: () => ({ skin: SKIN().light, hair: PAL.ink, top: PAL.light, style: 'bun', coat: true, steth: true, badge: true }), cpose: { mood: .7, brow: .5 } },
-  { id: 'pair2', head: 'A South Asian family. Stigma at home.', sub: 'matched with a doctor of the same background, in Hindi and Urdu.', pl: 'not talked about at home', cl: [['same background · '], ['हिंदी', '"Noto Devanagari"', .8], [' · '], ['اردو', '"Noto Urdu"', .8]], scene: 'home',
+  { id: 'pair2', head: 'A South Asian family. Stigma at home.', cl: [['same background · '], ['हिंदी', '"Noto Devanagari"', .8], [' · '], ['اردو', '"Noto Urdu"', .8]], scene: 'home',
     patient: () => ({ skin: SKIN().tan, hair: PAL.ink, top: PAL.fills[3], style: 'long', bindi: true }), pose: { mood: -.2, brow: -.3 },
     clinician: () => ({ skin: SKIN().tan, hair: PAL.ink, top: PAL.light, style: 'crop', beard: true, glasses: true, coat: true, steth: true, tag: true }), cpose: { mood: .6, brow: .4 } },
-  { id: 'pair3', head: 'Afraid of being judged.', sub: 'matched with plain language and no judgement.', pl: 'afraid of being judged', cl: [['plain language, no judgement']], scene: 'crowd',
+  { id: 'pair3', head: 'Afraid of being judged.', cl: [['plain language, no judgement']], scene: 'crowd',
     patient: () => ({ skin: SKIN().light, hair: PAL.ink, top: PAL.fills[1], style: 'hood' }), pose: { mood: -.5, brow: -.9, thought: true },
     clinician: () => ({ skin: SKIN().deep, hair: PAL.ink, top: PAL.light, style: 'curly', coat: true, steth: true, wave: true }), cpose: { mood: .9, brow: .6, speech: true } },
 ];
@@ -352,12 +349,12 @@ function cardWho(c, tau, i) {
   risoCard(c, (g, k) => {
     if (k === 2) { glow(g, m.x + m.w * .55, m.y + m.h * .5, 100, 600, .8); g.fillStyle = '#fff'; g.fill(polyPath(AUS.map(geo))); g.fill(polyPath(TAS.map(geo))); }
     if (k === 0) { g.fillStyle = gray(.6); g.fill(polyPath(AUS.map(geo))); g.fill(polyPath(TAS.map(geo))); }
-    if (k === 1) { CITIES.forEach((p, n) => { if (tau < t1 + n * .6) return; const [x, y] = geo(p); g.fillStyle = gray(.95); g.beginPath(); g.arc(x, y, 22, 0, TAU); g.fill(); }); if (tau >= t2) { g.fillStyle = gray(.18); g.beginPath(); g.roundRect(W * .04, CY + 150, W * .46, 300, 60); g.fill(); } }
+    if (k === 1) CITIES.forEach((p, n) => { if (tau < t1 + n * .6) return; const [x, y] = geo(p); g.fillStyle = gray(.95); g.beginPath(); g.arc(x, y, 20, 0, TAU); g.fill(); });
   }, { tau });
-  CITIES.forEach((p, n) => { const [x, y] = geo(p), q = sm(t1 + .1 + n * .6, t1 + .6 + n * .6, tau, easeOut); if (q > 0) dashedRing(c, x, y, 26 + 34 * q, PAL.ink, 80 + n, [8, 6], 2.2); });
+  CITIES.forEach((p, n) => { const [x, y] = geo(p), q = sm(t1 + .1 + n * .6, t1 + .6 + n * .6, tau, easeOut); if (q <= 0) return; dashedRing(c, x, y, 24 + 30 * q, PAL.ink, 80 + n, [8, 6], 2.2);
+    const right = n !== 1; hand(c, CITY_NAMES[n], x + (right ? 66 : -66), y + (right ? 14 : 16), { size: 38, align: right ? 'left' : 'right', ink2: null, al: q }); });   // each city named where it is
   YOUNG.forEach((look, n) => { const q = sm(t2 + n * .35, t2 + .4 + n * .35, tau, easeOut); if (q <= 0) return; c.save(); resetT(c); c.translate(W * .1 + n * W * .085, CY + 330); c.scale(.5 * (.8 + .2 * q), .5 * (.8 + .2 * q)); bust(c, 0, 0, 1, look(), { mood: .1, brow: 0, blink: blinkAt(i, n * 2) }, 300 + n * 10); c.restore(); });
   hand(c, typed('16 to 25,', sm(0, TYPE * .7, tau)), W * .06, CY - 200, { size: 120 }); hand(c, typed('seeking a diagnosis.', sm(TYPE * .6, TYPE * 1.8, tau)), W * .06, CY - 80, { size: 84 });
-  if (tau >= t1) hand(c, 'Sydney · Melbourne · Brisbane', W * .06, CY + 20, { size: 50, ink2: null, ink: PAL.inks[0] });
 }
 function cardSolution(c, tau, i) {
   usePalette('risoPop'); const d = D('solution'), px = W * .24, py = CY + 130, cx = W * .76, cys = [-2, -1, 0, 1, 2].map(m => CY + 60 + m * 150), pick = 2, tm = d * .5;
@@ -380,7 +377,7 @@ function lifeScene(g, k, name, x, y) {
   if (name === 'crowd' && k === 0) { g.fillStyle = gray(.3); [[-330, -40], [-250, -110], [-160, -150], [-70, -170], [30, -160]].forEach(([dx, dy]) => { g.beginPath(); g.arc(x + dx, y + dy - 60, 34, 0, TAU); g.fill(); g.beginPath(); g.roundRect(x + dx - 60, y + dy - 10, 120, 90, 30); g.fill(); }); }
 }
 function cardPair(n, c, tau, i) {
-  usePalette('risoPop'); const P = PAIRS[n], d = D(P.id), px = W * .27, py = CY + 96, qx = W * .73, qy = CY + 96, tm = d * .45, ts = tm + 1.1, s = 1.05;   // the sub line types as the match line lands
+  usePalette('risoPop'); const P = PAIRS[n], d = D(P.id), px = W * .27, py = CY + 96, qx = W * .73, qy = CY + 96, tm = d * .45, s = 1.05;
   risoCard(c, (g, k) => {
     if (k === 2) { if (tau >= tm + .9) glow(g, qx, qy - 60, 80, 440, .9); lifeScene(g, k, P.scene, px, py); }
     if (k === 1) { g.fillStyle = gray(.2); g.beginPath(); g.arc(px, py - 60, 250, 0, TAU); g.fill(); lifeScene(g, k, P.scene, px, py); }
@@ -397,85 +394,71 @@ function cardPair(n, c, tau, i) {
     bubble(c, bx, by, 130, 80, 451, cc => { const cap = roundRectPath(-92, -18, 88, 36, 18); cc.save(); cc.clip(cap); cc.fillStyle = PAL.fills[1]; cc.fillRect(-92, -18, 44, 36); cc.fillStyle = PAL.fills[0]; cc.fillRect(-48, -18, 44, 36); cc.restore(); cc.strokeStyle = PAL.ink; cc.lineWidth = 2; wob(cc, roundRectPts(-92, -18, 88, 36, 18), 1, 452, true); wob(cc, [[-48, -18], [-48, 18]], .6, 453); hand(cc, '?', 60, 34, { size: 96, ink: PAL.blush, ink2: PAL.accents[2], align: 'center' }); }, q); }
   if (P.cpose.speech) { const q = sm(tm + 1.0, tm + 1.5, tau, easeOut), bx = qx + 250, by = qy - 300;
     bubble(c, bx, by, 120, 74, 460, cc => { cc.fillStyle = PAL.accents[0]; cc.fill(polyPath(heartPts(-40, 6, 1.5))); cc.strokeStyle = PAL.inks[0]; cc.lineWidth = 6; cc.lineCap = 'round'; wob(cc, [[14, 4], [34, 24], [70, -18]], 1.2, 461); }, q); if (q >= 1) tail(c, [qx + 120, qy - 160], [bx - 50, by + 60], 462); }
-  const pw = 560, ph = 74;
-  c.fillStyle = PAL.fills[0]; pill(c, px, py + 212, pw, ph); surface(c, roundRectPath(px - pw / 2, py + 212 - ph / 2, pw, ph, ph / 2), [px - pw / 2, py + 175, pw, ph], { finish: 'riso', seed: 470 + n, density: .22, cell: 6, color: PAL.inks[1] }); hand(c, P.pl, px, py + 228, { size: 42, align: 'center', ink2: null });
+  const pw = 560, ph = 74;   // the headline names the patient's situation; one pill under the clinician names the match
   c.fillStyle = PAL.fills[1]; pill(c, qx, qy + 212, pw, ph); surface(c, roundRectPath(qx - pw / 2, qy + 212 - ph / 2, pw, ph, ph / 2), [qx - pw / 2, qy + 175, pw, ph], { finish: 'riso', seed: 480 + n, density: .22, cell: 6, color: PAL.inks[0] }); mixed(c, P.cl, qx, qy + 228, 42, { ink2: null });
   const q = sm(tm, tm + 1.0, tau, easeOut); if (q > 0) { c.strokeStyle = PAL.accents[0]; c.lineWidth = 8; c.lineCap = 'round'; selfDraw(c, [[px + 200, py - 60], [CX, py - 90], [qx - 200, qy - 60]], q, 490 + n, 3); }
   if (q >= 1) { seedDot(c, px + 200, py - 60, 10, PAL.accents[0], null); seedDot(c, qx - 200, qy - 60, 10, PAL.accents[0], null); dashedRing(c, qx, qy - 60, 262, PAL.accents[0], 495 + n, [12, 8], 3); }
   head(c, P.head, { size: 90, p: sm(0, TYPE, tau) });
-  sub(c, P.sub, { p: sm(ts, ts + TYPE2, tau), size: 48 });
 }
-function cardPairs(c, tau, i) {
-  usePalette('risoPop'); const d = D('pairs'), rows = [CY - 170, CY + 10, CY + 190], to = [2, 0, 1], t0 = n => .4 + n * d * .16;
-  risoCard(c, (g, k) => { rows.forEach((y, n) => { if (tau < t0(n)) return; if (k === 1) { g.fillStyle = gray(.28); pill(g, W * .3, y, 470, 80); } if (k === 0) { g.fillStyle = gray(.28); pill(g, W * .7, rows[to[n]], 470, 80); } }); }, { tau });
-  PAIRS.forEach((P, n) => { if (tau < t0(n)) return; const y = rows[n], yc = rows[to[n]];
-    bust(c, W * .12, y + 60, .42, P.patient(), { ...P.pose, blink: blinkAt(i, n) }, 600 + n * 10); hand(c, P.pl, W * .3 + 50, y + 14, { size: 36, align: 'center', ink2: null });
-    bust(c, W * .88, yc + 60, .42, P.clinician(), { ...P.cpose, blink: blinkAt(i, n + 5) }, 650 + n * 10); mixed(c, P.cl, W * .7 - 50, yc + 14, 36, { ink2: null });
-    const q = sm(t0(n) + .5, t0(n) + 1.1, tau, easeOut); if (q > 0) { c.strokeStyle = PAL.accents[0]; c.lineWidth = 6; c.lineCap = 'round'; selfDraw(c, [[W * .3 + 250, y], [CX, (y + yc) / 2], [W * .7 - 250, yc]], q, 680 + n, 3); }
-    if (q >= 1) { seedDot(c, W * .3 + 246, y, 8, PAL.accents[0], null); seedDot(c, W * .7 - 246, yc, 8, PAL.accents[0], null); } });
-  head(c, 'Matched on life, not just availability.', { size: 84, p: sm(0, TYPE, tau) });
-  sub(c, 'Postpartum. Cultural background. Stigma. The things a directory never asks.', { p: sm(d * .5, d * .5 + TYPE2, tau), size: 46 });
-}
-// how the match is made
-const ASK = [['baby', 'stage of life'], ['speech', 'background and language'], ['fear', 'what you fear'], ['plain', 'how you like to be spoken to'], ['tag', 'cost'], ['phone', 'telehealth'], ['clock', 'when']];
-const KNOW = [['mic', 'interviewed first'], ['baby', 'what they have seen'], ['match', 'who they do best with'], ['plain', 'how they speak'], ['checklist', 'how they run a consult'], ['steth', 'scope'], ['calendar', 'availability']];
-// seven icons in a grid of three columns beside a portrait, popping in one by one
-function gridOf(c, items, cols, rows, tau, t0, step, seed) {
-  items.forEach(([name, text], n) => { const q = sm(t0 + n * step, t0 + n * step + .6, tau, easeOut); if (q <= 0) return; const row = Math.floor(n / 3), col = n % 3, x = row === 2 ? cols[1] : cols[col], y = rows[row];
-    badgeIcon(c, name, x, y, text, q, seed + n * 10, { size: 27, r: 64, s: .72 }); });
+// how the match is made: the four things about a life that decide a match, and the four things we learn about a clinician
+const ASK = [['baby', 'stage of life'], ['speech', 'background and language'], ['fear', 'what you fear'], ['plain', 'how you like to be spoken to']];
+const KNOW = [['mic', 'interviewed first'], ['notes', 'what they have seen'], ['match', 'who they do best with'], ['plain', 'how they speak']];
+const GRID_AT = d => [d * .18, d * .16];   // when the first icon lands, and the gap to the next
+// four icons in two columns beside a portrait, popping in one by one
+function gridOf(c, items, xs, ys, tau, t0, step, seed) {
+  items.forEach(([name, text], n) => { const q = sm(t0 + n * step, t0 + n * step + .6, tau, easeOut); if (q <= 0) return;
+    badgeIcon(c, name, xs[n % xs.length], ys[Math.floor(n / xs.length)], text, q, seed + n * 10, { size: 31, r: 84, s: .95 }); });
 }
 function cardAlgo1(c, tau, i) {
-  usePalette('risoPop'); const d = D('algo1'), px = W * .22, py = CY + 150;
-  risoCard(c, (g, k) => { if (k === 1) { g.fillStyle = gray(.18); g.beginPath(); g.arc(px, py - 90, 230, 0, TAU); g.fill(); } if (k === 2) glow(g, W * .66, CY + 30, 60, 640, .5); }, { tau });
+  usePalette('risoPop'); const d = D('algo1'), px = W * .22, py = CY + 150, [t0, step] = GRID_AT(d);
+  risoCard(c, (g, k) => { if (k === 1) { g.fillStyle = gray(.18); g.beginPath(); g.arc(px, py - 90, 230, 0, TAU); g.fill(); } if (k === 2) glow(g, W * .67, CY + 10, 60, 560, .5); }, { tau });
   bust(c, px, py, 1.0, YOUNG[0](), { mood: .2, brow: 0, blink: blinkAt(i) }, 340);
-  gridOf(c, ASK, [W * .49, W * .67, W * .85], [CY - 200, CY + 10, CY + 220], tau, d * .2, (d * .7) / ASK.length, 720);
+  gridOf(c, ASK, [W * .56, W * .78], [CY - 160, CY + 110], tau, t0, step, 720);
   head(c, 'We ask about your life.', { p: sm(0, TYPE, tau) });
-  sub(c, 'Not your postcode.', { p: sm(TYPE + .2, TYPE + 1.2, tau) });
+  sub(c, 'Not your postcode.', { x: W * .67, p: sm(t0 + 3 * step + .4, t0 + 3 * step + 1.4, tau) });
 }
 function cardAlgo2(c, tau, i) {
-  usePalette('risoPop'); const d = D('algo2'), px = W * .78, py = CY + 150;
-  risoCard(c, (g, k) => { if (k === 0) { g.fillStyle = gray(.16); g.beginPath(); g.arc(px, py - 90, 230, 0, TAU); g.fill(); } if (k === 2) glow(g, W * .34, CY + 30, 60, 640, .5); }, { tau });
+  usePalette('risoPop'); const d = D('algo2'), px = W * .78, py = CY + 150, [t0, step] = GRID_AT(d);
+  risoCard(c, (g, k) => { if (k === 0) { g.fillStyle = gray(.16); g.beginPath(); g.arc(px, py - 90, 230, 0, TAU); g.fill(); } if (k === 2) glow(g, W * .33, CY + 10, 60, 560, .5); }, { tau });
   bust(c, px, py, 1.0, DOCS[3](), { mood: .5, brow: .4, blink: blinkAt(i) }, 350);
-  gridOf(c, KNOW, [W * .15, W * .33, W * .51], [CY - 200, CY + 10, CY + 220], tau, d * .2, (d * .7) / KNOW.length, 760);
+  gridOf(c, KNOW, [W * .22, W * .44], [CY - 160, CY + 110], tau, t0, step, 760);
   head(c, 'We know every clinician the same way.', { size: 92, p: sm(0, TYPE, tau) });
-  sub(c, 'Interviewed first. Notes and outcomes later, with consent.', { p: sm(TYPE + .2, TYPE + 1.6, tau) });
+  sub(c, 'Interviewed first. Outcomes later, with consent.', { x: W * .33, size: 44, p: sm(t0 + 3 * step + .4, t0 + 3 * step + 1.8, tau) });
 }
 function cardAlgo3(c, tau, i) {
   usePalette('risoPop'); const d = D('algo3'), lx = W * .27, rx = W * .73, top = CY - 230, tL = d * .12, tR = d * .5, tE = d * .82;
   risoCard(c, (g, k) => { if (k === 0) { g.fillStyle = gray(.14); g.beginPath(); g.roundRect(lx - 380, top - 70, 760, 560, 50); g.fill(); } if (k === 1) { g.fillStyle = gray(.14); g.beginPath(); g.roundRect(rx - 380, top - 70, 760, 560, 50); g.fill(); } }, { tau });
   c.fillStyle = PAL.fills[1]; pill(c, lx, top - 20, 300, 60); hand(c, 'rules', lx, top - 5, { size: 42, align: 'center', ink: PAL.light, ink2: null });
   c.fillStyle = PAL.fills[0]; pill(c, rx, top - 20, 420, 60); hand(c, 'language model', rx, top - 5, { size: 42, align: 'center', ink: PAL.light, ink2: null });
-  const factors = [['baby', .9], ['speech', .75], ['fear', .85], ['plain', .6], ['tag', .5]];
-  factors.forEach(([name, w], n) => { const q = sm(tL + n * .45, tL + n * .45 + .6, tau, easeOut); if (q <= 0) return; const y = top + 60 + n * 74;
-    icon(c, name, lx - 300, y, .38, { seed: 800 + n * 10 }); c.fillStyle = tint(PAL.fills[1], .55); c.fillRect(lx - 230, y - 15, 480 * w * q, 30); c.strokeStyle = PAL.ink; c.lineWidth = 2; wob(c, [[lx - 230, y - 15], [lx - 230 + 480 * w * q, y - 15], [lx - 230 + 480 * w * q, y + 15], [lx - 230, y + 15]], 1.2, 810 + n, true); });
-  const qS = sm(tL + 2.8, tL + 3.3, tau, easeOut); if (qS > 0) { c.save(); resetT(c); c.translate(lx, top + 430); c.scale(qS, qS); dashedRing(c, 0, 0, 44, PAL.inks[0], 820, [8, 6], 2.4); hand(c, 'score', 0, 10, { size: 30, align: 'center', ink2: null }); c.restore(); }
-  const qN = sm(tR, tR + .6, tau, easeOut), qB = sm(tR + 1.0, tR + 1.6, tau, easeOut), qM = sm(tR + 2.0, tR + 2.6, tau, easeOut);
-  if (qN > 0) { badgeIcon(c, 'notes', rx - 220, top + 130, 'what you wrote', qN, 830, { r: 64, s: .72, size: 28 }); }
-  arrow(c, [[rx - 136, top + 130], [rx - 30, top + 130]], sm(tR + .7, tR + 1.0, tau), 831, PAL.inks[0]);
-  if (qB > 0) badgeIcon(c, 'brain', rx + 60, top + 130, 'reads the nuance', qB, 840, { r: 64, s: .72, size: 28 });
-  if (qM > 0) { bubble(c, rx + 100, top + 360, 240, 62, 850, cc => { squiggleText(cc, -190, -8, 380, 2, { seed: 851, lineH: 24, amp: 6, width: 2, color: PAL.ink }); }, qM); if (qM >= 1) tail(c, [rx + 70, top + 210], [rx + 50, top + 305], 852); }
-  const qE = sm(tE, tE + .8, tau, easeOut); if (qE > 0) { [lx, rx].forEach((x, n) => { c.save(); resetT(c); c.translate(x, top + 540); c.scale(qE, qE); c.fillStyle = PAL.fills[2]; pill(c, 0, 0, 420, 56); hand(c, 'the same match', 0, 13, { size: 38, align: 'center', ink2: null }); c.restore(); }); hand(c, 'vs', CX, top + 250, { size: 90, ink: PAL.blush, ink2: PAL.accents[2], align: 'center' }); }
+  // rules: the four things we asked, each scored as a bar
+  ASK.forEach(([name], n) => { const w = [.9, .7, .85, .55][n], q = sm(tL + n * .5, tL + n * .5 + .6, tau, easeOut); if (q <= 0) return; const y = top + 90 + n * 100;
+    icon(c, name, lx - 290, y, .55, { seed: 800 + n * 10 }); c.fillStyle = tint(PAL.fills[1], .55); c.fillRect(lx - 210, y - 18, 480 * w * q, 36); c.strokeStyle = PAL.ink; c.lineWidth = 2; wob(c, [[lx - 210, y - 18], [lx - 210 + 480 * w * q, y - 18], [lx - 210 + 480 * w * q, y + 18], [lx - 210, y + 18]], 1.2, 810 + n, true); });
+  // the language model: what you wrote, read for its nuance
+  const qN = sm(tR, tR + .6, tau, easeOut), qB = sm(tR + 1.0, tR + 1.6, tau, easeOut);
+  if (qN > 0) badgeIcon(c, 'notes', rx - 190, top + 200, 'what you wrote', qN, 830, { r: 84, s: .95, size: 32 });
+  arrow(c, [[rx - 90, top + 200], [rx + 80, top + 200]], sm(tR + .7, tR + 1.0, tau), 831, PAL.inks[0], 5);
+  if (qB > 0) badgeIcon(c, 'brain', rx + 190, top + 200, 'reads the nuance', qB, 840, { r: 84, s: .95, size: 32 });
+  const qE = sm(tE, tE + .8, tau, easeOut); if (qE > 0) { [lx, rx].forEach(x => { c.save(); resetT(c); c.translate(x, top + 540); c.scale(qE, qE); c.fillStyle = PAL.fills[2]; pill(c, 0, 0, 420, 56); hand(c, 'the same match', 0, 13, { size: 38, align: 'center', ink2: null }); c.restore(); }); hand(c, 'vs', CX, top + 250, { size: 90, ink: PAL.blush, ink2: PAL.accents[2], align: 'center' }); }
   head(c, 'Two models, side by side.', { p: sm(0, TYPE, tau) });
-  sub(c, 'Transparent rules, and a language model that reads nuance. We test which earns its place.', { p: sm(d * .55, d * .55 + TYPE2, tau), size: 44 });
+  sub(c, 'Transparent rules, and a model that reads nuance. We test which earns its place.', { p: sm(d * .55, d * .55 + TYPE2, tau), size: 44 });
 }
-const SIGNALS = [['plain', 'communication'], ['match', 'collaboration'], ['checklist', 'structure'], ['steth', 'scope'], ['tag', 'price and availability']];
+const SIGNALS = [['plain', 'communication'], ['match', 'collaboration'], ['checklist', 'structure'], ['target', 'scope'], ['tag', 'price and availability']];
 function cardAlgo4(c, tau, i) {
-  usePalette('risoPop'); const d = D('algo4'), cx = CX - 120, cy = CY - 40, R = 250, tS = d * .18, step = d * .1, tN = d * .78;
-  risoCard(c, (g, k) => { if (k === 2) glow(g, cx, cy, 60, 460, .6); if (k === 0 && tau >= tN) glow(g, W * .86, CY + 40, 40, 260, .5); }, { tau });
+  usePalette('risoPop'); const d = D('algo4'), cx = CX - 140, cy = CY - 30, R = 250, nx = W * .85, tS = d * .18, step = d * .1, tN = d * .76;
+  risoCard(c, (g, k) => { if (k === 2) glow(g, cx, cy, 60, 460, .6); if (k === 0 && tau >= tN) { g.fillStyle = gray(.16); g.beginPath(); g.arc(nx, cy, 150, 0, TAU); g.fill(); } }, { tau });
   dottedArc(c, cx, cy, R - 60, PAL.chalkDim, 900, 12, 1.6);
   bust(c, cx - 62, cy + 50, .42, YOUNG[3](), { mood: .4, brow: .2, blink: blinkAt(i) }, 360); bust(c, cx + 62, cy + 50, .42, DOCS[4](), { mood: .6, brow: .4, blink: blinkAt(i, 4) }, 370);
   SIGNALS.forEach(([name, text], n) => { const a = -Math.PI * .3 + n / 5 * TAU, x = cx + Math.cos(a) * R, y = cy + Math.sin(a) * R, q = sm(tS + n * step, tS + n * step + .5, tau, easeOut); if (q <= 0) return; badgeIcon(c, name, x, y, text, q, 910 + n * 10, { size: 27, r: 62, s: .7 }); arrow(c, [[x + Math.cos(a + Math.PI / 2) * 52, y + Math.sin(a + Math.PI / 2) * 52], [cx + Math.cos(a + .6) * (R - 24), cy + Math.sin(a + .6) * (R - 24)]], sm(tS + n * step + .4, tS + n * step + .9, tau), 920 + n, PAL.accents[0], 3); });
-  const qN = sm(tN, tN + .8, tau, easeOut); if (qN > 0) { arrow(c, [[cx + R + 40, cy], [W * .86 - 120, CY + 40]], qN, 930, PAL.inks[0], 5); c.save(); resetT(c); c.translate(W * .86, CY + 40); c.scale(qN, qN); bust(c, -50, 60, .42, YOUNG[3](), { mood: .8, brow: .4 }, 380); bust(c, 50, 60, .42, DOCS[4](), { mood: .8, brow: .5 }, 390); hand(c, 'next match', 0, 150, { size: 34, align: 'center', ink2: null }); c.restore(); }
-  const qX = sm(d * .12, d * .12 + .5, tau, easeOut); if (qX > 0) { badgeIcon(c, 'starx', W * .1, CY - 60, 'not a star score', qX, 940, { size: 28 }); }
+  const qN = sm(tN, tN + .8, tau, easeOut); if (qN > 0) { arrow(c, [[cx + R + 60, cy], [nx - 130, cy]], qN, 930, PAL.inks[0], 5); badgeIcon(c, 'match', nx, cy - 10, 'next match', qN, 935, { r: 84, s: 1.0, size: 36 }); }
   head(c, 'Every consult makes the next match better.', { size: 88, p: sm(0, TYPE, tau) });
-  sub(c, 'Five fit signals, after every consultation. A fit profile, not a star score.', { p: sm(d * .55, d * .55 + TYPE2, tau), size: 44 });
+  sub(c, 'Five fit signals after every consult. A fit profile, not a star score.', { p: sm(d * .55, d * .55 + TYPE2, tau), size: 44 });
 }
 function cardValue(c, tau, i) {
   usePalette('risoPop'); const d = D('value'), xs = [W * .2, W * .5, W * .8], ts = [d * .08, d * .38, d * .62];
   risoCard(c, (g, k) => xs.forEach((x, n) => { if (tau < ts[n]) return; g.fillStyle = gray(.16); if (k === [1, 2, 0][n]) { g.beginPath(); g.arc(x, CY + 40, 250, 0, TAU); g.fill(); } }), { tau });
   const q0 = sm(ts[0], ts[0] + .7, tau, easeOut); if (q0 > 0) { badgeIcon(c, 'match', xs[0], CY - 150, null, q0, 950); c.save(); resetT(c); c.translate(xs[0], CY + 90); c.scale(q0, q0); bust(c, -70, 60, .48, YOUNG[1](), { mood: .7, brow: .3, blink: blinkAt(i) }, 960); bust(c, 70, 60, .48, DOCS[1](), { mood: .7, brow: .4, blink: blinkAt(i, 3) }, 970); c.restore(); hand(c, 'they fit, before you meet', xs[0], CY + 320, { size: 38, align: 'center', ink2: null, al: q0 }); }
   const q1 = sm(ts[1], ts[1] + .7, tau, easeOut); if (q1 > 0) { badgeIcon(c, 'clock', xs[1] - 90, CY - 130, null, q1, 980); badgeIcon(c, 'coin', xs[1] + 90, CY - 130, null, q1, 990); c.save(); resetT(c); c.translate(xs[1], CY + 90); c.scale(q1, q1); bust(c, 0, 60, .48, YOUNG[4](), { mood: .6, brow: .2, blink: blinkAt(i, 2) }, 1000); c.restore(); hand(c, 'faster and cheaper', xs[1], CY + 320, { size: 38, align: 'center', ink2: null, al: q1 }); hand(c, 'than the psychiatrist-only route', xs[1], CY + 362, { size: 30, align: 'center', ink2: null, al: q1 }); }
-  const q2 = sm(ts[2], ts[2] + .7, tau, easeOut); if (q2 > 0) { badgeIcon(c, 'calendar', xs[2], CY - 150, null, q2, 1010, { text: '6 · 12 · 24' }); c.save(); resetT(c); c.translate(xs[2], CY + 90); c.scale(q2, q2); [-120, 0, 120].forEach((dx, n) => bust(c, dx, 60, .42, DOCS[0](), { mood: .7, brow: .5, blink: blinkAt(i, n * 4) }, 1020 + n)); c.restore(); hand(c, 'the same clinician stays', xs[2], CY + 320, { size: 38, align: 'center', ink2: null, al: q2 }); }
+  const q2 = sm(ts[2], ts[2] + .7, tau, easeOut); if (q2 > 0) { badgeIcon(c, 'calendar', xs[2], CY - 150, null, q2, 1010, { text: '6 · 12 · 24' }); c.save(); resetT(c); c.translate(xs[2], CY + 90); c.scale(q2, q2); bust(c, -70, 60, .48, YOUNG[3](), { mood: .7, brow: .3, blink: blinkAt(i, 1) }, 1020); bust(c, 70, 60, .48, DOCS[0](), { mood: .7, brow: .5, blink: blinkAt(i, 4) }, 1021); c.restore(); hand(c, 'the same clinician stays', xs[2], CY + 320, { size: 38, align: 'center', ink2: null, al: q2 }); }
   head(c, 'What that changes.', { p: sm(0, TYPE, tau) });
 }
 function cardHow(c, tau, i) {
@@ -498,11 +481,11 @@ function cardWhyNow(c, tau, i) {
 }
 function cardMarket(c, tau, i) {
   usePalette('risoPop'); const d = D('market'), r = rng(140), count = sm(d * .45, d * .82, tau, easeOut);
-  const pts = []; for (let row = 0; row < 8; row++) for (let col = 0; col < 18; col++) pts.push([CX + 90 + col * 46 + (r() - .5) * 10, CY - 260 + row * 62 + (r() - .5) * 10]);
+  const pts = []; for (let row = 0; row < 10; row++) for (let col = 0; col < 10; col++) pts.push([W * .6 + col * 54 + (r() - .5) * 8, CY - 245 + row * 54 + (r() - .5) * 8]);   // a hundred people
   risoCard(c, (g, k) => {
     if (k === 2) glow(g, W * .27, CY, 80, 620, .7);
-    if (k === 0) pts.forEach(([x, y]) => { g.fillStyle = gray(.7); g.beginPath(); g.arc(x, y, 10, 0, TAU); g.fill(); });
-    if (k === 1) pts.forEach(([x, y], n) => { if (n % 4 || n / pts.length > count) return; g.fillStyle = gray(.95); g.beginPath(); g.arc(x, y, 13, 0, TAU); g.fill(); });
+    if (k === 0) pts.forEach(([x, y]) => { g.fillStyle = gray(.7); g.beginPath(); g.arc(x, y, 12, 0, TAU); g.fill(); });
+    if (k === 1) pts.forEach(([x, y], n) => { if (n >= Math.round(25 * count)) return; g.fillStyle = gray(.95); g.beginPath(); g.arc(x, y, 15, 0, TAU); g.fill(); });   // one in four, filling as the count rises
   }, { tau });
   const pop = sm(.5, 1.1, tau, easeOut), n = Math.round(250 * count);
   if (tau >= .5) { c.save(); resetT(c); c.translate(W * .27, CY - 110); c.scale(.6 + .4 * pop, .6 + .4 * pop); hand(c, '>1M', 0, 0, { size: 230, align: 'center' }); c.restore(); }
@@ -530,7 +513,7 @@ function cardTraction(c, tau, i) {
   const q = sm(t0(1) + .6, t0(1) + 1.1, tau, easeOut); if (q > 0) { c.save(); resetT(c); c.translate(W * .5, CY + 300); c.scale(q, q); bust(c, -80, 40, .34, DOCS[0](), { mood: .7, brow: .5, blink: blinkAt(i) }, 1300); bust(c, 80, 40, .34, DOCS[1](), { mood: .6, brow: .4, blink: blinkAt(i, 4) }, 1310); c.restore(); }
   head(c, 'Live today.', { p: sm(0, TYPE, tau) });
 }
-const CARDS = [cardTitle, cardPain1, cardPain2, cardPain3, cardPain4, cardWho, cardSolution, (c, t, i) => cardPair(0, c, t, i), (c, t, i) => cardPair(1, c, t, i), (c, t, i) => cardPair(2, c, t, i), cardPairs, cardAlgo1, cardAlgo2, cardAlgo3, cardAlgo4, cardValue, cardHow, cardWhyNow, cardMarket, cardModel, cardTraction];
+const CARDS = [cardTitle, cardPain1, cardPain2, cardPain3, cardPain4, cardWho, cardSolution, (c, t, i) => cardPair(0, c, t, i), (c, t, i) => cardPair(1, c, t, i), (c, t, i) => cardPair(2, c, t, i), cardAlgo1, cardAlgo2, cardAlgo3, cardAlgo4, cardValue, cardHow, cardWhyNow, cardMarket, cardModel, cardTraction];
 const FINAL = CARDS.map(fn => (c) => fn(c, 99, 0));
 
 // ===================== SCENES =====================
@@ -544,8 +527,8 @@ function sceneHook(c, tau, i) {
 }
 const PROBLEM = ['maze', 'pain1', 'pain2', 'pain3', 'pain4', 'giveup'], PROBLEM_FN = { maze: cardMaze, pain1: cardPain1, pain2: cardPain2, pain3: cardPain3, pain4: cardPain4, giveup: cardGiveUp };
 function sceneProblem(c, tau, i) { const [id, t] = beatAt(PROBLEM, tau); PROBLEM_FN[id](c, t, i); mark(c); }
-const MATCH = ['pair1', 'pair2', 'pair3', 'pairs'];
-function sceneMatching(c, tau, i) { const [id, t] = beatAt(MATCH, tau); if (id === 'pairs') cardPairs(c, t, i); else cardPair(MATCH.indexOf(id), c, t, i); mark(c); }
+const MATCH = ['pair1', 'pair2', 'pair3'];
+function sceneMatching(c, tau, i) { const [id, t] = beatAt(MATCH, tau); cardPair(MATCH.indexOf(id), c, t, i); mark(c); }
 const ALGO = ['algo1', 'algo2', 'algo3', 'algo4'], ALGO_FN = { algo1: cardAlgo1, algo2: cardAlgo2, algo3: cardAlgo3, algo4: cardAlgo4 };
 function sceneAlgo(c, tau, i) { const [id, t] = beatAt(ALGO, tau); ALGO_FN[id](c, t, i); mark(c); }
 const one = fn => (c, tau, i) => { fn(c, tau, i); mark(c); };
@@ -584,10 +567,18 @@ const TIMELINE = SCENES.map(([name, ids, fn]) => ({ name, dur: ids.reduce((a, id
 const T = { end: TIMELINE.reduce((a, s) => a + s.dur, 0) };
 
 // ===================== SCORE: THE MUSIC =====================
-// Written from the same timeline. Bars re-anchor on every narrative beat, so downbeats land on the cuts.
-// Arpeggio and synths: a triangle pluck with a dotted-eighth echo, a three-saw pad through a breathing lowpass,
-// a square bass through its own filter. Each section sets its key, chord loop, arpeggio rate (notes per beat),
-// a second arpeggio an octave up, the pad level and the filter cutoff. The value beat lifts the key a whole tone.
+// Written from the same timeline as a song, so it moves the way the film moves; bars re-anchor on every cut.
+// Arpeggio and synths only: a triangle pluck with a dotted-eighth echo, a three-saw pad through a breathing
+// lowpass, a square bass through its own filter, and a soft saw lead with vibrato for the melodies.
+//   intro (hook)                pad and a slow arpeggio in C
+//   verse (the problem)         minor loop, slow arpeggio, bass; all but the pad drops out for "give up"
+//   pre-chorus (who, solution)  the arpeggio doubles to eighths and the filter opens
+//   chorus (the three matches)  full arpeggio, the octave arpeggio, and a melody that varies on each match
+//   verse two (the engine)      new chords, an up-and-down arpeggio, the bass on eighths, a run up into the value
+//   chorus two (the value)      up a whole tone, the melody returns
+//   bridge (how), breakdown (why now)  the chords rotated, then pad and slow arpeggio on a borrowed minor chord, a riser
+//   last chorus (market, model, traction)  full, then thinning
+//   outro (gallery, close, sign-off)       arpeggio alone in its echo, the melody's last phrase, one chord
 function score(ac, t0, dest) {
   const master = ac.createGain(); master.gain.value = .5; master.connect(dest);
   const irN = Math.ceil(ac.sampleRate * 2.6), ir = ac.createBuffer(2, irN, ac.sampleRate), rr = rng(99);
@@ -597,38 +588,69 @@ function score(ac, t0, dest) {
   const beat = 60 / 66, bar = beat * 4, hz = m => 440 * Math.pow(2, (m - 69) / 12);
   const lp = ac.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 800; lp.Q.value = .8; lp.connect(send(1));   // the pad's filter
   const lfo = ac.createOscillator(), lfoAmt = ac.createGain(); lfo.frequency.value = .07; lfoAmt.gain.value = 170; lfo.connect(lfoAmt); lfoAmt.connect(lp.frequency); lfo.start(t0);   // it breathes
-  const arpBus = send(.9), highBus = send(1.1), bassBus = ac.createGain(); bassBus.connect(master);
+  const arpBus = send(.9), highBus = send(1.1), leadBus = send(1), bassBus = ac.createGain(); bassBus.connect(master);
   const bassLp = ac.createBiquadFilter(); bassLp.type = 'lowpass'; bassLp.frequency.value = 230; bassLp.Q.value = 1.2; bassLp.connect(bassBus);   // rounds the square bass
+  const leadLp = ac.createBiquadFilter(); leadLp.type = 'lowpass'; leadLp.frequency.value = 1500; leadLp.Q.value = .7; leadLp.connect(leadBus);
+  const vib = ac.createOscillator(), vibAmt = ac.createGain(); vib.frequency.value = 5.2; vibAmt.gain.value = 6; vib.connect(vibAmt); vib.start(t0);   // the lead's vibrato, in cents
   const echo = ac.createDelay(2), fb = ac.createGain(), echoTone = ac.createBiquadFilter(), echoOut = ac.createGain();   // a dotted-eighth echo on the arpeggio
   echo.delayTime.value = beat * .75; fb.gain.value = .3; echoTone.type = 'lowpass'; echoTone.frequency.value = 2200; echoOut.gain.value = .36;
   arpBus.connect(echo); echo.connect(echoTone); echoTone.connect(fb); fb.connect(echo); echoTone.connect(echoOut); echoOut.connect(master); echoOut.connect(conv);
-  const DEG = { I: [0, 4, 7], V: [-5, -1, 2], vi: [-3, 0, 4], IV: [-7, -3, 0], ii: [2, 5, 9] };
+  const DEG = { I: [0, 4, 7], ii: [2, 5, 9], iii: [4, 7, 11], IV: [-7, -3, 0], iv: [-7, -4, 0], V: [-5, -1, 2], vi: [-3, 0, 4] };
   const pad = (notes, t, d, g) => notes.forEach(m => [-9, 0, 9].forEach(det => { const o = ac.createOscillator(), e = ac.createGain(); o.type = 'sawtooth'; o.frequency.value = hz(m); o.detune.value = det;   // three detuned saws a note
     e.gain.setValueAtTime(0, t0 + t); e.gain.linearRampToValueAtTime(g * .7, t0 + t + Math.min(1.2, d * .4)); e.gain.setValueAtTime(g * .7, t0 + t + Math.max(0, d - .5)); e.gain.linearRampToValueAtTime(0, t0 + t + d + .5); o.connect(e); e.connect(lp); o.start(t0 + t); o.stop(t0 + t + d + .6); }));
   const pluck = (m, t, d, g, type = 'triangle', bus = arpBus) => { const o = ac.createOscillator(), e = ac.createGain(); o.type = type; o.frequency.value = hz(m); e.gain.setValueAtTime(0, t0 + t); e.gain.linearRampToValueAtTime(g, t0 + t + .015); e.gain.exponentialRampToValueAtTime(.0008, t0 + t + d); o.connect(e); e.connect(bus); o.start(t0 + t); o.stop(t0 + t + d + .05); };
   const bass = (m, t, d, g) => { const o = ac.createOscillator(), e = ac.createGain(); o.type = 'square'; o.frequency.value = hz(m - 24); e.gain.setValueAtTime(0, t0 + t); e.gain.linearRampToValueAtTime(g, t0 + t + .012); e.gain.exponentialRampToValueAtTime(g * .5, t0 + t + .3); e.gain.exponentialRampToValueAtTime(.0008, t0 + t + d); o.connect(e); e.connect(bassLp); o.start(t0 + t); o.stop(t0 + t + d + .05); };
-  // key, chord loop, pad level, arpeggio level and rate (notes per beat), the octave-up arpeggio, filter cutoff
-  const SECT = id => {
-    if (id === 'hook') return { key: 60, loop: ['I', 'IV', 'I', 'IV'], lvl: .045, arp: .05, rate: 1, high: 0, lp: 900 };
-    if (['maze', 'pain1', 'pain2', 'pain3', 'pain4', 'giveup'].includes(id)) return { key: 60, loop: ['vi', 'IV', 'I', 'V'], lvl: .045, arp: .05, rate: 1, high: 0, lp: 800 };
-    if (['who', 'solution'].includes(id)) return { key: 60, loop: ['I', 'V', 'vi', 'IV'], lvl: .05, arp: .05, rate: 2, high: 0, lp: 1100 };
-    if (id.startsWith('pair')) return { key: 60, loop: ['I', 'V', 'vi', 'IV'], lvl: .055, arp: .055, rate: 2, high: .022, lp: 1200 };
-    if (id.startsWith('algo')) return { key: 60, loop: ['vi', 'IV', 'I', 'V'], lvl: .055, arp: .06, rate: 2, high: .026, lp: 1300 };
-    if (id === 'value') return { key: 62, loop: ['I', 'V', 'vi', 'IV'], lvl: .062, arp: .065, rate: 2, high: .03, lp: 1500 };
-    if (['how', 'whynow', 'market', 'model', 'traction'].includes(id)) return { key: 62, loop: ['I', 'V', 'vi', 'IV'], lvl: .055, arp: .06, rate: 2, high: .024, lp: 1400 };
-    if (id === 'gallery') return { key: 62, loop: ['IV', 'I', 'IV', 'I'], lvl: .05, arp: .05, rate: 2, high: 0, lp: 1100 };
-    if (id === 'close') return { key: 62, loop: ['IV', 'V', 'I', 'I'], lvl: .05, arp: .045, rate: 1, high: 0, lp: 1000 };
-    return { key: 62, loop: ['I', 'I', 'I', 'I'], lvl: .05, arp: .04, rate: 1, high: 0, lp: 900 };
+  const lead = (m, t, d, g) => [-5, 5].forEach(det => { const o = ac.createOscillator(), e = ac.createGain(); o.type = 'sawtooth'; o.frequency.value = hz(m); o.detune.value = det; vibAmt.connect(o.detune); e.gain.setValueAtTime(0, t0 + t); e.gain.linearRampToValueAtTime(g, t0 + t + .06); e.gain.setValueAtTime(g, t0 + t + d * .55); e.gain.exponentialRampToValueAtTime(.0008, t0 + t + d); o.connect(e); e.connect(leadLp); o.start(t0 + t); o.stop(t0 + t + d + .05); });
+  // arpeggio shapes over a bar, from a chord [root, third, fifth]; a section alternates its shapes bar by bar
+  const SHAPE = {
+    slow: ch => [ch[0], ch[2], ch[1] + 12, ch[2]],
+    up: ch => [ch[0], ch[2], ch[1] + 12, ch[0] + 12, ch[2], ch[1] + 12, ch[0] + 12, ch[2] + 12],
+    wide: ch => [ch[0], ch[2], ch[0] + 12, ch[2] + 12, ch[1] + 12, ch[0] + 12, ch[2], ch[1]],
+    updown: ch => [ch[0], ch[1], ch[2], ch[0] + 12, ch[2] + 12, ch[0] + 12, ch[2], ch[1]],
   };
-  ORDER.forEach(id => { const b = B[id], S = SECT(id); lp.frequency.linearRampToValueAtTime(S.lp, t0 + b.start + .5);
-    for (let t = b.start, n = 0; t < b.start + b.dur - .05; t += bar, n++) {
-      const dur = Math.min(bar, b.start + b.dur - t), ch = DEG[S.loop[n % 4]].map(x => x + S.key), root = ch[0];
-      pad(ch, t, dur, S.lvl);
-      bass(root, t, beat * 1.7, .13); if (dur > beat * 2.2) bass(root, t + beat * 2, beat * 1.7, .09);
-      const step = beat / S.rate, pat = S.rate === 2 ? [ch[0], ch[2], ch[1] + 12, ch[0] + 12, ch[2], ch[1] + 12, ch[0] + 12, ch[2] + 12] : [ch[0], ch[2], ch[1] + 12, ch[2]];
-      pat.forEach((m, k) => { if (k * step < dur - .1) pluck(m, t + k * step, S.rate === 2 ? .4 : .75, S.arp); });
-      if (S.high) pat.forEach((m, k) => { if (k * step + step / 2 < dur - .1) pluck(m + 12, t + k * step + step / 2, .3, S.high, 'sine', highBus); });   // an octave up, on the off-beats
+  const RUN = ch => [ch[0] + 12, ch[1] + 12, ch[2] + 12, ch[0] + 24];   // the last half-bar of a section runs up into the next
+  // melodies: [semitones above the key's octave, start in beats, length in beats]
+  const M1 = [[4, 0, .9], [7, 1, .9], [9, 2, .9], [7, 3, .9], [4, 4.5, .9], [2, 5.5, .9], [0, 6.5, 1.8]];
+  const M2 = [[4, 0, .9], [7, 1, .9], [11, 2, .9], [9, 3, .9], [7, 4.5, .9], [4, 5.5, 1.8]];
+  const M3 = [[9, 0, .9], [7, 1, .9], [4, 2, .9], [7, 3, .9], [9, 4.5, .9], [11, 5.5, .9], [12, 6.5, 2.2]];
+  const M4 = [[4, 0, 1.4], [2, 1.5, 1.4], [0, 3, 2.8]];
+  const MELODY = { pair1: M1, pair2: M2, pair3: M3, value: M1, close: M4 };
+  // the song: a section per group of beats. key, chord loop, arpeggio shapes and rate (notes a beat), bass pattern,
+  // pad level, arpeggio levels (arp, and high an octave up on the off-beats), filter cutoff, lead level
+  const SECTION = id => id === 'hook' ? 'intro' : ['maze', 'pain1', 'pain2', 'pain3', 'pain4'].includes(id) ? 'verse' : id === 'giveup' ? 'drop'
+    : ['who', 'solution'].includes(id) ? 'pre' : id.startsWith('pair') ? 'chorus' : id.startsWith('algo') ? 'verse2' : id === 'value' ? 'chorus2'
+    : id === 'how' ? 'bridge' : id === 'whynow' ? 'breakdown' : ['market', 'model', 'traction'].includes(id) ? 'last' : id === 'gallery' ? 'outro' : id === 'close' ? 'close' : 'end';
+  const SONG = {
+    intro:     { key: 60, loop: ['I', 'IV'], shapes: ['slow'], rate: 1, bass: 'none', lvl: .045, arp: .05, high: 0, lp: 900 },
+    verse:     { key: 60, loop: ['vi', 'IV', 'I', 'V'], shapes: ['slow'], rate: 1, bass: 'long', lvl: .045, arp: .05, high: 0, lp: 800 },
+    drop:      { key: 60, loop: ['vi'], shapes: ['slow'], rate: 1, bass: 'none', lvl: .04, arp: .03, high: 0, lp: 600 },
+    pre:       { key: 60, loop: ['I', 'V', 'vi', 'IV'], shapes: ['up', 'wide'], rate: 2, bass: 'long', lvl: .05, arp: .05, high: 0, lp: 1100 },
+    chorus:    { key: 60, loop: ['I', 'V', 'vi', 'IV'], shapes: ['wide', 'up'], rate: 2, bass: 'long', lvl: .055, arp: .055, high: .022, lp: 1250, lead: .05 },
+    verse2:    { key: 60, loop: ['vi', 'ii', 'IV', 'V'], shapes: ['updown', 'up'], rate: 2, bass: 'eighths', lvl: .055, arp: .06, high: .026, lp: 1300 },
+    chorus2:   { key: 62, loop: ['I', 'V', 'vi', 'IV'], shapes: ['wide', 'up'], rate: 2, bass: 'long', lvl: .062, arp: .065, high: .03, lp: 1500, lead: .055 },
+    bridge:    { key: 62, loop: ['IV', 'I', 'V', 'vi'], shapes: ['up', 'updown'], rate: 2, bass: 'eighths', lvl: .055, arp: .06, high: .024, lp: 1400 },
+    breakdown: { key: 62, loop: ['IV', 'iv', 'I', 'I'], shapes: ['slow'], rate: 1, bass: 'none', lvl: .05, arp: .045, high: 0, lp: 700 },
+    last:      { key: 62, loop: ['I', 'V', 'vi', 'IV'], shapes: ['wide', 'up'], rate: 2, bass: 'long', lvl: .06, arp: .06, high: .028, lp: 1500 },
+    outro:     { key: 62, loop: ['I', 'IV'], shapes: ['wide'], rate: 2, bass: 'none', lvl: 0, arp: .05, high: 0, lp: 1100 },
+    close:     { key: 62, loop: ['IV', 'V', 'I', 'I'], shapes: ['slow'], rate: 1, bass: 'long', lvl: .05, arp: .045, high: 0, lp: 1000, lead: .05 },
+    end:       { key: 62, loop: ['I'], shapes: ['slow'], rate: 1, bass: 'none', lvl: .05, arp: .04, high: 0, lp: 900 },
+  };
+  const barsIn = {};   // bars already played in each section, so the chords and shapes keep turning across cuts
+  ORDER.forEach((id, k) => {
+    const b = B[id], name = SECTION(id), S = SONG[name], endsSection = k + 1 >= ORDER.length || SECTION(ORDER[k + 1]) !== name;
+    lp.frequency.linearRampToValueAtTime(S.lp, t0 + b.start + .5);
+    for (let t = b.start; t < b.start + b.dur - .05; t += bar) {
+      const n = barsIn[name] = (barsIn[name] || 0) + 1, dur = Math.min(bar, b.start + b.dur - t), ch = DEG[S.loop[(n - 1) % S.loop.length]].map(x => x + S.key), root = ch[0];
+      const lastBar = endsSection && t + bar >= b.start + b.dur - .05;
+      if (S.lvl) pad(ch, t, dur, S.lvl);
+      if (S.bass === 'long') { bass(root, t, beat * 1.7, .13); if (dur > beat * 2.2) bass(root, t + beat * 2, beat * 1.7, .09); }
+      if (S.bass === 'eighths') for (let e = 0; e < 8; e++) if (e * beat / 2 < dur - .1) bass(root + (e % 4 === 3 ? 12 : 0), t + e * beat / 2, .28, e % 2 ? .07 : .11);
+      const step = beat / S.rate; let pat = SHAPE[S.shapes[(n - 1) % S.shapes.length]](ch);
+      if (lastBar && S.rate === 2) pat = [...pat.slice(0, 4), ...RUN(ch)];
+      pat.forEach((m, j) => { if (j * step < dur - .1) pluck(m, t + j * step, S.rate === 2 ? .4 : .75, S.arp); });
+      if (S.high) pat.forEach((m, j) => { if (j * step + step / 2 < dur - .1) pluck(m + 12, t + j * step + step / 2, .3, S.high, 'sine', highBus); });
     }
+    if (S.lead && MELODY[id]) MELODY[id].forEach(([dg, q, len]) => lead(S.key + 12 + dg, b.start + 1.0 + q * beat, len * beat, S.lead));
   });
   // accents on the cuts and reveals
   pluck(84, B.hook.start + D('hook') * .5, 1.2, .16, 'sine'); pluck(88, B.hook.start + D('hook') * .5 + .3, 1.2, .12, 'sine');
@@ -636,7 +658,7 @@ function score(ac, t0, dest) {
   pluck(45, B.giveup.start, 1.8, .18, 'sine');
   pluck(84, B.solution.start + D('solution') * .5 + .9, 1.0, .16, 'sine');
   ['pair1', 'pair2', 'pair3'].forEach(id => { const t = B[id].start + D(id) * .45 + 1.0; pluck(84, t, .9, .16, 'sine'); pluck(91, t + .2, 1.2, .12, 'sine'); });
-  ['algo1', 'algo2'].forEach(id => { const S = 7, d = D(id); for (let n = 0; n < S; n++) pluck(72 + [0, 2, 4, 7, 9, 12, 14][n], B[id].start + d * .2 + n * (d * .72) / S, .3, .07, 'square'); });
+  ['algo1', 'algo2'].forEach(id => { const [at, step] = GRID_AT(D(id)); for (let n = 0; n < 4; n++) pluck(72 + [0, 4, 7, 12][n], B[id].start + at + n * step + .3, .3, .07, 'square'); });
   for (let n = 0; n < 5; n++) pluck(72 + [0, 4, 7, 11, 12][n], B.algo4.start + D('algo4') * (.18 + n * .1), .4, .08, 'square');
   for (let n = 0; n < 8; n++) pluck(62 + n * 2, B.whynow.start + D('whynow') - 1.6 + n * .2, .3, .05 + n * .01, 'square');   // a riser into the market
   pluck(98, B.market.start + .5, 1.6, .14, 'sine'); pluck(93, B.market.start + D('market') * .45, 1.2, .12, 'sine');

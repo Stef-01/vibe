@@ -9,7 +9,7 @@ to 24 fps ("on twos"), and a soundtrack generated from the same timeline.
 | film | file | look | what it is |
 |---|---|---|---|
 | Explainer | `adhdme.html` | ink on warm paper, with blueprint interludes | 28.75 s. Sam, a patient, tries to find a GP; the deck's problem, solution, assessment, fit loop and patient value |
-| Pitch | `adhdme-pitch.html` | riso print: cream stock, fluorescent inks, halftone plates, drawn people and icons | 2 min 47 s, no voice: the lettering carries the script over an arpeggio-and-synth score that lands its bars on the cuts. A YC-style pitch: hook, problem, who, solution, three matches on life experience shown as faces, how the match is made (four beats), what that changes, how it works, why now, market, model, traction, close. Content from the Value Proposition Canvas plus the deck's numbers |
+| Pitch | `adhdme-pitch.html` | riso print: cream stock, fluorescent inks, halftone plates, drawn people and icons | 2 min 40 s, no voice: the lettering carries the script over an arpeggio-and-synth score written as a song, its bars landing on the cuts. A YC-style pitch: hook, problem, who, solution, three matches on life experience shown as faces, how the match is made (four beats), what that changes, how it works, why now, market, model, traction, close. Content from the Value Proposition Canvas plus the deck's numbers |
 
 Outputs with sound: `out/adhdme-final.mp4` and `out/adhdme-pitch-final.mp4`, 1920x1080, 24 fps.
 Contact sheets (two tiles per second) sit next to them.
@@ -67,34 +67,45 @@ card.
 | 0:06 | maze | The headline knocked out of a real generated maze, the patient at the entrance, the door at the far end. | Getting ADHD care is a maze. |
 | 0:11 | pain1 to pain4 | A swinging price tag with a question for an amount; a round peg lowered onto a triangular hole; three clinicians' sheets that disagree; a bottle draining while the alert is crossed out. | Cost is hidden. Wrong fit. No standard. Scripts lapse. |
 | 0:27 | giveup | The line knocked out of a pink ellipse. | So people give up before the first booking. |
-| 0:31 | who | Australia prints in blue, then Sydney, Melbourne and Brisbane ring one by one; five young people arrive in a row. | 16 to 25, seeking a diagnosis. Sydney · Melbourne · Brisbane |
+| 0:31 | who | Australia prints in blue, then Sydney, Melbourne and Brisbane ring one by one, each named where it is; five young people arrive in a row. | 16 to 25, seeking a diagnosis. |
 | 0:38 | solution | A patient faces five clinicians; lines draw, the fit lights up, and the sub line types as it lands. | Matching, not triage. Not the next free slot. The right person, for you. |
-| 0:45 | pair1 | A new mother with her baby, a pram and a night-feed moon behind her, faces a woman GP who could be her: the same skin, the same bun, a coat, a stethoscope and a heart badge. The line lands. | A new parent, postpartum. matched with a GP who has perinatal experience. |
-| 0:53 | pair2 | A young woman with her family behind her, a lit window, and a "…" for the things not said, faces a bearded doctor whose name tag reads हिंदी and اردو. | A South Asian family. Stigma at home. matched with a doctor of the same background, in Hindi and Urdu. |
-| 1:02 | pair3 | A hooded patient with a crowd behind and a thought bubble holding a pill and a question mark, faces a clinician who waves, with a heart and a tick in a speech bubble. | Afraid of being judged. matched with plain language and no judgement. |
-| 1:10 | pairs | The three pairs as small portraits, cross-matched. | Matched on life, not just availability. Postpartum. Cultural background. Stigma. The things a directory never asks. |
-| 1:17 | algo1 | What we ask: a patient beside seven life factors that arrive one by one (stage of life, background and language, what you fear, how you like to be spoken to, cost, telehealth, when). | We ask about your life. Not your postcode. |
-| 1:25 | algo2 | What we know: a clinician beside the seven things the interview covers (interviewed first, what they have seen, who they do best with, how they speak, how they run a consult, scope, availability). | We know every clinician the same way. Interviewed first. Notes and outcomes later, with consent. |
-| 1:33 | algo3 | Two lanes: rules that score every factor as growing bars, and a language model that reads what you wrote; both end on the same match. | Two models, side by side. Transparent rules, and a language model that reads nuance. We test which earns its place. |
-| 1:42 | algo4 | The loop: a consultation in the middle, five fit signals around it feeding back, the next match better; a crossed-out star. | Every consult makes the next match better. Five fit signals, after every consultation. A fit profile, not a star score. |
-| 1:50 | value | Three columns: a pair who fit before they meet; faster and cheaper; the same clinician at 6, 12 and 24 months. | What that changes. |
-| 1:59 | how | Cost bands, standard templates, script alerts, and a pill: free for patients. | Published. Standard. Safe. |
-| 2:06 | whynow | A starfield timeline: QLD live, NSW and VIC in 2026. | Why now? GPs can now diagnose ADHD. The pathway is opening state by state. |
-| 2:13 | market | ">1M" pops, "250K" counts up while a quarter of the crowd turns pink. | >1M Australians with ADHD. 250K seeking care right now. |
-| 2:19 | model | Pink and blue duotone: patient, door, clinician. | Free for patients. Clinicians subscribe for matched patient flow. |
-| 2:26 | traction | Three stamps land with a tilt; two GPs stand by theirs. | Live today. adhdme.au · 2 GPs in Sydney · 2 models of matching in test |
-| 2:32 | gallery | Every card as a badge on dashed rings, collapsing into the seed dot. | |
-| 2:36 | close | The tagline types out; the six people stand together, smiling. | The right ADHD doctor should not be hard to find. Now, they are not. |
-| 2:42 | signoff | The logo draws itself over the closing ripples; adhdme.au beneath. | adhdme.au |
+| 0:45 | pair1 | A new mother with her baby, a pram and a night-feed moon behind her, faces a woman GP who could be her: the same skin, the same bun, a coat, a stethoscope and a heart badge. The line lands; one pill under the clinician names the match. | A new parent, postpartum. · perinatal experience |
+| 0:53 | pair2 | A young woman with her family behind her, a lit window, and a "…" for the things not said, faces a bearded doctor whose name tag reads हिंदी and اردو. | A South Asian family. Stigma at home. · same background · हिंदी · اردو |
+| 1:02 | pair3 | A hooded patient with a crowd behind and a thought bubble holding a pill and a question mark, faces a clinician who waves, with a heart and a tick in a speech bubble. | Afraid of being judged. · plain language, no judgement |
+| 1:10 | algo1 | What we ask: a patient beside the four things about a life that decide a match, arriving one by one (stage of life, background and language, what you fear, how you like to be spoken to). | We ask about your life. Not your postcode. |
+| 1:19 | algo2 | What we know: a clinician beside the four things the interview covers (interviewed first, what they have seen, who they do best with, how they speak). | We know every clinician the same way. Interviewed first. Outcomes later, with consent. |
+| 1:27 | algo3 | Two lanes: rules that score the four factors as growing bars, and a language model that reads what you wrote; both end on the same match. | Two models, side by side. Transparent rules, and a model that reads nuance. We test which earns its place. |
+| 1:35 | algo4 | The loop: a consultation in the middle, five fit signals around it feeding back, an arrow to the next match. | Every consult makes the next match better. Five fit signals after every consult. A fit profile, not a star score. |
+| 1:44 | value | Three columns: a pair who fit before they meet; faster and cheaper; the same pair under a calendar reading 6, 12, 24. | What that changes. |
+| 1:52 | how | Cost bands, standard templates, script alerts, and a pill: free for patients. | Published. Standard. Safe. |
+| 2:00 | whynow | A starfield timeline: QLD live, NSW and VIC in 2026. | Why now? GPs can now diagnose ADHD. The pathway is opening state by state. |
+| 2:06 | market | ">1M" pops; "250K" counts up while the first quarter of a hundred people turns pink. | >1M Australians with ADHD. 250K seeking care right now. |
+| 2:13 | model | Pink and blue duotone: patient, door, clinician. | Free for patients. Clinicians subscribe for matched patient flow. |
+| 2:20 | traction | Three stamps land with a tilt; two GPs stand by theirs. | Live today. adhdme.au · 2 GPs in Sydney · 2 models of matching in test |
+| 2:26 | gallery | Every card as a badge on dashed rings, collapsing into the seed dot. | |
+| 2:30 | close | The tagline types out; the six people stand together, smiling. | The right ADHD doctor should not be hard to find. Now, they are not. |
+| 2:36 | signoff | The logo draws itself over the closing ripples; adhdme.au beneath. | adhdme.au |
 
-The music is written in `score()` from the same timeline and re-anchors its bars on every
-beat, so downbeats land on the cuts. It is arpeggio and synths: a triangle pluck with a
-dotted-eighth echo carries the whole film over a pad of three detuned saws through a lowpass
-that slowly breathes, and a square synth bass rounded by its own filter. Quarter notes in the
-hook, a minor loop through the problem, eighths from the segment on, a second arpeggio an
-octave up on the off-beats through the matches and the engine, a key change up a whole tone
-for the value, a riser into the market, and the arpeggio thinning back to quarter notes for
-the close. No drums, no lead line, no voice. `build-pitch.sh` normalises it to about -16 LUFS.
+The music is written in `score()` from the same timeline as a song, so it moves the way the
+film moves, and its bars re-anchor on every cut. Arpeggio and synths only: a triangle pluck
+with a dotted-eighth echo, a pad of three detuned saws through a lowpass that slowly breathes,
+a square bass rounded by its own filter, and a soft saw lead with vibrato for the melodies.
+
+| section | beats | what happens |
+|---|---|---|
+| intro | hook | pad and a slow arpeggio in C |
+| verse | maze, the four pains | a minor loop, the slow arpeggio, bass; for "give up" everything but the pad drops out |
+| pre-chorus | who, solution | the arpeggio doubles to eighths and the filter opens |
+| chorus | the three matches | full arpeggio, a second arpeggio an octave up on the off-beats, and a melody that varies on each match |
+| verse two | the engine | new chords (vi ii IV V), an up-and-down arpeggio, the bass on eighths, a run up into the value |
+| chorus two | value | up a whole tone, the melody returns |
+| bridge, breakdown | how, why now | the chords rotated, then pad and slow arpeggio on a borrowed minor chord, a riser |
+| last chorus | market, model, traction | full, then thinning |
+| outro | gallery, close, sign-off | the arpeggio alone in its echo, the melody's last phrase, one chord |
+
+Within a section the arpeggio alternates two shapes bar by bar and the chord loop keeps
+turning across cuts, so no two cards start on the same bar. No drums, no voice.
+`build-pitch.sh` normalises the mix to about -16 LUFS.
 
 ## The explainer, scene by scene
 
@@ -117,10 +128,10 @@ the close. No drums, no lead line, no voice. `build-pitch.sh` normalises it to a
 
 A critical appraisal of the current cut, most valuable first.
 
-- **Length.** 2 min 47 s against a 2 min 30 s target, with every card holding long enough to
-  read its lines twice. `BEAT_SHEET` is the length control: taking half a second off each of
-  the four pain cards and the summary of the pairs, and a second off each engine card, lands
-  it at 2 min 40 s; dropping the "why now" beat gets it under 2 min 35 s.
+- **Length.** 2 min 40 s against a 2 min 30 s target, with every card holding long enough to
+  read its lines twice. `BEAT_SHEET` is the length control: half a second off each of the
+  four pain cards and a second off each engine card lands it at 2 min 32 s; dropping the
+  "why now" beat gets it under 2 min 30 s.
 - **The music.** The score is raw Web Audio oscillators, two filters, a delay and a generated
   reverb, written in the film. It lands its accents on the cuts and the synth character is
   deliberate, but the oscillators are unaliased ideal waveforms with no drift. Next steps that
@@ -173,6 +184,10 @@ A critical appraisal of the current cut, most valuable first.
   The other two matches are drawn on shared background and on manner.
 - The pitch has no voice. Every sub line types in as soon as its picture has made its point
   (the match line landing, the models arriving), so each card is read, not heard.
+- Each card carries one idea and as little else as it can: the match cards say the patient's
+  situation once, in the headline, and the match once, in a pill under the clinician; the
+  engine shows the four things that decide a match rather than every field on the form; the
+  market shows a hundred people with the first quarter pink rather than a scatter of dots.
 - Both are explainers, so each shot carries one short hand-lettered line in two inks. The skill
   reserves lettering for the sign-off; that deviation is noted in each file's brief.
 - Where the Value Proposition Canvas and the deck differ on money, the pitch follows the canvas:
