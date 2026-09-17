@@ -8,6 +8,9 @@
   @font-face { font-family: "Bradley Hand"; src: url("fonts/CaveatBrush-Regular.ttf"); }
   @font-face { font-family: "Noto Devanagari"; src: url("fonts/NotoSansDevanagari[wdth,wght].ttf"); font-weight: 100 900; }
   @font-face { font-family: "Noto Urdu"; src: url("fonts/NotoNastaliqUrdu[wght].ttf"); font-weight: 100 900; }
+  /* the logo: a heavy geometric "me" (Poppins, the brand's display face) and typewriter letters scattered above it */
+  @font-face { font-family: "Poppins Black"; src: url("fonts/Poppins-Black.ttf"); }
+  @font-face { font-family: "Courier Prime Bold"; src: url("fonts/CourierPrime-Bold.ttf"); }
   body{margin:0;background:#111;color:#ccc;font:13px/1.4 ui-monospace,Menlo,monospace;display:flex;flex-direction:column;align-items:center;gap:10px;padding:12px}
   canvas#c{width:min(92vw,960px);height:auto;background:#000;box-shadow:0 0 0 1px #333}
   .bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:center}
@@ -38,7 +41,9 @@
 //         card's plates arriving in print order. People are drawn: skin, hair and clothes as flat fills under
 //         a riso dot screen, features in navy line. Icons are small drawn marks on paper discs.
 // Palette: risoPop (blue, pink, yellow, navy). Skin tones and clothes are tints and shades of its fills.
-// Anchor: the seed dot, navy with a pink offset, at the bottom centre of every frame.
+// Anchor: the logo's orange full stop, with a pink offset, at the bottom centre of every frame.
+// Logo:   drawn, not loaded: "me" in Poppins Black with A D H D scattered above in Courier Prime, each at its own
+//         tilt, and the orange full stop; on its yellow field for the title card, bare for the sign-off.
 // Puppets: bust() for every person (three patients, five clinicians, five young people, families, crowds);
 //          icon() for two dozen marks: baby, moon, house, family, languages, plain speech, a pill with a
 //          question, tag, phone, clock, calendar, checklist, stethoscope, heart, microphone, match rings,
@@ -99,10 +104,23 @@ function mixed(c, parts, x, y, size, o = {}) {
 }
 const typed = (text, p) => text.slice(0, Math.round(text.length * clamp(p, 0, 1)));
 const head = (c, text, o = {}) => hand(c, typed(text, o.p ?? 1), CX, o.y ?? H * .17, { size: 100, align: 'center', ...o });
-const sub = (c, text, o = {}) => hand(c, typed(text, o.p ?? 1), CX, o.y ?? H * .86, { size: 50, align: 'center', ink2: null, ...o });
+const sub = (c, text, o = {}) => hand(c, typed(text, o.p ?? 1), o.x ?? CX, o.y ?? H * .86, { size: 50, align: 'center', ink2: null, ...o });
 const label = (c, text, p = 1) => hand(c, typed(text, p), CX, H * .83, { size: 84, align: 'center' });
 const blinkAt = (i, off = 0) => pulse(i + off, 11) ? 1 : 0;
-function mark(c, onNight = false) { resetT(c); const [x, y] = ANCHOR(); seedDot(c, x, y, 11, onNight ? PAL.chalk : PAL.ink, PAL.accents[0]); }
+// the anchor: the logo's orange full stop, with a pink misregistration
+function mark(c) { resetT(c); const [x, y] = ANCHOR(); const R = PALETTES.risoPop; seedDot(c, x, y, 11, R.fills[4], R.accents[0]); }   // always the brand orange, even on the duotone card
+// the logo, drawn: "me" in the heavy face with its baseline at (x, y) and font size s; A D H D scattered above in the
+// typewriter face, each at its own tilt; the orange full stop after the e. Two inks: a pink offset under the navy.
+function logo(c, x, y, s, o = {}) {
+  const { ink = PAL.ink, ink2 = PAL.accents[0], dot = PAL.fills[4], offset = s * .012, q = 1 } = o;
+  c.save(); c.translate(x, y); c.font = `${s}px "Poppins Black"`; c.textAlign = 'left'; c.textBaseline = 'alphabetic';
+  const w = c.measureText('me').width;
+  if (ink2) { c.fillStyle = ink2; c.globalAlpha = .85; c.fillText('me', offset, offset * .6); } c.fillStyle = ink; c.globalAlpha = 1; c.fillText('me', 0, 0);
+  const letters = [['A', .03, -.84, -.25], ['D', .36, -.64, .2], ['H', .69, -.84, .15], ['D', 1.0, -.53, .45]];
+  letters.forEach(([ch, lx, ly, rot], n) => { if (q < (n + 1) / 5) return; c.save(); c.translate(lx * w, ly * s); c.rotate(rot); c.font = `${s * .19}px "Courier Prime Bold"`; c.textAlign = 'center'; if (ink2) { c.fillStyle = ink2; c.globalAlpha = .85; c.fillText(ch, offset, offset * .6); } c.fillStyle = ink; c.globalAlpha = 1; c.fillText(ch, 0, 0); c.restore(); });
+  if (q >= 1) { if (ink2) { c.fillStyle = ink2; c.globalAlpha = .85; c.beginPath(); c.arc(w + s * .24 + offset, -s * .1 + offset * .6, s * .1, 0, TAU); c.fill(); } c.fillStyle = dot; c.globalAlpha = 1; c.beginPath(); c.arc(w + s * .24, -s * .1, s * .1, 0, TAU); c.fill(); }
+  c.restore(); return w;
+}
 const PLATES = [layer(), layer(), layer()], ARRIVAL = [3 / 12, 6 / 12, 0];
 function risoCard(c, draw, o = {}) {
   const inks = o.inks || PAL.inks.slice(0, 3), angles = o.angles || [.26, 1.31, 0], cell = o.cell || 7, tau = o.tau ?? 99; paper(c);
@@ -260,14 +278,14 @@ const CAST = () => [[PAIRS[0].patient, { mood: .7, brow: .3 }], [PAIRS[0].clinic
 
 // ===================== CARDS =====================
 function cardTitle(c, tau, i) {
-  usePalette('risoPop'); const dx = CX - 420, dy = CY + 30, d = D('hook');
+  usePalette('risoPop'); const d = D('hook'), S = 330, sq = 700, sx = CX - sq / 2, sy = CY - sq / 2 - 60, fy = sy + sq / 2;   // the field sits high so the tagline clears the anchor
   risoCard(c, (g, k) => {
-    if (k === 2) { glow(g, dx, dy - 40, 80, 640, .9); doorPath(g, dx, dy, 300, 540); g.fillStyle = '#fff'; g.fill(); }
-    if (k === 0) { doorPath(g, dx, dy, 300, 540); g.fillStyle = gray(.6); g.fill(); doorPath(g, dx, dy, 226, 466); g.fillStyle = '#fff'; g.fill(); }
-    if (k === 1) { doorPath(g, dx, dy, 226, 466); g.fillStyle = gray(.9); g.fill(); g.fillStyle = '#fff'; g.beginPath(); g.arc(dx + 66, dy + 30, 14, 0, TAU); g.fill(); }
+    if (k === 2) { glow(g, CX, fy, sq * .6, sq * 1.2, .14); g.fillStyle = gray(.96); g.beginPath(); g.roundRect(sx, sy, sq, sq, 28); g.fill(); }   // a faint halo, then the logo's yellow field
+    if (k === 1) { g.fillStyle = gray(.82); g.beginPath(); g.roundRect(sx + 14, sy + 16, sq, sq, 28); g.fill(); g.fillStyle = '#fff'; g.beginPath(); g.roundRect(sx, sy, sq, sq, 28); g.fill(); }   // a pink misregistered edge
   }, { tau });
-  hand(c, 'ADHDme', CX - 140, CY - 20, { size: 230 });
-  hand(c, typed('The front door to', sm(d * .5, d * .66, tau)), CX - 130, CY + 80, { size: 66, ink2: null }); hand(c, typed('ADHD care in Australia.', sm(d * .62, d * .84, tau)), CX - 130, CY + 156, { size: 66, ink2: null });
+  c.save(); c.font = `${S}px "Poppins Black"`; const w = c.measureText('me').width; c.restore();
+  logo(c, CX - (w + S * .34) / 2, fy + 150, S, { q: sm(d * .12, d * .4, tau) });
+  hand(c, typed('The front door to ADHD care in Australia.', sm(d * .5, d * .8, tau)), CX, sy + sq + 64, { size: 60, align: 'center', ink2: null });
 }
 function cardMaze(c, tau, i) {
   usePalette('risoPop'); const { s, cols, rows } = MZ, ox = (W - cols * s) / 2, oy = (H - rows * s) / 2;
@@ -350,7 +368,7 @@ function cardSolution(c, tau, i) {
   c.save(); c.strokeStyle = PAL.ink; c.lineWidth = 1.8; c.globalAlpha = .4; c.lineCap = 'round'; cys.forEach((y, m) => { const q = sm(2.2 + m * .3, 2.7 + m * .3, tau); if (q > 0) selfDraw(c, [[px + 120, py - 90], [cx - 80, y]], q, 90 + m, 2); }); c.restore();
   const q = sm(tm, tm + .9, tau, easeOut); if (q > 0) { c.strokeStyle = PAL.accents[0]; c.lineWidth = 7; c.lineCap = 'round'; selfDraw(c, [[px + 120, py - 90], [(px + cx) / 2, py - 120], [cx - 80, cys[pick]]], q, 96, 3); if (q >= 1) dashedRing(c, cx, cys[pick] - 20, 90, PAL.accents[0], 97, [10, 7], 3); }
   head(c, 'Matching, not triage.', { p: sm(0, TYPE, tau) });
-  sub(c, 'Not the next free slot. The right person, for you.', { p: sm(d * .66, d * .66 + TYPE2, tau) });
+  sub(c, 'Not the next free slot. The right person, for you.', { x: W * .36, size: 44, p: sm(d * .66, d * .66 + TYPE2, tau) });   // left of the clinician column
 }
 function lifeScene(g, k, name, x, y) {
   if (name === 'pram' && k === 1) { g.fillStyle = gray(.6); g.beginPath(); g.roundRect(x - 330, y + 10, 170, 80, 24); g.fill(); g.beginPath(); g.arc(x - 200, y + 10, 62, Math.PI, TAU); g.fill(); g.fillRect(x - 336, y - 64, 10, 84); for (const wx of [x - 300, x - 190]) { g.beginPath(); g.arc(wx, y + 108, 22, 0, TAU); g.fill(); g.fillStyle = '#fff'; g.beginPath(); g.arc(wx, y + 108, 7, 0, TAU); g.fill(); g.fillStyle = gray(.6); } }
@@ -545,9 +563,11 @@ function sceneClose(c, tau, i) {
   mark(c);
 }
 function sceneSignoff(c, tau, i) {
-  usePalette('risoPop'); paper(c); const [ax, ay] = ANCHOR();
+  usePalette('risoPop'); paper(c); const [ax, ay] = ANCHOR(), S = 320;
   ripples(c, ax, ay, [420, 560, 720], alpha(PAL.accents[0], .3), 170, 3.5);
-  signOff(c, 'ADHDme', 'adhdme.au', { x: CX, y: CY - 30, size: 150, ink2: PAL.accents[0], progressA: sm(0, 1.0, tau), progressB: sm(1.0, 2.0, tau) });
+  c.save(); c.font = `${S}px "Poppins Black"`; const w = c.measureText('me').width; c.restore();
+  logo(c, CX - (w + S * .34) / 2, CY + 90, S, { q: sm(0, 1.2, tau) });
+  hand(c, typed('adhdme.au', sm(1.3, 2.1, tau)), CX, CY + 250, { size: 84, align: 'center' });
   mark(c);
 }
 
@@ -555,7 +575,7 @@ function sceneSignoff(c, tau, i) {
 const SCENES = [
   ['hook', ['hook'], sceneHook], ['problem', PROBLEM, sceneProblem], ['who', ['who'], one(cardWho)], ['solution', ['solution'], one(cardSolution)],
   ['matching', MATCH, sceneMatching], ['algo', ALGO, sceneAlgo], ['value', ['value'], one(cardValue)], ['how', ['how'], one(cardHow)],
-  ['whynow', ['whynow'], (c, tau, i) => { cardWhyNow(c, tau, i); mark(c, true); }], ['market', ['market'], one(cardMarket)],
+  ['whynow', ['whynow'], one(cardWhyNow)], ['market', ['market'], one(cardMarket)],
   ['model', ['model'], one(cardModel)], ['traction', ['traction'], one(cardTraction)], ['gallery', ['gallery'], sceneGallery], ['close', ['close'], sceneClose], ['signoff', ['signoff'], sceneSignoff],
 ];
 const TIMELINE = SCENES.map(([name, ids, fn]) => ({ name, dur: ids.reduce((a, id) => a + D(id), 0), fn }));
@@ -617,6 +637,6 @@ function score(ac, t0, dest) {
   pluck(62, B.close.start, 3.0, .12, 'sine'); pluck(69, B.close.start + .6, 2.6, .1, 'sine'); pluck(74, B.signoff.start, 3.4, .14, 'sine'); pluck(78, B.signoff.start + .4, 3.0, .1, 'sine'); pluck(50, B.signoff.start, 3.6, .16, 'sine');
 }
 
-Promise.all(['40px "Bradley Hand"', '40px "Noto Devanagari"', '40px "Noto Urdu"'].map(f => document.fonts.load(f).catch(() => {}))).then(() =>
+Promise.all(['40px "Bradley Hand"', '40px "Noto Devanagari"', '40px "Noto Urdu"', '40px "Poppins Black"', '40px "Courier Prime Bold"'].map(f => document.fonts.load(f).catch(() => {}))).then(() =>
   defineFilm({ palette: 'risoPop', timeline: TIMELINE, score, format: { ar: '16:9', width: 1920 } }));
 </script>

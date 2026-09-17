@@ -26,6 +26,7 @@ Contact sheets (two tiles per second) sit next to them.
 | `fonts/Caveat[wght].ttf` | the explainer's hand-lettering face (SIL Open Font License, `fonts/OFL.txt`) |
 | `fonts/CaveatBrush-Regular.ttf` | the pitch's bold marker face (SIL Open Font License) |
 | `fonts/NotoSansDevanagari…`, `fonts/NotoNastaliqUrdu…` | the Hindi and Urdu on the clinician's label (SIL Open Font License) |
+| `fonts/Poppins-Black.ttf`, `fonts/CourierPrime-Bold.ttf` | the logo: the heavy geometric "me" and the typewriter A D H D (both SIL Open Font License) |
 
 ## Watch or scrub
 
@@ -71,7 +72,7 @@ Times are from the current narration; they move when a line changes.
 
 | t | beat | what it shows | narration |
 |---|---|---|---|
-| 0:00 | hook | Crayon ripples from the seed dot; an iris opens on the title card: a door. | ADHDme. The front door to ADHD care in Australia. |
+| 0:00 | hook | Crayon ripples from the seed dot; an iris opens on the logo card: the yellow field with a pink misregistered edge, "me" in the heavy face, A D H D landing one by one in the typewriter face, the orange full stop, then the tagline typing out. | ADHDme. The front door to ADHD care in Australia. |
 | 0:06 | maze | The headline knocked out of a real generated maze, the patient at the entrance, the door at the far end. | Getting ADHD care in Australia is a maze. |
 | 0:11 | pain1 to pain4 | A swinging price tag with a question for an amount; a round peg lowered onto a triangular hole; three clinicians' sheets that disagree; a bottle draining while the alert is crossed out. | The cost is hidden… You get whoever is available… Every clinician assesses you differently… Prescriptions lapse without warning. |
 | 0:29 | giveup | | So people give up before the first booking. |
@@ -93,7 +94,7 @@ Times are from the current narration; they move when a line changes.
 | 2:55 | traction | Three stamps land with a tilt; two GPs stand by theirs. | We are live at adhdme.au, with two GPs in Sydney, and two matching models in test. |
 | 3:02 | gallery | Every card as a badge on dashed rings, collapsing into the seed dot. | |
 | 3:06 | close | The tagline types out; the six people stand together, smiling. | The right ADHD doctor should not be hard to find. Now, they are not. |
-| 3:13 | signoff | ADHDme / adhdme.au in two inks. | ADHDme. |
+| 3:13 | signoff | The logo draws itself over the closing ripples; adhdme.au beneath. | ADHDme. |
 
 The music is written in `score()` from the same timeline and re-anchors its bars on every
 beat, so downbeats land on the cuts: warm pads in the hook, a minor loop through the problem,
@@ -156,7 +157,10 @@ A critical appraisal of the current cut, most valuable first.
   9:16 and 1:1 layouts, which need the lettering resized per format.
 - **Tooling.** A check that every hand-lettered line fits its frame (measureText against the
   card width) and a contact-sheet diff against a golden render would catch layout
-  regressions before a four-minute build.
+  regressions before a four-minute build. The current QA pass is manual: two spot frames per
+  beat rendered with `--only`, tiled four to a sheet and read at full size. That is what caught
+  the tagline sitting on the anchor, a sub line running into the clinician column, and the
+  anchor turning blue under the duotone palette.
 
 ## Design notes
 
@@ -165,9 +169,14 @@ A critical appraisal of the current cut, most valuable first.
   blueprint interludes.
 - The pitch uses the skill's `risoPop` palette as printed: each card is three plates (blue, pink,
   yellow) drawn in black on white with knockouts, printed as halftone dots that multiply like
-  ink; blue shapes are knocked out of the yellow glow so they stay blue. Its anchor is the seed
-  dot at the bottom of every frame; the hook's ripples are born from it and the gallery collapses
-  into it.
+  ink; blue shapes are knocked out of the yellow glow so they stay blue. Its anchor is the
+  logo's orange full stop at the bottom of every frame; the hook's ripples are born from it and
+  the gallery collapses into it.
+- The logo is drawn, not placed: `logo()` in `adhdme-pitch.html` sets "me" in Poppins Black,
+  scatters A D H D above it in Courier Prime Bold at the tilts of the brand mark, and adds the
+  orange full stop, with a pink offset under the navy like every other line in the film. On the
+  title card it sits on its yellow field, printed on the yellow plate with a misregistered pink
+  edge. The explainer (`adhdme.html`) still hand-letters the name.
 - The people in the pitch are drawn by one `bust()` function: skin, hair and clothes as flat
   fills under a riso dot screen, features in navy line, with a mood and a brow angle, and
   props for a life: a baby held, a bindi, a hood, a beard and glasses, a stethoscope, a badge,

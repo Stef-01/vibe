@@ -4,139 +4,139 @@ const BEATS = [
     "id": "hook",
     "start": 0.0,
     "dur": 6.5,
-    "speech": 4.371
+    "speech": 4.382
   },
   {
     "id": "maze",
     "start": 6.5,
-    "dur": 5.0,
-    "speech": 3.413
+    "dur": 5.083333333333333,
+    "speech": 3.483
   },
   {
     "id": "pain1",
-    "start": 11.5,
+    "start": 11.5833,
     "dur": 4.583333333333333,
-    "speech": 3.019
+    "speech": 3.007
   },
   {
     "id": "pain2",
-    "start": 16.0833,
+    "start": 16.1667,
     "dur": 4.666666666666667,
-    "speech": 3.047
+    "speech": 3.035
   },
   {
     "id": "pain3",
-    "start": 20.75,
+    "start": 20.8333,
     "dur": 4.0,
-    "speech": 1.985
+    "speech": 1.904
   },
   {
     "id": "pain4",
-    "start": 24.75,
+    "start": 24.8333,
     "dur": 4.5,
-    "speech": 2.775
+    "speech": 2.763
   },
   {
     "id": "giveup",
-    "start": 29.25,
+    "start": 29.3333,
     "dur": 4.0,
-    "speech": 2.183
+    "speech": 2.264
   },
   {
     "id": "who",
-    "start": 33.25,
+    "start": 33.3333,
     "dur": 8.0,
-    "speech": 6.13
+    "speech": 5.933
   },
   {
     "id": "solution",
-    "start": 41.25,
+    "start": 41.3333,
     "dur": 7.0,
-    "speech": 5.316
+    "speech": 5.432
   },
   {
     "id": "pair1",
-    "start": 48.25,
+    "start": 48.3333,
     "dur": 8.0,
-    "speech": 6.084
+    "speech": 6.002
   },
   {
     "id": "pair2",
-    "start": 56.25,
-    "dur": 10.416666666666666,
-    "speech": 8.8
+    "start": 56.3333,
+    "dur": 10.666666666666666,
+    "speech": 9.067
   },
   {
     "id": "pair3",
-    "start": 66.6667,
+    "start": 67.0,
     "dur": 9.0,
-    "speech": 6.85
+    "speech": 7.012
   },
   {
     "id": "pairs",
-    "start": 75.6667,
-    "dur": 7.583333333333333,
-    "speech": 5.96
+    "start": 76.0,
+    "dur": 7.416666666666667,
+    "speech": 5.832
   },
   {
     "id": "algo1",
-    "start": 83.25,
-    "dur": 11.25,
-    "speech": 9.618
+    "start": 83.4167,
+    "dur": 11.333333333333334,
+    "speech": 9.746
   },
   {
     "id": "algo2",
-    "start": 94.5,
-    "dur": 8.0,
-    "speech": 6.368
+    "start": 94.75,
+    "dur": 8.166666666666666,
+    "speech": 6.588
   },
   {
     "id": "algo3",
-    "start": 102.5,
-    "dur": 11.416666666666666,
-    "speech": 9.809
+    "start": 102.9167,
+    "dur": 11.333333333333334,
+    "speech": 9.763
   },
   {
     "id": "algo4",
-    "start": 113.9167,
-    "dur": 12.666666666666666,
-    "speech": 11.093
+    "start": 114.25,
+    "dur": 12.5,
+    "speech": 10.895
   },
   {
     "id": "value",
-    "start": 126.5833,
-    "dur": 12.666666666666666,
-    "speech": 11.098
+    "start": 126.75,
+    "dur": 12.916666666666666,
+    "speech": 11.295
   },
   {
     "id": "how",
-    "start": 139.25,
-    "dur": 11.083333333333334,
-    "speech": 9.49
+    "start": 139.6667,
+    "dur": 10.916666666666666,
+    "speech": 9.339
   },
   {
     "id": "whynow",
-    "start": 150.3333,
+    "start": 150.5833,
     "dur": 10.5,
-    "speech": 8.932
+    "speech": 8.909
   },
   {
     "id": "market",
-    "start": 160.8333,
+    "start": 161.0833,
     "dur": 7.583333333333333,
-    "speech": 5.996
+    "speech": 5.973
   },
   {
     "id": "model",
-    "start": 168.4167,
-    "dur": 7.0,
-    "speech": 5.439
+    "start": 168.6667,
+    "dur": 6.833333333333333,
+    "speech": 5.218
   },
   {
     "id": "traction",
-    "start": 175.4167,
-    "dur": 7.5,
-    "speech": 5.875
+    "start": 175.5,
+    "dur": 7.416666666666667,
+    "speech": 5.793
   },
   {
     "id": "gallery",
@@ -148,12 +148,12 @@ const BEATS = [
     "id": "close",
     "start": 186.9167,
     "dur": 7.0,
-    "speech": 4.429
+    "speech": 4.289
   },
   {
     "id": "signoff",
     "start": 193.9167,
     "dur": 4.0,
-    "speech": 1.126
+    "speech": 1.196
   }
 ];
