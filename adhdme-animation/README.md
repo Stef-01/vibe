@@ -9,7 +9,7 @@ to 24 fps ("on twos"), and a soundtrack generated from the same timeline.
 | film | file | look | what it is |
 |---|---|---|---|
 | Explainer | `adhdme.html` | ink on warm paper, with blueprint interludes | 28.75 s. Sam, a patient, tries to find a GP; the deck's problem, solution, assessment, fit loop and patient value |
-| Pitch | `adhdme-pitch.html` | riso print: cream stock, fluorescent inks, halftone plates | 28 s. A YC-style pitch: hook, problem, who, solution, how, why now, market, model, traction, close. Content from the Value Proposition Canvas plus the deck's numbers |
+| Pitch | `adhdme-pitch.html` | riso print: cream stock, fluorescent inks, halftone plates | 60 s. A YC-style pitch at a slow, deliberate pace: hook, problem, who, solution, matching on life experience, how, why now, market, model, traction, close. Content from the Value Proposition Canvas plus the deck's numbers |
 
 Outputs with sound: `out/adhdme-final.mp4` and `out/adhdme-pitch-final.mp4`, 1920x1080, 24 fps.
 Contact sheets (two tiles per second) sit next to them.
@@ -49,17 +49,18 @@ vertical cut is usable. Pass `--width 3840` for a 4K render.
 | t | scene | what it shows |
 |---|---|---|
 | 0.00 | hook | Crayon ripples from the seed dot; an iris opens on the title card: a door, "ADHDme, the front door to ADHD care in Australia." |
-| 2.00 | problem | "Getting ADHD care is a maze", then four pain cards at half a second each (cost is hidden, wrong fit, no standard, scripts lapse), then "So people give up before the first booking." |
-| 5.50 | who | Australia in blue with Sydney, Melbourne and Brisbane ringed: 16 to 25, seeking a diagnosis. |
-| 7.50 | solution | A patient dot and five clinicians; the fit lights up. "Matching, not triage." |
-| 10.50 | how | Three cards at a second each: published cost bands, standard diagnosis templates, script-expiry alerts. |
-| 13.50 | whynow | A starfield timeline: QLD live since Dec 2025, NSW and VIC in 2026. GPs can now diagnose ADHD. |
-| 16.00 | market | ">1M Australians with ADHD" pops, "250K actively seeking care" counts up over a dot cloud of people. |
-| 18.50 | model | A pink and blue duotone beat: patient, door, clinician. Free for patients; clinicians subscribe for matched patient flow. |
-| 21.00 | traction | Three stamps: live at adhdme.au, 2 GPs in Sydney, 2 matching models in test. |
-| 23.00 | gallery | Every card as a badge on dashed rings, collapsing into the seed dot. |
-| 24.50 | close | "The right ADHD doctor should not be hard to find." types out over ripples. |
-| 26.50 | signoff | ADHDme / adhdme.au in two inks. |
+| 4.00 | problem | "Getting ADHD care is a maze" over a real generated maze, then four pain cards at a second each (a swinging tag with the cost hidden, a round peg lowered onto a triangular hole, three clinicians' sheets that disagree, a bottle draining while the alert is crossed out), then "So people give up before the first booking." |
+| 11.00 | who | Australia prints in blue, then Sydney, Melbourne and Brisbane ring one by one: 16 to 25, seeking a diagnosis. |
+| 15.00 | solution | A patient dot and five clinicians; lines draw, the fit lights up. "Matching, not triage. Not the next free slot. The right person." |
+| 19.50 | psycho | "Matched on life, not just availability." Three patients paired with three clinicians, one pair at a time: postpartum with perinatal experience, a South Asian family and stigma at home with a clinician of the same background who speaks Hindi and Urdu, a fear of being judged with plain language and no judgement. |
+| 26.00 | how | Three cards at two seconds each: published cost bands, standard diagnosis templates, script-expiry alerts (the bell rings). |
+| 32.00 | whynow | A starfield timeline: QLD live since Dec 2025, NSW and VIC in 2026. GPs can now diagnose ADHD. |
+| 37.00 | market | ">1M Australians with ADHD" pops, "250K actively seeking care" counts up while a quarter of the crowd turns pink. |
+| 42.00 | model | A pink and blue duotone beat: patient, door, clinician. Free for patients; clinicians subscribe for matched patient flow. |
+| 46.50 | traction | Three stamps land with a tilt: live at adhdme.au, 2 GPs in Sydney, 2 matching models in test. |
+| 50.00 | gallery | Every card as a badge on dashed rings, collapsing into the seed dot. |
+| 53.00 | close | "The right ADHD doctor should not be hard to find." types out over ripples. |
+| 57.00 | signoff | ADHDme / adhdme.au in two inks. |
 
 ## The explainer, scene by scene
 
