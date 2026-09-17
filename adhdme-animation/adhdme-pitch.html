@@ -1,0 +1,335 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>ADHDme: the pitch</title>
+<style>
+  /* core.js lists "Bradley Hand" first in HAND_FONT. Registering Caveat Brush (OFL, fonts/OFL.txt) under that
+     name gives this film its bold marker lettering on every machine, headless or not. */
+  @font-face { font-family: "Bradley Hand"; src: url("fonts/CaveatBrush-Regular.ttf"); }
+  body{margin:0;background:#111;color:#ccc;font:13px/1.4 ui-monospace,Menlo,monospace;display:flex;flex-direction:column;align-items:center;gap:10px;padding:12px}
+  canvas#c{width:min(92vw,960px);height:auto;background:#000;box-shadow:0 0 0 1px #333}
+  .bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:center}
+  button{background:#222;color:#ddd;border:1px solid #444;padding:4px 10px;cursor:pointer;font:inherit}
+  input[type=range]{width:320px}
+</style>
+<canvas id="c" width="1920" height="1080"></canvas>
+<script src="core.js"></script>
+<script>
+'use strict';
+// ============================================================
+// ADHDme, the pitch: a riso-printed startup pitch drawn frame by frame on Canvas 2D on top
+// of core.js (hand-drawn-canvas-animation skill). No images, no libraries, no Math.random.
+// ============================================================
+
+// ===================== BRIEF & BEAT SHEET =====================
+// BRIEF
+// Subject: ADHDme as a YC-style pitch: hook, problem, who, solution, how, why now, market, business
+//          model, traction, close. Content from the Value Proposition Canvas (customer jobs, pains,
+//          relievers, gains, the free-for-patients model, the GP-led pathway) with market numbers and
+//          traction from the strategic plan deck.
+// Format: 16:9, output width 1920, drawn 12 fps, output 24 fps, 28 seconds.
+// Look:   riso throughout: cream stock, fluorescent inks printed as halftone plates with knockouts,
+//         crayon ripples, an iris, a card montage, a badge gallery, one duotone beat, one starfield.
+// Palette: risoPop (blue, pink, yellow, navy). Duotone pink and blue for the business-model beat.
+// Finish: riso.
+// Anchor: the seed dot, navy with a pink offset, at the bottom centre of every frame. The hook's
+//         ripples are born from it and the gallery collapses into it.
+// Puppets: none. Every card is silhouettes on three plates, then hand lettering in two inks.
+// Text:   a pitch is headlines and numbers, so every card carries one headline and one line under
+//         it, in bold marker lettering with a pink offset. Numbers are big.
+//
+// t      dur   scene      look        what changes                                                  kit                          sound
+// 0.00   2.00  hook       riso        ripples from the dot, iris opens on the title card             crayon iris plates           plucks, rising note
+// 2.00   3.50  problem    riso        "a maze" card, four pain cards at 0.5 s, "people give up"     plates knockouts montage     square per cut, low sine
+// 5.50   2.00  who        riso        Australia in blue, three pink city dots, 16 to 25              plates dashedRing            two plucks
+// 7.50   3.00  solution   riso        patient dot, five clinicians, the fit lights up                plates crayon selfDraw       sine, bright note at the match
+// 10.50  3.00  how        riso        cost bands, diagnosis templates, script alerts, 1 s each       montage plates selfDraw      square per card
+// 13.50  2.50  whynow     starfield   timeline: QLD live, NSW and VIC 2026, asters ignite            night grain aster dashedRing sawtooth swell, notes per stamp
+// 16.00  2.50  market     riso        >1M pops, 250K counts up, dot cloud of people                  plates hand                  two dyads
+// 18.50  2.50  model      duotone     patient, door, clinician in two inks; free for patients        duotone plates crayon        plucks
+// 21.00  2.00  traction   riso        three stamps pop: live, 2 GPs, 2 matching models               plates dashedRing            three rising notes
+// 23.00  1.50  gallery    riso        every card as a badge on rings, collapsing into the dot        badges                       long dyad
+// 24.50  2.00  close      riso        the tagline types out over faint ripples                       crayon hand                  long dyad
+// 26.50  1.50  signoff    riso        ADHDme / adhdme.au, two dots                                   signOff                      dyad, 1 s release
+
+// ===================== PALETTE =====================
+usePalette('risoPop');
+const DUO = makePalette({ paperBand: null }, duotone(PALETTES.risoPop.inks[1], PALETTES.risoPop.inks[0]));   // pink and blue, the flipbook's two-ink beat, on plain stock
+const ANCHOR = () => [CX, H * .905];
+
+// ===================== HELPERS =====================
+// hand lettering in two inks (Caveat Brush is a single weight)
+function hand(c, text, x, y, o = {}) {
+  const { size = 48, ink = PAL.ink, ink2 = PAL.accents[0], offset = 4, align = 'left', al = 1 } = o;
+  if (!text) return;
+  c.save(); c.font = `${size}px ${HAND_FONT}`; c.textAlign = align; c.textBaseline = 'alphabetic';
+  if (ink2) { c.fillStyle = ink2; c.globalAlpha = .85 * al; c.fillText(text, x + offset, y + offset * .6); }
+  c.fillStyle = ink; c.globalAlpha = al; c.fillText(text, x, y); c.restore();
+}
+const head = (c, text, y, o = {}) => hand(c, text, CX, y, { size: 100, align: 'center', ...o });
+const sub = (c, text, y, o = {}) => hand(c, text, CX, y, { size: 50, align: 'center', ink2: null, ...o });
+const label = (c, text) => hand(c, text, CX, H * .84, { size: 84, align: 'center' });
+const typed = (text, p) => text.slice(0, Math.round(text.length * p));
+// the anchor
+function mark(c, onNight = false) { resetT(c); const [x, y] = ANCHOR(); seedDot(c, x, y, 11, onNight ? PAL.chalk : PAL.ink, PAL.accents[0]); }
+// riso printing: three reusable plates, coverage drawn in black on white, white is a knockout
+const PLATES = [layer(), layer(), layer()];
+function risoCard(c, draw, o = {}) {
+  const inks = o.inks || PAL.inks.slice(0, 3), angles = o.angles || [.26, 1.31, 0], cell = o.cell || 7; paper(c);
+  inks.forEach((ink, k) => { const P = PLATES[k], g = P.getContext('2d'); resetT(g); g.globalAlpha = 1; g.fillStyle = '#fff'; g.fillRect(0, 0, W, H); g.fillStyle = '#000'; g.strokeStyle = '#000'; g.lineWidth = 6; g.lineCap = 'round'; draw(g, k); printPlate(c, P, { cell, ink, angle: angles[k], seed: 30 + k }); });
+}
+const gray = v => `rgb(${255 - v * 255 | 0},${255 - v * 255 | 0},${255 - v * 255 | 0})`;   // plate coverage 0..1 -> grey
+const radial = (g, x, y, r0, r1, c0, c1) => { const gr = g.createRadialGradient(x, y, r0, x, y, r1); gr.addColorStop(0, c0); gr.addColorStop(1, c1); return gr; };
+function glow(g, x, y, r0, r1, v) { g.fillStyle = radial(g, x, y, r0, r1, gray(v), gray(0)); g.fillRect(0, 0, W, H); }
+function ko(g, text, x, y, size, align = 'center') { g.save(); g.font = `${size}px ${HAND_FONT}`; g.textAlign = align; g.fillStyle = '#fff'; g.fillText(text, x, y); g.restore(); }   // knockout lettering
+function doorPath(g, cx, cy, w, h) { g.beginPath(); g.moveTo(cx - w / 2, cy + h / 2); g.lineTo(cx - w / 2, cy - h / 2 + w / 2); g.arc(cx, cy - h / 2 + w / 2, w / 2, Math.PI, 0); g.lineTo(cx + w / 2, cy + h / 2); g.closePath(); }
+function bellPath(g, x, y, s) { g.beginPath(); g.moveTo(x - 70 * s, y + 40 * s); g.quadraticCurveTo(x - 70 * s, y - 60 * s, x, y - 72 * s); g.quadraticCurveTo(x + 70 * s, y - 60 * s, x + 70 * s, y + 40 * s); g.lineTo(x + 92 * s, y + 62 * s); g.lineTo(x - 92 * s, y + 62 * s); g.closePath(); }
+function tagPath(g, x, y, s) { g.beginPath(); g.moveTo(x - 48 * s, y - 30 * s); g.lineTo(x + 14 * s, y - 30 * s); g.lineTo(x + 50 * s, y); g.lineTo(x + 14 * s, y + 30 * s); g.lineTo(x - 48 * s, y + 30 * s); g.closePath(); }
+// a rough Australia, lon/lat, for the segment card
+const AUS = [[114.0,-22.0],[113.6,-24.5],[114.6,-28.5],[115.0,-31.5],[115.7,-33.5],[115.0,-34.5],[117.5,-35.0],[120.0,-33.9],[124.0,-33.0],[128.0,-32.0],[131.5,-31.5],[134.0,-32.5],[135.6,-34.8],[137.5,-35.6],[138.5,-35.6],[140.5,-38.0],[143.5,-38.8],[146.0,-39.0],[147.5,-38.0],[150.0,-37.5],[150.2,-35.8],[151.2,-33.9],[153.0,-31.0],[153.6,-28.2],[153.2,-25.5],[150.9,-22.9],[149.0,-21.0],[146.5,-19.0],[145.5,-16.5],[144.5,-14.5],[143.5,-12.0],[142.5,-10.7],[141.6,-12.7],[141.4,-15.5],[140.8,-17.5],[139.0,-17.6],[137.0,-16.0],[136.5,-14.0],[136.0,-12.2],[133.5,-11.5],[131.0,-12.2],[129.5,-14.5],[127.5,-14.0],[126.0,-14.5],[124.5,-16.0],[123.0,-17.0],[121.5,-19.0],[119.0,-20.0],[116.5,-20.7],[114.5,-21.7]];
+const TAS = [[145.0,-40.8],[148.2,-40.9],[147.8,-43.2],[146.0,-43.5],[144.7,-41.3]];
+const CITIES = [[151.2,-33.9], [145.0,-37.8], [153.0,-27.5]];   // Sydney, Melbourne, Brisbane
+const MAP = () => ({ x: W * .56, y: H * .15, w: 760, h: 620 });
+const geo = ([lon, lat]) => { const m = MAP(); return [m.x + (lon - 112) / 42 * m.w, m.y + (-lat - 10) / 34 * m.h]; };
+
+// ===================== CARDS =====================
+// Each card is (c, tau, i): plates first, lettering and crayon on top. tau = 99 gives the finished card for the gallery.
+function cardTitle(c, tau, i) {
+  usePalette('risoPop'); const dx = CX - 420, dy = CY + 30;
+  risoCard(c, (g, k) => {
+    if (k === 2) { glow(g, dx, dy - 40, 80, 640, .9); doorPath(g, dx, dy, 300, 540); g.fillStyle = '#fff'; g.fill(); }   // the door is knocked out of the glow so blue stays blue
+    if (k === 0) { doorPath(g, dx, dy, 300, 540); g.fillStyle = gray(.6); g.fill(); doorPath(g, dx, dy, 226, 466); g.fillStyle = '#fff'; g.fill(); }
+    if (k === 1) { doorPath(g, dx, dy, 226, 466); g.fillStyle = gray(.9); g.fill(); g.fillStyle = '#fff'; g.beginPath(); g.arc(dx + 66, dy + 30, 14, 0, TAU); g.fill(); }
+  });
+  hand(c, 'ADHDme', CX - 140, CY - 20, { size: 230 });
+  hand(c, 'The front door to', CX - 130, CY + 80, { size: 66, ink2: null }); hand(c, 'ADHD care in Australia.', CX - 130, CY + 156, { size: 66, ink2: null });
+}
+function cardMaze(c, tau, i) {
+  usePalette('risoPop');
+  risoCard(c, (g, k) => {
+    if (k === 2) glow(g, CX, CY, 100, 900, .8);
+    if (k === 0) { const r = rng(55), s = 120; g.fillStyle = gray(.55);   // a maze of walls behind the headline
+      for (let row = -1; row < H / s + 1; row++) for (let col = -1; col < W / s + 1; col++) { const x = col * s + 30, y = row * s + 20; if (r() < .5) g.fillRect(x, y, s + 14, 14); if (r() < .5) g.fillRect(x, y, 14, s + 14); }
+      g.fillStyle = '#fff'; g.beginPath(); g.roundRect(CX - 700, CY - 190, 1400, 360, 40); g.fill(); }
+    if (k === 1) { g.fillStyle = gray(.9); g.beginPath(); g.arc(W * .12, H * .84, 26, 0, TAU); g.fill(); }
+  });
+  head(c, typed('Getting ADHD care', sm(0, .4, tau)), CY - 60, { size: 130 }); head(c, typed('is a maze.', sm(.25, .6, tau)), CY + 90, { size: 130 });
+}
+function cardGiveUp(c, tau, i) {
+  usePalette('risoPop');
+  risoCard(c, (g, k) => { if (k === 1) { g.fillStyle = gray(.85); g.beginPath(); g.ellipse(CX, CY + 20, 620, 330, -.08, 0, TAU); g.fill(); ko(g, 'So people give up', CX, CY - 40, 130); ko(g, 'before the first booking.', CX, CY + 110, 100); } if (k === 2) glow(g, CX + 500, CY - 260, 40, 500, .7); });
+  hand(c, 'So people give up', CX, CY - 40, { size: 130, align: 'center', ink2: null, al: sm(.1, .3, tau) }); hand(c, 'before the first booking.', CX, CY + 110, { size: 100, align: 'center', ink2: null, al: sm(.3, .5, tau) });
+}
+function cardPain1(c, tau, i) {   // price opacity
+  usePalette('risoPop');
+  risoCard(c, (g, k) => {
+    if (k === 2) glow(g, CX, CY, 100, 760, .6);
+    if (k === 0) { g.fillStyle = gray(.7); g.fillRect(CX - 232, -10, 10, CY - 150); }
+    if (k === 1) { g.fillStyle = gray(.85); g.beginPath(); g.moveTo(CX - 300, CY - 150); g.lineTo(CX + 150, CY - 150); g.lineTo(CX + 300, CY); g.lineTo(CX + 150, CY + 150); g.lineTo(CX - 300, CY + 150); g.closePath(); g.fill(); g.fillStyle = '#fff'; g.beginPath(); g.arc(CX - 228, CY, 22, 0, TAU); g.fill(); ko(g, '$?', CX + 10, CY + 78, 220); }
+  });
+  label(c, 'Cost is hidden');
+}
+function cardPain2(c, tau, i) {   // wrong fit: a round peg over a triangular hole
+  usePalette('risoPop');
+  risoCard(c, (g, k) => {
+    if (k === 2) { glow(g, CX, CY - 200, 60, 420, .8); g.fillStyle = '#fff'; g.beginPath(); g.arc(CX, CY - 220, 130, 0, TAU); g.fill(); }
+    if (k === 1) { g.fillStyle = gray(.85); g.fillRect(CX - 200, CY - 40, 400, 360); g.fillStyle = '#fff'; g.beginPath(); g.moveTo(CX, CY + 40); g.lineTo(CX + 130, CY + 250); g.lineTo(CX - 130, CY + 250); g.closePath(); g.fill(); }
+    if (k === 0) { g.fillStyle = gray(.9); g.beginPath(); g.arc(CX, CY - 220, 130, 0, TAU); g.fill(); }
+  });
+  label(c, 'Wrong fit');
+}
+function cardPain3(c, tau, i) {   // three clinicians, three different answers
+  usePalette('risoPop');
+  risoCard(c, (g, k) => {
+    for (let m = 0; m < 3; m++) { const x = CX - 560 + m * 400, y = CY - 250;
+      if (k === 0) { g.fillStyle = gray(.22); g.fillRect(x, y, 320, 420); squiggleText(g, x + 30, y + 70, 260, 6 - m, { color: '#000', seed: 70 + m, lineH: 44 + m * 16, amp: 6 + m * 6, width: 5 }); }
+      if (k === 1 && m === 1) { g.fillStyle = gray(.85); g.beginPath(); g.arc(x + 270, y + 50, 46, 0, TAU); g.fill(); }
+      if (k === 2 && m === 2) { g.fillStyle = gray(.85); g.fillRect(x, y, 320, 70); }
+    }
+  });
+  label(c, 'No standard');
+}
+function cardPain4(c, tau, i) {   // scripts lapse at handover
+  usePalette('risoPop');
+  risoCard(c, (g, k) => {
+    if (k === 2) { glow(g, CX - 200, CY + 40, 80, 520, .6); bellPath(g, CX + 300, CY - 40, 1.7); g.fillStyle = '#fff'; g.fill(); }
+    if (k === 1) { g.fillStyle = gray(.85); g.beginPath(); g.roundRect(CX - 330, CY - 160, 260, 400, 30); g.fill(); g.fillRect(CX - 280, CY - 230, 160, 80); g.fillStyle = '#fff'; g.fillRect(CX - 305, CY - 135, 210, 300); g.fillStyle = gray(.85); g.fillRect(CX - 305, CY + 110, 210, 55); }
+    if (k === 0) { bellPath(g, CX + 300, CY - 40, 1.7); g.fillStyle = gray(.8); g.fill(); g.beginPath(); g.arc(CX + 300, CY + 95, 24, 0, TAU); g.fill(); g.strokeStyle = '#fff'; g.lineWidth = 22; g.beginPath(); g.moveTo(CX + 170, CY - 190); g.lineTo(CX + 430, CY + 110); g.moveTo(CX + 430, CY - 190); g.lineTo(CX + 170, CY + 110); g.stroke(); }
+  });
+  label(c, 'Scripts lapse');
+}
+function cardWho(c, tau, i) {
+  usePalette('risoPop'); const m = MAP();
+  risoCard(c, (g, k) => {
+    if (k === 2) { glow(g, m.x + m.w * .55, m.y + m.h * .5, 100, 620, .8); g.fillStyle = '#fff'; g.fill(polyPath(AUS.map(geo))); g.fill(polyPath(TAS.map(geo))); }
+    if (k === 0) { g.fillStyle = gray(.6); g.fill(polyPath(AUS.map(geo))); g.fill(polyPath(TAS.map(geo))); }
+    if (k === 1) CITIES.forEach(p => { const [x, y] = geo(p); g.fillStyle = gray(.95); g.beginPath(); g.arc(x, y, 22, 0, TAU); g.fill(); });
+  });
+  CITIES.forEach((p, n) => { const [x, y] = geo(p), q = sm(.3 + n * .2, .6 + n * .2, tau, easeOut); if (q > 0) dashedRing(c, x, y, 26 + 34 * q, PAL.ink, 80 + n, [8, 6], 2.2); });
+  hand(c, '16 to 25,', W * .06, CY - 70, { size: 120 }); hand(c, 'seeking a diagnosis.', W * .06, CY + 50, { size: 84 });
+  hand(c, 'Sydney · Melbourne · Brisbane', W * .06, CY + 150, { size: 50, ink2: null, ink: PAL.inks[0] });
+}
+function cardSolution(c, tau, i) {
+  usePalette('risoPop'); const px = W * .28, py = CY + 40, cx = W * .74, cys = [-2, -1, 0, 1, 2].map(m => CY + 40 + m * 140), pick = 2;
+  risoCard(c, (g, k) => {
+    if (k === 2) { glow(g, cx, cys[pick], 40, 300, .95); g.fillStyle = '#fff'; cys.forEach(y => { g.beginPath(); g.arc(cx, y, 44, 0, TAU); g.fill(); }); }
+    if (k === 1) { g.fillStyle = gray(.9); g.beginPath(); g.arc(px, py, 74, 0, TAU); g.fill(); }
+    if (k === 0) cys.forEach(y => { g.fillStyle = gray(.85); g.beginPath(); g.arc(cx, y, 44, 0, TAU); g.fill(); });
+  });
+  c.save(); c.strokeStyle = PAL.ink; c.lineWidth = 1.8; c.globalAlpha = .4; cys.forEach((y, m) => wob(c, [[px + 80, py], [cx - 54, y]], 2, 90 + m)); c.restore();
+  const q = sm(.7, 1.3, tau, easeOut); if (q > 0) { c.strokeStyle = PAL.accents[0]; c.lineWidth = 7; c.lineCap = 'round'; selfDraw(c, [[px + 80, py], [(px + cx) / 2, py - 10], [cx - 58, cys[pick]]], q, 96, 3); if (q >= 1) dashedRing(c, cx, cys[pick], 78, PAL.accents[0], 97, [10, 7], 3); }
+  head(c, 'Matching, not triage.', H * .17);
+  sub(c, 'Needs and psychographics, not just who is free.', H * .86);
+}
+function cardHow1(c, tau, i) {   // published cost bands
+  usePalette('risoPop');
+  risoCard(c, (g, k) => { [[2, 900, .9], [1, 640, .85], [0, 400, .8]].forEach(([plate, w, v], m) => { if (k !== plate) return; const y = CY - 200 + m * 150; g.fillStyle = gray(v); g.beginPath(); g.roundRect(CX - 450, y, w, 112, 20); g.fill(); ko(g, ['$', '$$', '$$$'][m], CX - 420, y + 88, 84, 'left'); }); });
+  head(c, 'Published cost bands.', H * .17); sub(c, 'Free for patients. No platform fee on top.', H * .86);
+}
+function cardHow2(c, tau, i) {   // standard diagnosis templates
+  usePalette('risoPop'); const x = CX - 300, y = CY - 250;
+  risoCard(c, (g, k) => {
+    if (k === 0) { g.fillStyle = gray(.22); g.fillRect(x, y, 600, 520); for (let m = 0; m < 3; m++) { g.fillStyle = '#fff'; g.fillRect(x + 50, y + 130 + m * 130, 70, 70); squiggleText(g, x + 160, y + 180 + m * 130, 380, 1, { color: '#000', seed: 100 + m, lineH: 30, amp: 7, width: 5 }); } }
+    if (k === 2) { g.fillStyle = gray(.85); g.fillRect(x, y, 600, 84); }
+  });
+  for (let m = 0; m < 3; m++) { const q = sm(.25 + m * .2, .45 + m * .2, tau, easeOut); if (q <= 0) continue; const bx = x + 50, by = y + 130 + m * 130; c.strokeStyle = PAL.accents[0]; c.lineWidth = 7; c.lineCap = 'round'; selfDraw(c, [[bx + 12, by + 38], [bx + 30, by + 60], [bx + 66, by + 10]], q, 110 + m, 2); }
+  head(c, 'Standard diagnosis templates.', H * .17); sub(c, 'The same assessment from every clinician.', H * .86);
+}
+function cardHow3(c, tau, i) {   // script-expiry alerts
+  usePalette('risoPop'); const bx = CX, by = CY - 30;
+  risoCard(c, (g, k) => {
+    if (k === 2) glow(g, bx, by, 60, 520, .9);
+    if (k === 1) { bellPath(g, bx, by, 1.8); g.fillStyle = gray(.85); g.fill(); g.beginPath(); g.arc(bx, by + 118, 26, 0, TAU); g.fill(); }
+    if (k === 0) { g.fillStyle = gray(.8); g.beginPath(); g.roundRect(CX - 130, CY + 230, 260, 84, 42); g.fill(); g.fillStyle = '#fff'; g.beginPath(); g.roundRect(CX - 130, CY + 230, 130, 84, 42); g.fill(); g.fillStyle = gray(.8); g.fillRect(CX - 60, CY + 230, 60, 84); }
+  });
+  const q = sm(.2, .6, tau, easeOut); if (q > 0) { dashedRing(c, bx, by, 210 * q, PAL.accents[0], 120, [12, 8], 3); dashedRing(c, bx, by, 265 * q, alpha(PAL.accents[0], .5), 121, [12, 10], 2.4); }
+  if (pulse(i, 6, 3)) aster(c, bx, by - 150, 6, 10, PAL.accents[2], 122 + (i % 6), 1, PAL.accents[2], PAL.ink);
+  head(c, 'Script-expiry alerts.', H * .17); sub(c, 'No lapse at handover between prescribers.', H * .86);
+}
+function cardWhyNow(c, tau, i) {
+  usePalette('risoPop'); night(c, PAL.night, 61);
+  for (let k = 0; k < 3; k++) grain(c, rectPath(0, 0, W, H), [0, 0, W, H], 220, PAL.accents[k], .7, 62 + k, 2.4);
+  const y = CY + 90; c.strokeStyle = PAL.chalkDim; c.lineWidth = 2.5; wob(c, [[W * .18, y], [W * .82, y]], 2, 65);
+  [[W * .3, 'QLD', 'live since Dec 2025', .4], [W * .55, 'NSW', '2026', .9], [W * .74, 'VIC', '2026', 1.3]].forEach(([x, big, small, t0], n) => {
+    const q = sm(t0, t0 + .3, tau, easeOut); dashedRing(c, x, y, 62, PAL.chalkDim, 66 + n, [8, 6], 1.6); if (q <= 0) return;
+    aster(c, x, y, 14, 16, PAL.accents[2], 70 + n, q, PAL.night, PAL.chalk);
+    hand(c, big, x, y - 100, { size: 72, align: 'center', ink: PAL.chalk, ink2: PAL.accents[0], al: q }); hand(c, small, x, y + 150, { size: 40, align: 'center', ink: PAL.chalkDim, ink2: null, al: q });
+  });
+  head(c, 'Why now?', H * .2, { size: 120, ink: PAL.accents[2], ink2: PAL.accents[0] }); sub(c, 'GPs can now diagnose ADHD. The pathway is opening state by state.', H * .33, { size: 54, ink: PAL.chalk });
+}
+function cardMarket(c, tau, i) {
+  usePalette('risoPop'); const r = rng(140);
+  const pts = []; for (let row = 0; row < 8; row++) for (let col = 0; col < 18; col++) pts.push([CX + 90 + col * 46 + (r() - .5) * 10, CY - 260 + row * 62 + (r() - .5) * 10]);
+  risoCard(c, (g, k) => {
+    if (k === 2) glow(g, W * .27, CY, 80, 620, .7);
+    if (k === 0) pts.forEach(([x, y]) => { g.fillStyle = gray(.7); g.beginPath(); g.arc(x, y, 10, 0, TAU); g.fill(); });
+    if (k === 1) pts.forEach(([x, y], n) => { if (n % 4) return; g.fillStyle = gray(.95); g.beginPath(); g.arc(x, y, 13, 0, TAU); g.fill(); });
+  });
+  const pop = sm(0, .3, tau, easeOut), n = Math.round(250 * sm(.4, 1.1, tau, easeOut));
+  c.save(); resetT(c); c.translate(W * .27, CY - 110); c.scale(.6 + .4 * pop, .6 + .4 * pop); hand(c, '>1M', 0, 0, { size: 230, align: 'center' }); c.restore();
+  hand(c, 'Australians with ADHD', W * .27, CY - 30, { size: 50, align: 'center', ink2: null });
+  if (tau >= .4) { hand(c, `${n}K`, W * .27, CY + 200, { size: 230, align: 'center', ink: PAL.inks[0] }); hand(c, 'actively seeking care', W * .27, CY + 280, { size: 50, align: 'center', ink2: null }); }
+}
+function cardModel(c, tau, i) {
+  usePalette(DUO); const px = W * .2, cx = W * .8, y = CY + 40;
+  risoCard(c, (g, k) => {
+    g.fillStyle = gray(.9); g.beginPath(); g.arc(k ? cx : px, y, 84, 0, TAU); g.fill();
+    doorPath(g, CX, y, 220, 380); g.fillStyle = gray(.7); g.fill(); doorPath(g, CX, y, 150, 300); g.fillStyle = '#fff'; g.fill();
+  }, { inks: PAL.inks });
+  const q1 = sm(.2, .6, tau, easeOut), q2 = sm(.6, 1.0, tau, easeOut);
+  c.strokeStyle = PAL.ink; c.lineWidth = 6; c.lineCap = 'round'; if (q1 > 0) selfDraw(c, [[px + 110, y], [CX - 140, y]], q1, 130, 2.5); if (q2 > 0) selfDraw(c, [[CX + 140, y], [cx - 110, y]], q2, 131, 2.5);
+  if (q1 >= 1) hand(c, 'free', px, y - 120, { size: 64, align: 'center', ink2: null });
+  if (q2 >= 1) { c.save(); c.translate(cx, y - 130); c.scale(1.2, 1.2); tagPath(c, 0, 0, 1); c.fillStyle = PAL.blush; c.fill(); c.strokeStyle = PAL.ink; c.lineWidth = 2; wob(c, [[-48, -30], [14, -30], [50, 0], [14, 30], [-48, 30]], 1.5, 132, true); c.restore(); hand(c, '$', cx + 4, y - 108, { size: 60, align: 'center', ink: PAL.paper, ink2: null }); }
+  head(c, 'Free for patients.', H * .17, { size: 110 }); sub(c, 'Clinicians subscribe for matched patient flow.', H * .86, { size: 54 });
+}
+function cardTraction(c, tau, i) {
+  usePalette('risoPop'); const items = [[W * .25, 2, 'Live', 'adhdme.au'], [W * .5, 1, '2 GPs', 'in Sydney'], [W * .75, 0, '2 models', 'of matching in test']];
+  risoCard(c, (g, k) => items.forEach(([x, plate]) => { if (k !== plate) return; g.fillStyle = gray(.35); g.beginPath(); g.arc(x, CY + 40, 190, 0, TAU); g.fill(); }));
+  items.forEach(([x, , big, small], n) => { const q = sm(.1 + n * .35, .35 + n * .35, tau, easeOut); if (q <= 0) return;
+    dashedRing(c, x, CY + 40, 196 * q, PAL.ink, 150 + n, [12, 8], 3);
+    c.save(); resetT(c); c.translate(x, CY + 40); c.scale(q, q); hand(c, big, 0, 10, { size: 100, align: 'center' }); hand(c, small, 0, 70, { size: 40, align: 'center', ink2: null }); c.restore(); });
+  head(c, 'Live today.', H * .17);
+}
+const CARDS = [cardTitle, cardPain1, cardPain2, cardPain3, cardPain4, cardWho, cardSolution, cardHow1, cardHow2, cardHow3, cardWhyNow, cardMarket, cardModel, cardTraction];
+const FINAL = CARDS.map(fn => (c) => fn(c, 99, 0));   // finished cards for the badge gallery
+
+// ===================== SCENES =====================
+const L1 = layer();
+function sceneHook(c, tau, i) {
+  usePalette('risoPop'); paper(c); const [ax, ay] = ANCHOR();
+  for (let b = 0; b * 4 / 12 <= tau; b++) { const r = (tau + 1 / 12 - b * 4 / 12) * 340; if (r > 8 && r < 1700) crayon(c, ellPts(ax, ay, r, r, 0, Math.max(48, r / 5 | 0)), b % 2 ? PAL.accents[0] : PAL.accents[1], 4, 40 + b, true); }
+  const p = sm(.6, 1.3, tau, easeOut), R = 30 + p * 1400;
+  if (p > 0) { iris(c, CX, CY, R, cc => cardTitle(cc, tau, i)); c.strokeStyle = PAL.ink; c.lineWidth = 3; wob(c, ellPts(CX, CY, R, R, 0, 140), 2, 41, true); }
+  mark(c);
+}
+function sceneProblem(c, tau, i) {
+  if (tau < .75) cardMaze(c, tau, i);
+  else if (tau < 2.75) { const k = Math.min(3, Math.floor((tau - .75) / .5)); CARDS[1 + k](c, tau - .75 - k * .5, i); }
+  else cardGiveUp(c, tau - 2.75, i);
+  mark(c);
+}
+function sceneWho(c, tau, i) { cardWho(c, tau, i); mark(c); }
+function sceneSolution(c, tau, i) { cardSolution(c, tau, i); mark(c); }
+function sceneHow(c, tau, i) { montage(c, [cardHow1, cardHow2, cardHow3], tau, 1.0, i); mark(c); }
+function sceneWhyNow(c, tau, i) { cardWhyNow(c, tau, i); mark(c, true); }
+function sceneMarket(c, tau, i) { cardMarket(c, tau, i); mark(c); }
+function sceneModel(c, tau, i) { cardModel(c, tau, i); mark(c); }
+function sceneTraction(c, tau, i) { cardTraction(c, tau, i); mark(c); }
+function sceneGallery(c, tau, i) {
+  const g = L1.getContext('2d'); usePalette('risoPop'); paper(g); dotScreen(g, rectPath(0, 0, W, H), [0, 0, W, H], { cell: 9, color: PAL.inks[2], density: .16, angle: .26, jitter: .3, seed: 50 });
+  badges(g, FINAL, { cx: CX, cy: CY, r0: 60, gap: 150, size: 62, progress: sm(0, .5, tau, easeOut), seed: 51 });
+  usePalette('risoPop'); paper(c); const [ax, ay] = ANCHOR(), s = 1 - sm(1.0, 1.5, tau, easeIn) * .985;
+  c.save(); resetT(c); c.translate(ax, ay); c.scale(s, s); c.translate(-ax, -ay); c.drawImage(L1, 0, 0, W, H); c.restore();
+  mark(c);
+}
+function sceneClose(c, tau, i) {
+  usePalette('risoPop'); paper(c); const [ax, ay] = ANCHOR();
+  ripples(c, ax, ay, [520, 700, 900], alpha(PAL.accents[1], .3), 160, 3.5);
+  head(c, typed('The right ADHD doctor', sm(0, .6, tau)), CY - 90, { size: 130 }); head(c, typed('should not be hard to find.', sm(.5, 1.3, tau)), CY + 60, { size: 130 });
+  mark(c);
+}
+function sceneSignoff(c, tau, i) {
+  usePalette('risoPop'); paper(c); const [ax, ay] = ANCHOR();
+  ripples(c, ax, ay, [420, 560, 720], alpha(PAL.accents[0], .3), 170, 3.5);
+  signOff(c, 'ADHDme', 'adhdme.au', { x: CX, y: CY - 30, size: 150, ink2: PAL.accents[0], progressA: sm(0, .5, tau), progressB: sm(.5, 1.0, tau) });
+  mark(c);
+}
+
+// ===================== FILM =====================
+const TIMELINE = [
+  { name: 'hook',     dur: 2.00, fn: sceneHook },
+  { name: 'problem',  dur: 3.50, fn: sceneProblem },
+  { name: 'who',      dur: 2.00, fn: sceneWho },
+  { name: 'solution', dur: 3.00, fn: sceneSolution },
+  { name: 'how',      dur: 3.00, fn: sceneHow },
+  { name: 'whynow',   dur: 2.50, fn: sceneWhyNow },
+  { name: 'market',   dur: 2.50, fn: sceneMarket },
+  { name: 'model',    dur: 2.50, fn: sceneModel },
+  { name: 'traction', dur: 2.00, fn: sceneTraction },
+  { name: 'gallery',  dur: 1.50, fn: sceneGallery },
+  { name: 'close',    dur: 2.00, fn: sceneClose },
+  { name: 'signoff',  dur: 1.50, fn: sceneSignoff },
+];
+const T = {}; { let acc = 0; for (const s of TIMELINE) { T[s.name] = acc; acc += s.dur; } T.end = acc; }
+
+// ===================== SCORE =====================
+// Reads the same timeline as the pictures: a cue on every cut, a motif per scene.
+function score(ac, t0, dest) {
+  const master = ac.createGain(); master.gain.value = .55; master.connect(dest); const r = rng(7);
+  const n = (hz, t, d, type, g) => note(ac, master, hz, t0, t, d, type, g);
+  for (let t = T.hook; t < T.hook + 1.3; t += 1 / 3) n(pentHz(1, r() * 5 | 0), t, .3, 'triangle', .15); n(pentHz(2, 0), T.hook + 1.3, .6, 'sine', .2);
+  [0, .75, 1.25, 1.75, 2.25].forEach((t, k) => n(pentHz(1 + (k % 2), k % 5), T.problem + t, .22, 'square', .07)); n(pentHz(-1, 0), T.problem + 2.75, 1.0, 'sine', .22);
+  n(pentHz(0, 2), T.who, .6, 'triangle', .16); n(pentHz(0, 4), T.who + .5, .6, 'triangle', .16); [0, 1, 2].forEach(k => n(pentHz(1, k), T.who + .5 + k * .2, .25, 'sine', .12));
+  n(pentHz(0, 0), T.solution, .8, 'sine', .2); n(pentHz(2, 4), T.solution + 1.1, .6, 'sine', .22);
+  [0, 1, 2].forEach(k => n(pentHz(1, k * 2 % 5), T.how + k, .3, 'square', .08));
+  n(55, T.whynow, 1.6, 'sawtooth', .10); n(110, T.whynow + .1, 1.4, 'sine', .14); [.4, .9, 1.3].forEach((t, k) => n(pentHz(1, k + 2), T.whynow + t, .5, 'sine', .2));
+  n(pentHz(0, 0), T.market, 1.2, 'sine', .22); n(pentHz(1, 2), T.market + .1, 1.0, 'sine', .14); n(pentHz(0, 4), T.market + 1.0, 1.2, 'sine', .2); n(pentHz(1, 4), T.market + 1.1, 1.0, 'sine', .12);
+  for (let t = T.model; t < T.traction; t += .5) n(pentHz(0, r() * 5 | 0), t, .6, 'triangle', .14);
+  [0, 1, 2].forEach(k => n(pentHz(1, [0, 2, 4][k]), T.traction + .1 + k * .35, .6, 'triangle', .2));
+  n(pentHz(0, 0), T.gallery, 1.4, 'sine', .22); n(pentHz(1, 2), T.gallery + .4, 1.0, 'sine', .14);
+  n(pentHz(0, 0), T.close, 2.0, 'sine', .22); n(pentHz(1, 2), T.close + .6, 1.4, 'sine', .14);
+  n(pentHz(0, 0), T.signoff, 1.5, 'sine', .25); n(pentHz(0, 2), T.signoff + .5, 1.0, 'sine', .18);
+}
+
+document.fonts.load('40px "Bradley Hand"').catch(() => {}).then(() =>
+  defineFilm({ palette: 'risoPop', timeline: TIMELINE, score, format: { ar: '16:9', width: 1920 } }));
+</script>

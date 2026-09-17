@@ -1,45 +1,67 @@
-# ADHDme explainer animation
+# ADHDme animations
 
-A 28.75 second hand-drawn explainer of what ADHDme does, why finding a GP you click
-with is hard, and the value proposition from the September 2026 strategic plan deck.
-Every frame is drawn by JavaScript on Canvas 2D from one HTML file, following the
+Two short hand-drawn films about ADHDme, both built with the
 [hand-drawn-canvas-animation](https://github.com/alesha-pro/tools/tree/main/skills/hand-drawn-canvas-animation)
-skill: no images, no libraries, seeded textures, drawn at 12 fps and packed to 24 fps
-("on twos"), with the soundtrack generated from the same timeline.
+skill: every frame is drawn by JavaScript on Canvas 2D from one HTML file, following the
+skill's `core.js`, with no images or libraries, seeded textures, drawn at 12 fps and packed
+to 24 fps ("on twos"), and a soundtrack generated from the same timeline.
+
+| film | file | look | what it is |
+|---|---|---|---|
+| Explainer | `adhdme.html` | ink on warm paper, with blueprint interludes | 28.75 s. Sam, a patient, tries to find a GP; the deck's problem, solution, assessment, fit loop and patient value |
+| Pitch | `adhdme-pitch.html` | riso print: cream stock, fluorescent inks, halftone plates | 28 s. A YC-style pitch: hook, problem, who, solution, how, why now, market, model, traction, close. Content from the Value Proposition Canvas plus the deck's numbers |
+
+Outputs with sound: `out/adhdme-final.mp4` and `out/adhdme-pitch-final.mp4`, 1920x1080, 24 fps.
+Contact sheets (two tiles per second) sit next to them.
 
 | file | what it is |
 |---|---|
-| `adhdme.html` | the film: brief and beat sheet, palette, puppets, twelve scenes, score |
 | `core.js` | the skill's shared core (palettes, finishes, marks, reveals, player). Not edited. |
 | `render.mjs` | headless Chrome renderer: grid sheet, spot frames, mp4 and contact sheet |
-| `score.mjs` | renders the Web Audio score to `out/score.wav` headlessly, so no browser click is needed |
-| `fonts/Caveat[wght].ttf` | the hand-lettering face (SIL Open Font License, see `fonts/OFL.txt`) |
-| `out/adhdme-final.mp4` | the film with sound, 1920x1080, 24 fps |
-| `out/adhdme-contact.jpg` | contact sheet, two tiles per second |
+| `score.mjs` | renders a film's Web Audio score to WAV headlessly, so no browser click is needed |
+| `fonts/Caveat[wght].ttf` | the explainer's hand-lettering face (SIL Open Font License, `fonts/OFL.txt`) |
+| `fonts/CaveatBrush-Regular.ttf` | the pitch's bold marker face (SIL Open Font License) |
 
-## Watch or scrub it
+## Watch or scrub
 
-Open `adhdme.html` in a browser: play, scrub, toggle sound, export frames or the score.
+Open either HTML file in a browser: play, scrub, toggle sound, export frames or the score.
 
-## Render it
+## Render
 
 Needs Node 18+, Chrome or Chromium, and ffmpeg on PATH. `puppeteer-core` drives the Chrome
 you already have. Set `CHROME=/path/to/chrome` if it is not found automatically.
 
 ```bash
 npm i --no-audit --no-fund
-node render.mjs adhdme.html --ar 16:9 --width 1920 --grid 24    # 24-frame sheet, look at this first
-node render.mjs adhdme.html --ar 16:9 --width 1920              # out/adhdme.mp4 + out/adhdme-contact.jpg
-node score.mjs adhdme.html                                      # out/score.wav
-ffmpeg -i out/adhdme.mp4 -i out/score.wav -c:v copy -c:a aac -shortest out/adhdme-final.mp4
+node render.mjs adhdme-pitch.html --ar 16:9 --width 1920 --grid 24    # 24-frame sheet, look at this first
+node render.mjs adhdme-pitch.html --ar 16:9 --width 1920              # out/adhdme-pitch.mp4 + contact sheet
+node score.mjs adhdme-pitch.html --out out/score-pitch.wav            # the soundtrack
+ffmpeg -i out/adhdme-pitch.mp4 -i out/score-pitch.wav -c:v copy -c:a aac -shortest out/adhdme-pitch-final.mp4
 ```
 
-The film is designed for 16:9. Scenes place everything relative to the frame centre, so
-`--ar 1:1` or `--ar 9:16` render too, but the captions and card text are sized for the wide
-frame and need shrinking before a square or vertical cut is usable. Pass `--width 3840` for
-a 4K render.
+Swap `adhdme-pitch` for `adhdme` to build the explainer. Both films are designed for 16:9.
+Scenes place everything relative to the frame centre, so `--ar 1:1` or `--ar 9:16` render
+too, but the lettering is sized for the wide frame and needs shrinking before a square or
+vertical cut is usable. Pass `--width 3840` for a 4K render.
 
-## The scenes
+## The pitch, scene by scene
+
+| t | scene | what it shows |
+|---|---|---|
+| 0.00 | hook | Crayon ripples from the seed dot; an iris opens on the title card: a door, "ADHDme, the front door to ADHD care in Australia." |
+| 2.00 | problem | "Getting ADHD care is a maze", then four pain cards at half a second each (cost is hidden, wrong fit, no standard, scripts lapse), then "So people give up before the first booking." |
+| 5.50 | who | Australia in blue with Sydney, Melbourne and Brisbane ringed: 16 to 25, seeking a diagnosis. |
+| 7.50 | solution | A patient dot and five clinicians; the fit lights up. "Matching, not triage." |
+| 10.50 | how | Three cards at a second each: published cost bands, standard diagnosis templates, script-expiry alerts. |
+| 13.50 | whynow | A starfield timeline: QLD live since Dec 2025, NSW and VIC in 2026. GPs can now diagnose ADHD. |
+| 16.00 | market | ">1M Australians with ADHD" pops, "250K actively seeking care" counts up over a dot cloud of people. |
+| 18.50 | model | A pink and blue duotone beat: patient, door, clinician. Free for patients; clinicians subscribe for matched patient flow. |
+| 21.00 | traction | Three stamps: live at adhdme.au, 2 GPs in Sydney, 2 matching models in test. |
+| 23.00 | gallery | Every card as a badge on dashed rings, collapsing into the seed dot. |
+| 24.50 | close | "The right ADHD doctor should not be hard to find." types out over ripples. |
+| 26.50 | signoff | ADHDme / adhdme.au in two inks. |
+
+## The explainer, scene by scene
 
 | t | scene | what it shows |
 |---|---|---|
@@ -58,11 +80,17 @@ a 4K render.
 
 ## Design notes
 
-- Palette comes from the deck's brand system (paper, ink, amber, tint, slate) through the
-  skill's `makePalette`, with a warmer paper so stock grain shows and a slate navy for the
+- The explainer's palette comes from the deck's brand system (paper, ink, amber, tint, slate)
+  through the skill's `makePalette`; Sam is its anchor, in every shot, in chalk during the
   blueprint interludes.
-- Sam is the anchor: in every shot, in chalk during the blueprint interludes.
-- This is an explainer, so each shot carries one short hand-lettered caption in two inks,
-  taken from the deck's own lines. Everything else is drawn.
+- The pitch uses the skill's `risoPop` palette as printed: each card is three plates (blue, pink,
+  yellow) drawn in black on white with knockouts, printed as halftone dots that multiply like
+  ink; blue shapes are knocked out of the yellow glow so they stay blue. Its anchor is the seed
+  dot at the bottom of every frame; the hook's ripples are born from it and the gallery collapses
+  into it.
+- Both are explainers, so each shot carries one short hand-lettered line in two inks. The skill
+  reserves lettering for the sign-off; that deviation is noted in each file's brief.
+- Where the Value Proposition Canvas and the deck differ on money, the pitch follows the canvas:
+  free for patients, a clinician subscription for matched patient flow.
 - `render.mjs` is the skill's script plus two small changes: it finds Playwright's bundled
   Chromium, and it passes `--no-sandbox` only when running as root (containers, CI).
