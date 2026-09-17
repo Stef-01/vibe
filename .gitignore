@@ -62,3 +62,9 @@ unitycloudbuild/
 
 # Package manager
 /Packages/manifest.json.lock
+
+# ADHDme animation (adhdme-animation/): rendered frames, the raw score, the grid sheet and the silent mp4 are rebuilt by render.mjs / score.mjs
+adhdme-animation/out/adhdme-frames/
+adhdme-animation/out/*.wav
+adhdme-animation/out/adhdme-grid.jpg
+adhdme-animation/out/adhdme.mp4

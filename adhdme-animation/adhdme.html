@@ -1,0 +1,522 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>ADHDme: the front door to ADHD care</title>
+<style>
+  /* core.js lists "Bradley Hand" first in HAND_FONT. Registering Caveat (OFL, fonts/OFL.txt) under that
+     name makes every hand-lettered line render the same on every machine, headless or not. */
+  @font-face { font-family: "Bradley Hand"; src: url("fonts/Caveat[wght].ttf"); font-weight: 100 900; }
+  body{margin:0;background:#111;color:#ccc;font:13px/1.4 ui-monospace,Menlo,monospace;display:flex;flex-direction:column;align-items:center;gap:10px;padding:12px}
+  canvas#c{width:min(92vw,960px);height:auto;background:#000;box-shadow:0 0 0 1px #333}
+  .bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:center}
+  button{background:#222;color:#ddd;border:1px solid #444;padding:4px 10px;cursor:pointer;font:inherit}
+  input[type=range]{width:320px}
+</style>
+<canvas id="c" width="1920" height="1080"></canvas>
+<script src="core.js"></script>
+<script>
+'use strict';
+// ============================================================
+// ADHDme, an explainer drawn frame by frame on Canvas 2D on top of core.js
+// (hand-drawn-canvas-animation skill). No images, no libraries, no Math.random.
+// ============================================================
+
+// ===================== BRIEF & BEAT SHEET =====================
+// BRIEF
+// Subject: what ADHDme does, why it is hard to find a GP you click with, and the value prop
+//          from the September 2026 strategic plan deck (problem, solution, assessment, fit loop,
+//          patient value: transparent, fast, personal).
+// Format: 16:9, output width 1920, drawn 12 fps, output 24 fps, 28.75 seconds.
+//         Everything is placed relative to CX, CY, W, H so the same file renders 1:1 or 9:16.
+// Look:   ink on warm paper (home look), one pencil page (the directory), two blueprint
+//         interludes on navy (what ADHDme does, the fit loop). Cuts only on hard cuts.
+// Palette: makePalette from the deck's brand system: paper #FBFAF7, ink #191A17, amber #8A5A16,
+//         tint #E9D6B4, slate #5C6CB0. Paper warmed so stock grain shows; night is a slate navy.
+// Finish: follows the palette (ink); pencil on the directory page.
+// Anchor: Sam, the patient. In every shot, in chalk during the blueprint interludes,
+//         waving under the sign-off.
+// Puppets: one person builder (drawPerson) with looks: Sam (slate top, amber hair) and five GPs
+//         (white coats, stethoscopes, different hair, skin and glasses). Pose: lean, arm, mood,
+//         walk, nod, blink.
+// Text:   this is an explainer, so each shot carries one short hand-lettered caption in two inks
+//         (the deck's own lines), plus the labels a diagram needs. Everything else is drawn.
+//
+// t      dur   scene       look        camera    what changes                                        kit                                   sound
+// 0.00   2.50  sam         ink         push-in   Sam on a hatched ground, thought bubble: a GP and ?  ground construction bubble scribble   slow plucks
+// 2.50   2.00  directory   pencil      scroll    identical listings, same score stamp, ads, $ scrawl  squiggleText dashedRing thread        low sines
+// 4.50   4.25  stuck       ink         static    Sam constant; tag with hidden price / four faceless  device T: world cuts at 1 s           a note per cut,
+//                                                cards, same score / a door and a pill thought /      shape card bubble                     low note at "stop"
+//                                                Sam walks away: people stop before the booking
+// 8.75   2.75  frontdoor   ink->blue   static    ink blot to blueprint; ADHDme circle self-draws,     blot selfDraw dashedRing strokes      sawtooth swell,
+//                                                three branches: find, compare, book                                                       rising notes
+// 11.50  2.50  find        ink         static    Sam constant; five GP profile cards cut at 0.5 s,     device T card squiggleText seedDot   squares per card
+//                                                filter chips, fit dots, scope icons
+// 14.00  2.00  compare     ink         static    two cards, the full two-consult price, scope ticks,   card hand selfDraw                    plucks, bright tick
+//                                                a crayon ring picks one, Sam points
+// 16.00  1.75  book        ink         static    a calendar, two dates circled, both linked to one GP  card selfDraw dashed lines            two cues, arpeggio
+// 17.75  2.50  assess      ink         push-in   Sam and the GP at a desk; cardiac, psychological,     ground shape strokes dashedRing      plucks, a note per icon
+//                                                biomarkers appear on rings
+// 20.25  2.50  loop        blueprint   iris      need, match, consult, rate, learn on a ring; a spark   iris dottedArc selfDraw aster         swell, rising fives
+//                                                laps it faster the second time; stars crossed out
+// 22.75  2.50  value       ink         static    three badges: tag, clock, pair; transparent, fast,    surface dashedRing strokes aster      three rising notes
+//                                                personal; Sam and the GP together
+// 25.25  2.00  tagline     ink         static    "The right ADHD doctor should not be hard to find."   ripples hand walk cycle               long dyad
+// 27.25  1.50  signoff     ink         static    ADHDme / adhdme.au, two dots, Sam waves               signOff ripples                       dyad, 1 s release
+
+// ===================== PALETTE =====================
+const ADHDME = makePalette({
+  paper: '#f7f1e6', paperBand: 'rgba(233,214,180,.38)', ink: '#1b1c19',
+  night: '#1a2038', chalk: '#ebe7f7', chalkDim: '#8b93c6', guide: 'rgba(92,108,176,.55)',
+  fills: ['#e9d6b4', '#8a5a16', '#5c6cb0', '#d9b078', '#bfc5e3', '#c99a5a'],
+  shade: '#4a3512', light: '#fffaf0', blush: '#b0483a',
+  accents: ['#5c6cb0', '#8a5a16', '#e0a63a', '#b0483a'],
+  inks: ['#1b1c19', '#8a5a16', '#5c6cb0'], finish: 'ink',
+}, 'paperInk');
+const ADHDME_PENCIL = makePalette({ finish: 'pencil', paperBand: null }, ADHDME);
+usePalette(ADHDME);
+
+// ===================== HELPERS =====================
+// points around a rounded rectangle, for wob / selfDraw outlines that must not coincide with the Path2D fill
+function roundRectPts(x, y, w, h, r, n = 6) {
+  const pts = [], corner = (cx, cy, a0) => { for (let k = 0; k <= n; k++) { const a = a0 + k / n * Math.PI / 2; pts.push([cx + Math.cos(a) * r, cy + Math.sin(a) * r]); } };
+  corner(x + w - r, y + r, -Math.PI / 2); corner(x + w - r, y + h - r, 0); corner(x + r, y + h - r, Math.PI / 2); corner(x + r, y + r, Math.PI);
+  return pts;
+}
+// hand lettering in two inks, like handText but with a weight (Caveat is a variable font)
+function hand(c, text, x, y, o = {}) {
+  const { size = 48, ink = PAL.ink, ink2 = PAL.accents[1], offset = 3, align = 'left', weight = 600, al = 1 } = o;
+  if (!text) return;
+  c.save(); c.font = `${weight} ${size}px ${HAND_FONT}`; c.textAlign = align; c.textBaseline = 'alphabetic';
+  if (ink2) { c.fillStyle = ink2; c.globalAlpha = .85 * al; c.fillText(text, x + offset, y + offset * .6); }
+  c.fillStyle = ink; c.globalAlpha = al; c.fillText(text, x, y); c.restore();
+}
+// one caption per shot, bottom left, screen coordinates; p < 1 types it out
+function caption(c, text, o = {}) { const p = o.p ?? 1; resetT(c); hand(c, text.slice(0, Math.round(text.length * p)), o.x ?? W * .055, o.y ?? H * .91, { size: 54, ...o }); }
+// fill -> finish -> wobbly outline, the whole ink pipeline for one shape
+function shape(c, path, pts, box, fill, seed, o = {}) {
+  c.fillStyle = fill; c.fill(path); surface(c, path, box, { seed, ...o });
+  c.strokeStyle = o.line || PAL.ink; c.lineWidth = o.lw || (PAL.finish === 'pencil' ? 1.2 : 2.6); wob(c, pts, o.amp || 1.8, seed + 1, true);
+}
+// a paper card with a flat offset shadow
+function card(c, x, y, w, h, seed, fill = PAL.light, r = 26) {
+  c.fillStyle = alpha(PAL.ink, .10); c.fill(roundRectPath(x + 8, y + 10, w, h, r));
+  shape(c, roundRectPath(x, y, w, h, r), roundRectPts(x, y, w, h, r), [x, y, w, h], fill, seed, { alpha: .12, gap: 7, grain: 60 });
+}
+// the hatched ground of the ink look: a huge circle whose rim is the horizon
+const GROUND_R = 2600;
+const groundY = (x, top, R = GROUND_R) => top + R - Math.sqrt(R * R - (x - CX) * (x - CX));
+function ground(c, seed = 21, top = CY + 170) {
+  const R = GROUND_R, cy = top + R, g = circPath(CX, cy, R), box = [0, top, W, H - top];
+  c.fillStyle = PAL.fills[0]; c.fill(g);
+  surface(c, g, box, { seed, color: PAL.light, density: .25, gap: 7, len: 18, alpha: .55, width: 1.4, grain: 0 });
+  c.save(); c.clip(g); hatch(c, circPath(CX + 500, top + 700, 900), [CX - 400, top - 200, 1800, 1800], { angle: -.6, gap: 6, len: 20, jitter: 5, color: PAL.blush, alpha: .2, seed: seed + 1 }); c.restore();
+  grain(c, g, box, 5000, PAL.shade, .3, seed + 2, 2);
+  c.strokeStyle = PAL.ink; c.lineWidth = 3; c.globalAlpha = .85; wob(c, ellPts(CX, cy, R, R, 0, 400), 2.5, seed + 3, true); c.globalAlpha = 1;
+}
+// a thought bubble with a drawing inside, plus the trail of small circles from the head
+function bubble(c, x, y, rx, ry, seed, draw, q = 1) {
+  if (q <= 0) return; c.save(); c.translate(x, y); c.scale(q, q);
+  const p = ellPath(0, 0, rx, ry); c.fillStyle = PAL.light; c.fill(p); surface(c, p, [-rx, -ry, 2 * rx, 2 * ry], { seed, alpha: .12, gap: 8, grain: 30 });
+  c.strokeStyle = PAL.ink; c.lineWidth = 2.6; wob(c, ellPts(0, 0, rx, ry, 0, 60), 2, seed + 1, true);
+  draw(c); c.restore();
+}
+function bubbleTrail(c, from, to, seed, q) {
+  for (let k = 0; k < 3; k++) { const u = (k + 1) / 4, qq = sm(k * .12, k * .12 + .2, q); if (qq <= 0) continue; const x = lerp(from[0], to[0], u), y = lerp(from[1], to[1], u), r = (9 + k * 7) * qq;
+    c.fillStyle = PAL.light; c.fill(circPath(x, y, r)); c.strokeStyle = PAL.ink; c.lineWidth = 2.2; wob(c, ellPts(x, y, r, r, 0, 16), 1.2, seed + k, true); }
+}
+// icons as lists of polylines, so selfDraw can draw them in; p is the progress across the whole list
+function strokes(c, list, p, seed, amp = 1.2) {
+  const base = c.lineWidth, lens = list.map(s => pathLength(s.pts, s.close)), total = lens.reduce((a, b) => a + b, 0); let acc = 0;
+  list.forEach((s, k) => { const a = acc / total, b = (acc + lens[k]) / total; acc += lens[k]; const q = clamp((p - a) / (b - a), 0, 1); if (q <= 0) return; c.lineWidth = base * (s.w || 1); selfDraw(c, s.pts, q, seed + k, amp, s.close); });
+  c.lineWidth = base;
+}
+const heartPts = (() => { const p = []; for (let k = 0; k < 48; k++) { const t = k / 48 * TAU; p.push([16 * Math.pow(Math.sin(t), 3) * 2.4, -(13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t)) * 2.4 + 4]); } return p; })();
+const dropPts = (() => { const p = []; for (let k = 0; k < 44; k++) { const a = k / 44 * TAU, bx = Math.cos(a) * 30, by = 14 + Math.sin(a) * 30, w = Math.pow(Math.max(0, -Math.sin(a)), 1.6) * .9; p.push([lerp(bx, 0, w), lerp(by, -50, w)]); } return p; })();
+const headPts = [[4, -50], [-22, -44], [-40, -22], [-42, 4], [-34, 22], [-36, 34], [-24, 36], [-22, 50], [14, 50], [16, 30], [30, 26], [26, 12], [36, 6], [28, -4], [30, -22], [20, -42]];
+const ICONS = {
+  find: [{ pts: ellPts(-10, -10, 32, 32, 0, 40), close: true }, { pts: [[14, 14], [48, 48]], w: 1.8 }],
+  compare: [{ pts: roundRectPts(-58, -42, 50, 84, 8), close: true }, { pts: roundRectPts(8, -42, 50, 84, 8), close: true }, { pts: [[-48, 22], [-18, 22]], w: 1.6 }, { pts: [[18, 22], [48, 22]], w: 1.6 }, { pts: [[-48, -20], [-30, -20]] }, { pts: [[18, -20], [36, -20]] }],
+  book: [{ pts: roundRectPts(-48, -40, 96, 84, 8), close: true }, { pts: [[-48, -16], [48, -16]] }, { pts: [[-28, -54], [-28, -30]], w: 1.6 }, { pts: [[28, -54], [28, -30]], w: 1.6 }, { pts: [[-22, 12], [-8, 28], [26, -4]], w: 1.8 }],
+  heart: [{ pts: heartPts, close: true }],
+  head: [{ pts: headPts, close: true }, { pts: ellPts(-6, -8, 13, 13, 0, 14), close: true }],
+  drop: [{ pts: dropPts, close: true }, { pts: [[-12, 14], [-8, 26]], w: .8 }],
+  tag: [{ pts: [[-48, -30], [14, -30], [50, 0], [14, 30], [-48, 30]], close: true }, { pts: ellPts(-32, 0, 6, 6, 0, 10), close: true }],
+  clock: [{ pts: ellPts(0, 0, 42, 42, 0, 40), close: true }, { pts: [[0, 0], [0, -28]], w: 1.5 }, { pts: [[0, 0], [20, 12]], w: 1.5 }, { pts: [[54, -34], [74, -34]] }, { pts: [[58, -12], [80, -12]] }, { pts: [[54, 10], [74, 10]] }],
+  pair: [{ pts: ellPts(-24, -14, 15, 16, 0, 20), close: true }, { pts: ellPts(24, -14, 15, 16, 0, 20), close: true }, { pts: [[-52, 36], [-44, 10], [-24, 4], [-6, 10], [0, 28]] }, { pts: [[52, 36], [44, 10], [24, 4], [6, 10], [0, 28]] }],
+  pill: [{ pts: roundRectPts(-44, -16, 88, 32, 16), close: true }, { pts: [[0, -16], [0, 16]] }],
+};
+// an icon on a dashed ring, optionally with a flat fill under the first stroke once it is drawn
+function iconRing(c, name, x, y, o = {}) {
+  const { q = 1, scale = 1, ring = 70, fill, seed = 1, line = PAL.ink, ringColor = PAL.accents[0], lw = 3 } = o; if (q <= 0) return;
+  if (ring) dashedRing(c, x, y, ring * Math.max(q, .01), ringColor, seed, [8, 6], 1.4);
+  c.save(); c.translate(x, y); c.scale(scale, scale);
+  if (fill && q >= .95) { const p = polyPath(ICONS[name][0].pts); c.fillStyle = fill; c.fill(p); surface(c, p, [-60, -60, 120, 120], { seed: seed + 5, alpha: .25, gap: 5, grain: 30 }); }
+  c.strokeStyle = line; c.lineWidth = lw / scale; strokes(c, ICONS[name], q, seed + 10); c.restore();
+}
+
+// ===================== PUPPET =====================
+// One builder for everyone. Local coords: origin at the chest, head up (-y), feet at y = 124, about 250 px tall at scale 1.
+// pose: { lean -1..1, arm 0..1 (the look's armSide raises), mood -1..1 (frown..smile), walk phase or undefined, nod 0..1, blink 0|1 }
+const HEAD = [0, -84, 34, 37];
+const SAM = () => ({ skin: PAL.fills[0], top: PAL.fills[2], hair: PAL.fills[1], style: 'crop', armSide: 1 });
+const GPS = [
+  () => ({ skin: PAL.fills[0], top: PAL.light, hair: PAL.ink, style: 'bun', glasses: true, coat: true, steth: true, armSide: -1 }),
+  () => ({ skin: PAL.fills[5], top: PAL.light, hair: PAL.ink, style: 'crop', beard: true, coat: true, steth: true, armSide: -1 }),
+  () => ({ skin: shade(PAL.fills[5], .38), top: PAL.light, hair: PAL.ink, style: 'curls', glasses: true, coat: true, steth: true, armSide: -1 }),
+  () => ({ skin: PAL.fills[0], top: PAL.light, hair: PAL.chalkDim, style: 'short', coat: true, steth: true, armSide: -1 }),
+  () => ({ skin: PAL.fills[3], top: PAL.light, hair: PAL.fills[1], style: 'bob', coat: true, steth: true, armSide: -1 }),
+];
+const BODY = { path: () => roundRectPath(-42, -42, 84, 102, 34), pts: () => roundRectPts(-42, -42, 84, 102, 34), box: [-42, -42, 84, 102] };
+function drawPerson(c, mode, pose, seed, lookFn = SAM) {
+  const look = lookFn(), ink = mode !== 'blueprint', line = ink ? PAL.ink : PAL.chalk, lw = ink ? (PAL.finish === 'pencil' ? 1.2 : 2.6) : 2.6;
+  const lean = pose.lean || 0, arm = pose.arm || 0, mood = pose.mood || 0, walk = pose.walk, nod = pose.nod || 0, blink = pose.blink || 0;
+  c.save(); c.lineJoin = 'round'; c.lineCap = 'round'; c.rotate(lean * .1); c.strokeStyle = line; c.lineWidth = lw; c.globalAlpha = 1;
+  // legs
+  for (const s of [-1, 1]) {
+    const sw = walk === undefined ? 0 : 1, ph = sw ? Math.sin(walk * TAU + (s > 0 ? Math.PI : 0)) : 0, lift = Math.max(0, ph);
+    const kx = s * 18 + ph * 10 * sw, ky = 90 - lift * 8, fx = s * 20 + ph * 22 * sw, fy = 124 - lift * 14;
+    wob(c, [[s * 15, 50], [kx, ky], [fx, fy], [fx + s * 14, fy]], 1.5, seed + 3 + s);
+  }
+  // body
+  const body = BODY.path();
+  if (ink) { c.fillStyle = look.top; c.fill(body); surface(c, body, BODY.box, { seed: seed + 11 }); }
+  if (ink && look.coat) { c.save(); c.clip(body); c.lineWidth = lw * .7; wob(c, [[-24, -42], [-10, -6], [-8, 60]], 1.2, seed + 13); wob(c, [[24, -42], [10, -6], [8, 60]], 1.2, seed + 14); c.restore(); }
+  c.strokeStyle = line; c.lineWidth = lw; wob(c, BODY.pts(), 1.8, seed + 12, true);
+  if (look.steth) { c.strokeStyle = ink ? PAL.fills[2] : line; c.lineWidth = lw * .8; wob(c, [[-16, -44], [-27, -8], [-14, 26], [4, 31]], 1.2, seed + 15); c.fillStyle = ink ? PAL.fills[2] : PAL.night; c.beginPath(); c.arc(9, 33, 7, 0, TAU); c.fill(); c.strokeStyle = line; wob(c, ellPts(9, 33, 7, 7, 0, 12), .8, seed + 16, true); }
+  // arms
+  for (const s of [-1, 1]) {
+    const up = s === look.armSide ? arm : 0, ex = s * (60 + up * 8), ey = 34 - up * 96;
+    c.strokeStyle = line; c.lineWidth = lw; wob(c, [[s * 40, -24], [s * 60, 8 - up * 46], [ex, ey]], 1.6, seed + 20 + s);
+    if (ink) { c.fillStyle = look.skin; c.fill(circPath(ex, ey, 7)); } c.lineWidth = lw * .8; wob(c, ellPts(ex, ey, 7, 7, 0, 12), 1, seed + 24 + s, true);
+  }
+  // head
+  c.save(); c.translate(0, nod * 6);
+  const head = ellPath(...HEAD), hbox = [-38, -124, 76, 80];
+  if (ink) { c.fillStyle = look.skin; c.fill(head); surface(c, head, hbox, { seed: seed + 30, alpha: .18, gap: 6, grain: 60 }); }
+  if (ink && look.style !== 'none') {
+    c.save(); c.clip(head); c.fillStyle = look.hair; const hp = new Path2D();
+    if (look.style === 'crop') hp.ellipse(0, -92, 38, 30, 0, Math.PI, TAU);
+    else if (look.style === 'bun' || look.style === 'short') hp.ellipse(0, -96, 40, 26, 0, Math.PI, TAU);
+    else if (look.style === 'curls') { hp.ellipse(0, -100, 36, 22, 0, Math.PI, TAU); for (let k = -3; k <= 3; k++) { hp.moveTo(k * 11 + 10, -110 + Math.abs(k) * 4); hp.arc(k * 11, -110 + Math.abs(k) * 4, 10, 0, TAU); } }
+    else if (look.style === 'bob') hp.rect(-38, -124, 76, 46);
+    hp.closePath(); c.fill(hp); surface(c, hp, hbox, { seed: seed + 32, alpha: .3 }); c.restore();
+    if (look.style === 'bun') { c.fillStyle = look.hair; c.fill(circPath(24, -116, 12)); c.strokeStyle = line; c.lineWidth = lw * .8; wob(c, ellPts(24, -116, 12, 12, 0, 16), 1, seed + 33, true); }
+    if (look.beard) { c.save(); c.clip(head); c.fillStyle = look.hair; const bp = new Path2D(); bp.ellipse(0, -66, 30, 18, 0, 0, Math.PI); bp.closePath(); c.fill(bp); c.restore(); }
+  }
+  c.strokeStyle = line; c.lineWidth = lw; wob(c, ellPts(...HEAD), 1.8, seed + 31, true);
+  // face
+  c.lineWidth = lw * .8; c.fillStyle = line;
+  for (const s of [-1, 1]) {
+    if (blink) { c.beginPath(); c.moveTo(s * 12 - 4, -90); c.lineTo(s * 12 + 4, -90); c.stroke(); } else { c.beginPath(); c.arc(s * 12, -90, 2.8, 0, TAU); c.fill(); }
+    if (mood < -.15) wob(c, [[s * 19, -104], [s * 6, -100]], .8, seed + 40 + s);
+    if (look.glasses) { wob(c, ellPts(s * 12, -89, 10, 9, 0, 16), 1, seed + 44 + s, true); }
+  }
+  if (look.glasses) { c.beginPath(); c.moveTo(-2, -89); c.lineTo(2, -89); c.stroke(); }
+  c.beginPath(); c.moveTo(-10, -68); c.quadraticCurveTo(0, -68 + mood * 12, 10, -68); c.stroke();
+  c.restore(); c.restore();
+}
+// blink on the 12 fps grid: one drawn frame closed every 9
+const blinkAt = (i, off = 0) => pulse(i + off, 9) ? 1 : 0;
+
+// ===================== SCENES =====================
+// Each scene is (c, tau, i): tau = seconds since the scene started, i = global drawn-frame index.
+const L1 = layer(), L2 = layer();
+
+// 1. Sam on the paper, wanting an assessment
+function sceneSam(c, tau, i) {
+  usePalette(ADHDME); paper(c);
+  cam(c, CX, CY + 30, lerp(1.08, 1.18, sm(0, 2.5, tau)));
+  ground(c, 21, CY + 170);
+  const x = CX - 60, y = CY - 15;
+  c.save(); c.translate(x, y); c.scale(1.35, 1.35); construction(c, 0, -10, 150, 25);
+  drawPerson(c, 'ink', { mood: -.3, blink: blinkAt(i) }, 26, SAM);
+  scribble(c, BODY.path(), 0, 9, { seed: 27, amp: 5, alpha: .45 });
+  c.restore();
+  const q = sm(.4, 1.1, tau, easeOut), bx = x + 360, by = y - 270;
+  bubbleTrail(c, [x + 70, y - 150], [bx - 150, by + 100], 28, q);
+  bubble(c, bx, by, 200, 125, 29, cc => {
+    cc.save(); cc.translate(-85, 40); cc.scale(.55, .55); drawPerson(cc, 'ink', { mood: .2 }, 30, GPS[0]); cc.restore();
+    hand(cc, '?', 80, 60, { size: 170, ink: PAL.blush, ink2: PAL.accents[2], align: 'center' });
+  }, q);
+  caption(c, 'Sam needs an ADHD assessment. Step one: find a GP.', { p: sm(.6, 1.8, tau) });
+}
+
+// 2. The directory: page after page of identical listings (pencil look)
+function sceneDirectory(c, tau, i) {
+  usePalette(ADHDME_PENCIL); paper(c);
+  const scroll = Math.floor(tau * 12 / 4) * 50;          // the page scrolls one notch every 4 drawn frames
+  c.save(); c.beginPath(); c.rect(0, 0, W, H * .855); c.clip();   // the page stops above the caption band
+  cam(c, CX, CY + scroll, 1);
+  const x0 = W * .30, rowH = 150;
+  for (let r = 0; r < 14; r++) {
+    const y = 100 + r * rowH; if (y - scroll > H + 60 || y - scroll < -200) continue;
+    const av = circPath(x0 + 60, y + 50, 46); c.fillStyle = PAL.fills[4]; c.fill(av); surface(c, av, [x0 + 14, y + 4, 92, 92], { seed: 100 + r });
+    c.save(); c.clip(av); c.fillStyle = PAL.fills[3]; c.fill(circPath(x0 + 60, y + 36, 18)); c.fill(ellPath(x0 + 60, y + 88, 34, 26)); c.restore();
+    c.strokeStyle = PAL.ink; c.lineWidth = 1.2; wob(c, ellPts(x0 + 60, y + 50, 46, 46, 0, 40), 1.2, 110 + r, true);
+    squiggleText(c, x0 + 140, y + 34, 480, 1, { seed: 120 + r, lineH: 22, amp: 7, width: 1.7, color: PAL.ink });
+    squiggleText(c, x0 + 140, y + 72, 640, 2, { seed: 130 + r, lineH: 24, amp: 4, width: 1.1, color: PAL.shade });
+    hand(c, '$', x0 + 860, y + 66, { size: 44, ink2: null, weight: 500 }); squiggleText(c, x0 + 888, y + 60, 90, 1, { seed: 170 + r, lineH: 20, amp: 9, width: 1.8 });
+    dashedRing(c, x0 + 1030, y + 50, 34, PAL.ink, 140 + r, [6, 5], 1.2); dottedArc(c, x0 + 1030, y + 50, 18, PAL.ink, 150 + r, 22, 2.4); c.fillStyle = PAL.ink; c.fill(circPath(x0 + 1030, y + 50, 3));
+    if (r % 3 !== 2) { c.fillStyle = PAL.accents[2]; c.fill(roundRectPath(x0 + 1090, y + 32, 72, 36, 6)); c.strokeStyle = PAL.ink; c.lineWidth = 1.1; wob(c, roundRectPts(x0 + 1090, y + 32, 72, 36, 6), 1, 160 + r, true); squiggleText(c, x0 + 1100, y + 56, 52, 1, { seed: 165 + r, lineH: 10, amp: 4, width: 1.2 }); }
+    c.strokeStyle = alpha(PAL.ink, .35); c.lineWidth = .9; wob(c, [[x0, y + 128], [x0 + 1180, y + 128]], 1, 180 + r);
+  }
+  c.restore(); resetT(c); c.save(); c.translate(W * .13, H * .76); c.scale(.9, .9); drawPerson(c, 'ink', { mood: -.4, lean: .3, blink: blinkAt(i) }, 26, SAM); c.restore();
+  thread(c, W * .955, 96, PAL.accents[1], 1.2);
+  caption(c, 'Page after page of listings, ranked by ads.', {});
+}
+
+// 3. Stuck: Sam stays put while the world cuts around him, then walks away
+function sceneStuck(c, tau, i) {
+  usePalette(ADHDME); paper(c); cam(c, CX, CY, 1);
+  const top = CY + 270; ground(c, 31, top);
+  const k = tau < 1 ? 0 : tau < 2 ? 1 : tau < 3 ? 2 : 3, t = tau - k;
+  const SC = 1.15, sx0 = W * .24, sx = k === 3 ? sx0 - t * 180 : sx0, sy = groundY(sx, top) - 124 * SC;
+  const door = () => {
+    const dx = W * .66, dy = groundY(dx, top) + 4;
+    shape(c, roundRectPath(dx - 150, dy - 520, 300, 520, 10), roundRectPts(dx - 150, dy - 520, 300, 520, 10), [dx - 150, dy - 520, 300, 520], PAL.fills[1], 100, { alpha: .3, angle: 1.57, gap: 6, len: 26 });
+    const win = circPath(dx, dy - 400, 40); c.fillStyle = PAL.fills[4]; c.fill(win); surface(c, win, [dx - 40, dy - 440, 80, 80], { seed: 101, alpha: .2 }); c.strokeStyle = PAL.ink; c.lineWidth = 2.4; wob(c, ellPts(dx, dy - 400, 40, 40, 0, 30), 1.4, 102, true);
+    c.fillStyle = PAL.accents[2]; c.fill(circPath(dx + 104, dy - 250, 12)); wob(c, ellPts(dx + 104, dy - 250, 12, 12, 0, 14), 1, 103, true);
+    const sign = circPath(dx, dy - 600, 44); c.fillStyle = PAL.light; c.fill(sign); surface(c, sign, [dx - 44, dy - 644, 88, 88], { seed: 104, alpha: .15 }); c.strokeStyle = PAL.ink; c.lineWidth = 2.4; wob(c, ellPts(dx, dy - 600, 44, 44, 0, 30), 1.4, 105, true);
+    c.strokeStyle = PAL.blush; c.lineWidth = 9; wob(c, [[dx - 22, dy - 600], [dx + 22, dy - 600]], 1, 106); wob(c, [[dx, dy - 622], [dx, dy - 578]], 1, 107);
+  };
+  if (k === 0) {   // a price tag hanging from the top, the amount a scrawl
+    const tx = W * .64, ty = CY - 60, sw = Math.sin(t * 5) * .04;
+    c.save(); c.translate(tx, ty - 700); c.rotate(sw); c.translate(0, 700);
+    c.strokeStyle = PAL.ink; c.lineWidth = 2.4; wob(c, [[0, -900], [0, -170]], 1.5, 40);
+    const tagPts = [[-70, -170], [70, -170], [230, -40], [230, 190], [-230, 190], [-230, -40]];
+    shape(c, polyPath(tagPts), tagPts, [-230, -170, 460, 360], PAL.fills[3], 41, { alpha: .2 });
+    c.fillStyle = PAL.paper; c.fill(circPath(0, -130, 14)); c.strokeStyle = PAL.ink; c.lineWidth = 2; wob(c, ellPts(0, -130, 14, 14, 0, 16), 1, 42, true);
+    hand(c, '$', -190, 130, { size: 160, ink2: null }); c.strokeStyle = PAL.ink; squiggleText(c, -90, 100, 200, 1, { seed: 43, lineH: 30, amp: 34, width: 5 });
+    hand(c, '?', 150, 150, { size: 200, ink: PAL.blush, ink2: PAL.accents[2], align: 'center' });
+    c.restore();
+    caption(c, 'Cost is hidden. Fees arrive late.', {});
+  }
+  if (k === 1) {   // four faceless profiles with the same score
+    for (let n = 0; n < 4; n++) { const cx = W * .47 + n * 250, cy = CY - 60; card(c, cx - 100, cy - 190, 200, 340, 50 + n, PAL.light);
+      const av = circPath(cx, cy - 90, 54); c.fillStyle = PAL.fills[4]; c.fill(av); surface(c, av, [cx - 54, cy - 144, 108, 108], { seed: 60 + n, alpha: .2 });
+      c.save(); c.clip(av); c.fillStyle = PAL.fills[3]; c.fill(circPath(cx, cy - 108, 22)); c.fill(ellPath(cx, cy - 44, 40, 30)); c.restore();
+      c.strokeStyle = PAL.ink; c.lineWidth = 2.4; wob(c, ellPts(cx, cy - 90, 54, 54, 0, 40), 1.6, 70 + n, true);
+      squiggleText(c, cx - 70, cy + 4, 140, 3, { seed: 80 + n, lineH: 22, amp: 4, width: 1.2 });
+      dashedRing(c, cx, cy + 100, 28, PAL.ink, 90 + n, [6, 5], 1.6); dottedArc(c, cx, cy + 100, 14, PAL.accents[2], 95 + n, 8, 2.8); c.fillStyle = PAL.ink; c.fill(circPath(cx, cy + 100, 3));
+      if (n < 2) { c.fillStyle = PAL.accents[2]; c.fill(roundRectPath(cx + 36, cy - 180, 58, 30, 5)); c.strokeStyle = PAL.ink; c.lineWidth = 1.4; wob(c, roundRectPts(cx + 36, cy - 180, 58, 30, 5), 1, 96 + n, true); squiggleText(c, cx + 44, cy - 159, 44, 1, { seed: 97 + n, lineH: 10, amp: 3, width: 1.1 }); }
+    }
+    caption(c, 'Profiles are unvetted. Same score on every one.', {});
+  }
+  if (k === 2) {   // the door, and the worry about being judged for wanting medication
+    door();
+    const q = sm(.15, .6, t, easeOut), bx = sx + 170, by = sy - 350;
+    bubbleTrail(c, [sx + 70, sy - 150], [bx - 110, by + 70], 108, q);
+    bubble(c, bx, by, 210, 120, 109, cc => {
+      cc.save(); cc.translate(-70, 10); cc.scale(1.3, 1.3); const cap = polyPath(ICONS.pill[0].pts); cc.save(); cc.clip(cap); cc.fillStyle = PAL.fills[2]; cc.fillRect(-50, -20, 50, 40); cc.fillStyle = PAL.fills[0]; cc.fillRect(0, -20, 50, 40); surface(cc, cap, [-44, -16, 88, 32], { seed: 110, alpha: .3 }); cc.restore();
+      cc.strokeStyle = PAL.ink; cc.lineWidth = 2; strokes(cc, ICONS.pill, 1, 111); cc.restore();
+      hand(cc, '?', 110, 50, { size: 150, ink: PAL.blush, ink2: PAL.accents[2], align: 'center' });
+    }, q);
+    caption(c, 'Stigma at the door: "they\'ll think I just want medication."', { size: 50 });
+  }
+  if (k === 3) { door(); caption(c, 'So people stop before the first booking.', {}); }
+  const pose = k === 0 ? { mood: -.3, nod: -.6 } : k === 1 ? { mood: -.4 } : k === 2 ? { mood: -.5, lean: -.45 } : { mood: -.4, lean: -.15, walk: t * 1.5 };
+  c.save(); c.translate(sx, sy); c.scale(SC, SC); drawPerson(c, 'ink', { ...pose, blink: blinkAt(i) }, 26, SAM); c.restore();
+}
+
+// 4. Ink blot into blueprint: what ADHDme does
+function drawFrontDoor(c, tau, i) {
+  usePalette(ADHDME); night(c, PAL.night, 33); cam(c, CX, CY, 1);
+  c.save(); c.translate(W * .16, CY + 60); c.scale(1.1, 1.1); construction(c, 0, -10, 140, 34, alpha(PAL.chalk, .45)); drawPerson(c, 'blueprint', { mood: .2 }, 26, SAM); c.restore();
+  const cx = W * .5, cy = CY - 30, R = 170, p0 = sm(.75, 1.2, tau, easeOut);
+  if (p0 > 0) { c.strokeStyle = PAL.chalk; c.lineWidth = 3; selfDraw(c, ellPts(cx, cy, R, R, 0, 120), p0, 35, 1.5, true); c.save(); c.globalAlpha = p0; dashedRing(c, cx, cy, R + 26, PAL.chalkDim, 36, [10, 8], 1.2); c.restore(); }
+  if (p0 > .5) hand(c, 'ADHDme', cx, cy + 24, { size: 76, ink: PAL.chalk, ink2: PAL.accents[2], align: 'center' });
+  const pa = sm(1.15, 1.4, tau); if (pa > 0) { c.strokeStyle = PAL.chalkDim; c.lineWidth = 2; selfDraw(c, [[W * .16 + 100, CY + 20], [cx - R - 40, cy]], pa, 37, 1.2); if (pa >= 1) wob(c, [[cx - R - 66, cy - 16], [cx - R - 40, cy], [cx - R - 66, cy + 16]], 1, 38); }
+  const nodes = [[W * .79, CY - 300, 'find'], [W * .84, CY - 30, 'compare'], [W * .79, CY + 240, 'book']];
+  nodes.forEach(([nx, ny, label], k) => { const t0 = 1.45 + k * .35, q = sm(t0, t0 + .3, tau, easeOut); if (q <= 0) return;
+    c.strokeStyle = PAL.chalkDim; c.lineWidth = 1.6; selfDraw(c, [[cx + R, cy], [(cx + R + nx) / 2, (cy + ny) / 2 + (k - 1) * 30], [nx - 90, ny]], q, 40 + k, 1.2);
+    iconRing(c, label, nx, ny, { q, scale: .95, ring: 78, seed: 44 + k, line: PAL.chalk, ringColor: PAL.chalkDim, lw: 2.6 });
+    hand(c, label, nx, ny + 130, { size: 46, ink: PAL.chalk, ink2: PAL.accents[2], align: 'center', al: q });
+  });
+  caption(c, 'One front door to ADHD care in Australia.', { ink: PAL.chalk, ink2: PAL.accents[2] });
+}
+function sceneFrontDoor(c, tau, i) {
+  const b = L2.getContext('2d'); drawFrontDoor(b, tau, i);
+  if (tau >= .75) { blit(c, L2); return; }
+  sceneStuck(L1.getContext('2d'), 4.25 - 1 / 12, i); blit(c, L1);
+  blot(c, L2, W * .24 - 225, CY + 200, lerp(0, W * 1.1, sm(0, .75, tau)), 32);   // grows out of Sam, where he stopped
+}
+
+// 5. Find: Sam constant, five GP profile cards cut behind at 0.5 s
+const STYLES = ['collaborative · plain language', 'structured adult ADHD assessment', 'cardiac and metabolic baseline', 'mental health focus', 'phone consults · Hindi and Urdu'];
+function sceneFind(c, tau, i) {
+  usePalette(ADHDME); paper(c); cam(c, CX, CY, 1);
+  const k = Math.min(4, Math.floor(tau / .5));
+  ['approach', 'background', 'fit'].forEach((lab, n) => { const x = W * .40 + n * 300, y = H * .12, on = (k + n) % 3 !== 2, p = roundRectPath(x, y - 26, 250, 52, 26);
+    c.fillStyle = on ? PAL.fills[2] : PAL.light; c.fill(p); surface(c, p, [x, y - 26, 250, 52], { seed: 200 + n, alpha: .15, grain: 20 }); c.strokeStyle = PAL.ink; c.lineWidth = 2; wob(c, roundRectPts(x, y - 26, 250, 52, 26), 1.2, 210 + n, true);
+    hand(c, lab, x + 125, y + 13, { size: 36, ink: on ? PAL.light : PAL.ink, ink2: null, align: 'center' }); });
+  const cx = W * .40, cy = H * .22, cw = W * .52, ch = H * .64; card(c, cx, cy, cw, ch, 220 + k, PAL.light);
+  c.save(); c.translate(cx + 170, cy + 250); c.scale(1.1, 1.1); drawPerson(c, 'ink', { mood: .5, blink: blinkAt(i, k * 3), nod: pulse(i, 7) ? 1 : 0 }, 230 + k, GPS[k]); c.restore();
+  squiggleText(c, cx + 350, cy + 70, cw - 410, 4, { seed: 240 + k, lineH: 34, amp: 7, width: 1.8, color: PAL.ink });
+  hand(c, STYLES[k], cx + 350, cy + 260, { size: 42, ink2: null });
+  for (let n = 0; n < 5; n++) { const on = n < 3 + (k % 3); seedDot(c, cx + 366 + n * 46, cy + 330, 12, on ? PAL.fills[2] : PAL.fills[0], on ? PAL.accents[2] : null); if (!on) { c.strokeStyle = PAL.ink; c.lineWidth = 1.4; wob(c, ellPts(cx + 366 + n * 46, cy + 330, 12, 12, 0, 14), 1, 250 + n, true); } }
+  iconRing(c, 'pair', cx + 350 + 5 * 46 + 60, cy + 330, { scale: .5, ring: 0, seed: 256, lw: 2.4 });
+  ['heart', 'head', 'drop'].forEach((ic, n) => iconRing(c, ic, cx + 400 + n * 130, cy + 470, { scale: .6, ring: 50, seed: 260 + n, lw: 2.8 }));
+  hand(c, 'A$400 diagnosis  ·  A$200 review', cx + 350, cy + ch - 60, { size: 46 });
+  c.save(); c.translate(W * .18, H * .78); c.scale(.95, .95); drawPerson(c, 'ink', { mood: lerp(-.1, .6, k / 4), blink: blinkAt(i), arm: k >= 3 ? .6 : 0 }, 26, SAM); c.restore();
+  caption(c, 'Find: each GP in their own words, filtered by approach, background and fit.', { size: 48 });
+}
+
+// 6. Compare: the whole two-consult price before booking
+function sceneCompare(c, tau, i) {
+  usePalette(ADHDME); paper(c); cam(c, CX, CY, 1);
+  [[W * .30, GPS[1]], [W * .70, GPS[0]]].forEach(([cx, gp], n) => { const w = 600, h = 640, x = cx - w / 2, y = H * .11; card(c, x, y, w, h, 300 + n, PAL.light);
+    c.save(); c.translate(x + 120, y + 190); c.scale(.9, .9); drawPerson(c, 'ink', { mood: .4, blink: blinkAt(i, n * 4) }, 310 + n, gp); c.restore();
+    squiggleText(c, x + 250, y + 70, 300, 2, { seed: 320 + n, lineH: 30, amp: 6, width: 1.6 });
+    hand(c, 'A$400', x + 250, y + 230, { size: 90 }); hand(c, 'diagnosis consult', x + 250, y + 274, { size: 36, ink2: null });
+    hand(c, 'A$200', x + 250, y + 380, { size: 90 }); hand(c, 'each quarterly review', x + 250, y + 424, { size: 36, ink2: null });
+    ['heart', 'head', 'drop'].forEach((ic, m) => { const ix = x + 110 + m * 160, iy = y + 545; iconRing(c, ic, ix, iy, { scale: .55, ring: 48, seed: 330 + m + n * 3, lw: 2.8 });
+      const q = sm(.3 + m * .25, .5 + m * .25, tau, easeOut); if (q > 0) { c.strokeStyle = PAL.accents[0]; c.lineWidth = 5; selfDraw(c, [[ix + 28, iy + 24], [ix + 40, iy + 38], [ix + 64, iy + 8]], q, 350 + m, 1.2); } });
+  });
+  const q = sm(1.25, 1.6, tau, easeOut); if (q > 0) { c.strokeStyle = PAL.accents[1]; c.lineWidth = 6; selfDraw(c, roundRectPts(W * .7 - 320, H * .11 - 20, 640, 680, 40, 8), q, 360, 3, true); }
+  c.save(); c.translate(W * .62, H * .85); c.scale(.8, .8); drawPerson(c, 'ink', { mood: .6, arm: q, blink: blinkAt(i) }, 26, SAM); c.restore();
+  caption(c, 'Compare: the whole price, published before you book.', {});
+}
+
+// 7. Book: both consults in one flow, the same GP after
+function sceneBook(c, tau, i) {
+  usePalette(ADHDME); paper(c); cam(c, CX, CY, 1);
+  const x = W * .34, y = H * .13, w = 720, h = 560; card(c, x, y, w, h, 400, PAL.light);
+  const head = roundRectPath(x, y, w, 70, 26); c.fillStyle = PAL.fills[2]; c.fill(head); c.fillRect(x, y + 40, w, 30); surface(c, rectPath(x, y, w, 70), [x, y, w, 70], { seed: 401, alpha: .2 });
+  c.strokeStyle = PAL.ink; c.lineWidth = 3; for (const rx of [x + 120, x + w - 120]) wob(c, ellPts(rx, y + 2, 12, 24, 0, 20), 1.2, 402, true);
+  const gx = x + 60, gy = y + 130, sx = (w - 120) / 6, sy = 92;
+  c.strokeStyle = alpha(PAL.ink, .2); c.lineWidth = 1; for (let r = 0; r < 5; r++) wob(c, [[x + 40, gy + r * sy + 44], [x + w - 40, gy + r * sy + 44]], 1, 410 + r);
+  c.fillStyle = PAL.ink; for (let r = 0; r < 5; r++) for (let col = 0; col < 7; col++) { c.globalAlpha = .55; c.beginPath(); c.arc(gx + col * sx, gy + r * sy, 4, 0, TAU); c.fill(); } c.globalAlpha = 1;
+  const d1 = [gx + 2 * sx, gy + 1 * sy], d2 = [gx + 4 * sx, gy + 3 * sy], q1 = sm(.25, .5, tau, easeOut), q2 = sm(.75, 1.0, tau, easeOut), q3 = sm(1.0, 1.4, tau, easeOut);
+  if (q1 > 0) { c.strokeStyle = PAL.accents[1]; c.lineWidth = 5; selfDraw(c, ellPts(d1[0], d1[1], 36, 30, .2, 40), q1, 420, 2.5, true); }
+  if (q2 > 0) { c.strokeStyle = PAL.accents[0]; c.lineWidth = 5; selfDraw(c, ellPts(d2[0], d2[1], 36, 30, -.2, 40), q2, 421, 2.5, true); }
+  const gpx = W * .84, gpy = CY + 40;
+  if (q3 > 0) { c.strokeStyle = PAL.ink; c.lineWidth = 2.4; c.save(); c.setLineDash([12, 9]); selfDraw(c, [[d1[0] + 42, d1[1]], [x + w + 50, d1[1] + 30], [gpx - 130, gpy - 40]], q3, 422, 1.5); selfDraw(c, [[d2[0] + 42, d2[1]], [x + w + 50, d2[1] - 30], [gpx - 130, gpy + 30]], q3, 423, 1.5); c.restore(); }
+  c.save(); c.translate(gpx, gpy); construction(c, 0, -10, 140, 424); drawPerson(c, 'ink', { mood: .5, arm: q3 > .8 ? .7 : 0, blink: blinkAt(i, 3) }, 425, GPS[0]); c.restore();
+  c.save(); c.translate(W * .16, CY + 90); drawPerson(c, 'ink', { mood: .6, arm: .85, blink: blinkAt(i) }, 26, SAM); c.restore();
+  caption(c, 'Book both consults in one flow. Same GP for the reviews.', {});
+}
+
+// 8. The assessment: two long consults that look at the whole person
+function sceneAssess(c, tau, i) {
+  usePalette(ADHDME); paper(c); cam(c, CX, CY + 20, lerp(1.0, 1.06, sm(0, 2.5, tau)));
+  const top = CY + 300; ground(c, 51, top);
+  const dx = CX, dy = CY + 260;
+  shape(c, roundRectPath(dx - 270, dy - 40, 540, 90, 30), roundRectPts(dx - 270, dy - 40, 540, 90, 30), [dx - 270, dy - 40, 540, 90], PAL.fills[1], 500, { alpha: .3, angle: .05, gap: 6, len: 26 });
+  c.strokeStyle = PAL.ink; c.lineWidth = 3; wob(c, [[dx - 230, dy + 50], [dx - 240, dy + 160]], 1.5, 501); wob(c, [[dx + 230, dy + 50], [dx + 240, dy + 160]], 1.5, 502);
+  squiggleText(c, dx - 120, dy - 14, 240, 1, { seed: 503, lineH: 20, amp: 5, width: 1.4, color: PAL.shade });
+  const py = groundY(CX - 420, top) - 149;
+  c.save(); c.translate(CX - 420, py); c.scale(1.2, 1.2); drawPerson(c, 'ink', { mood: .4, blink: blinkAt(i), nod: pulse(i + 5, 11) ? 1 : 0 }, 26, SAM); c.restore();
+  c.save(); c.translate(CX + 420, py); c.scale(1.2, 1.2); drawPerson(c, 'ink', { mood: .5, blink: blinkAt(i, 4), nod: pulse(i, 10) ? 1 : 0, arm: .3 }, 510, GPS[0]); c.restore();
+  const items = [['heart', 'cardiac', PAL.blush], ['head', 'psychological', PAL.fills[4]], ['drop', 'biomarkers', PAL.fills[2]]];
+  items.forEach(([ic, label, fill], n) => { const t0 = .5 + n * .6, q = sm(t0, t0 + .4, tau, easeOut); if (q <= 0) return; const ix = CX - 240 + n * 240, iy = CY - 230;
+    iconRing(c, ic, ix, iy, { q, scale: 1, ring: 84, fill, seed: 520 + n, lw: 3.2 });
+    hand(c, label, ix, iy + 140, { size: 42, align: 'center', al: q, ink2: null });
+  });
+  caption(c, 'Two long consults that look at the whole person.', {});
+}
+
+// 9. The fit loop: every consult makes the next match better (blueprint, iris in)
+function drawLoop(c, tau, i) {
+  usePalette(ADHDME); night(c, PAL.night, 61); cam(c, CX, CY, 1);
+  const cx = CX + 140, cy = CY - 30, R = 300, nodes = ['need', 'match', 'consult', 'rate', 'learn'];
+  dottedArc(c, cx, cy, R, PAL.chalkDim, 62, 10, 1.4); dottedArc(c, cx, cy, R + 60, alpha(PAL.chalkDim, .5), 63, 14, 1.1);
+  nodes.forEach((lab, k) => { const a = -Math.PI / 2 + k / 5 * TAU, nx = cx + Math.cos(a) * R, ny = cy + Math.sin(a) * R, t0 = .3 + k * .3, q = sm(t0, t0 + .25, tau, easeOut); if (q <= 0) return;
+    c.fillStyle = PAL.night; c.fill(circPath(nx, ny, 58)); c.strokeStyle = PAL.chalk; c.lineWidth = 2.4; selfDraw(c, ellPts(nx, ny, 58, 58, 0, 48), q, 64 + k, 1.4, true);
+    hand(c, lab, nx, ny + 12, { size: 36, ink: PAL.chalk, ink2: PAL.accents[2], align: 'center', al: q });
+    const a2 = a + TAU / 5, arc = []; for (let s = 0; s <= 12; s++) { const aa = a + (a2 - a) * (.22 + .56 * s / 12); arc.push([cx + Math.cos(aa) * R, cy + Math.sin(aa) * R]); }
+    const q2 = sm(t0 + .2, t0 + .45, tau); if (q2 > 0) { c.strokeStyle = PAL.accents[2]; c.lineWidth = 3; selfDraw(c, arc, q2, 70 + k, 1); }
+  });
+  if (tau >= 1.9) { const u = (tau - 1.9) / .6, a = -Math.PI / 2 + u * TAU; aster(c, cx + Math.cos(a) * R, cy + Math.sin(a) * R, 9, 12, PAL.accents[2], 80 + Math.floor(tau * 12), 1, PAL.night, PAL.chalk); }
+  c.save(); c.translate(cx - 70, cy + 40); c.scale(.6, .6); drawPerson(c, 'blueprint', { mood: .5 }, 26, SAM); c.restore();
+  c.save(); c.translate(cx + 70, cy + 40); c.scale(.6, .6); drawPerson(c, 'blueprint', { mood: .5 }, 510, GPS[0]); c.restore();
+  const sx = W * .16, sy = CY - 80, star = []; for (let k = 0; k < 10; k++) { const a = -Math.PI / 2 + k / 10 * TAU, r = k % 2 ? 28 : 64; star.push([sx + Math.cos(a) * r, sy + Math.sin(a) * r]); }
+  c.strokeStyle = PAL.chalkDim; c.lineWidth = 2; wob(c, star, 1.5, 90, true);
+  const qs = sm(1.2, 1.5, tau); if (qs > 0) { c.strokeStyle = PAL.accents[3]; c.lineWidth = 6; selfDraw(c, [[sx - 74, sy - 74], [sx + 74, sy + 74]], qs, 91, 2); selfDraw(c, [[sx + 74, sy - 74], [sx - 74, sy + 74]], qs, 92, 2); }
+  hand(c, 'fit, not stars', sx, sy + 130, { size: 40, ink: PAL.chalk, ink2: PAL.accents[2], align: 'center' });
+  caption(c, 'Every consult makes the next match better.', { ink: PAL.chalk, ink2: PAL.accents[2] });
+}
+function sceneLoop(c, tau, i) {
+  const b = L2.getContext('2d'); drawLoop(b, tau, i);
+  if (tau >= .5) { blit(c, L2); return; }
+  usePalette(ADHDME); paper(c); const R = lerp(0, W * .62, sm(0, .5, tau, easeOut));
+  iris(c, CX, CY, R, cc => blit(cc, L2)); c.strokeStyle = PAL.ink; c.lineWidth = 3; wob(c, ellPts(CX, CY, R, R, 0, 120), 2, 93, true);
+}
+
+// 10. Patient value: save money, get diagnosed fast, find a doctor who gets you
+function sceneValue(c, tau, i) {
+  usePalette(ADHDME); paper(c); cam(c, CX, CY, 1);
+  [['tag', 'transparent'], ['clock', 'fast'], ['pair', 'personal']].forEach(([ic, label], n) => { const t0 = n * .4, q = sm(t0, t0 + .45, tau, easeOut); if (q <= 0) return; const x = W * .25 + n * W * .25, y = CY - 120, r = 150 * q;
+    const disc = circPath(x, y, r); c.fillStyle = PAL.fills[0]; c.fill(disc); surface(c, disc, [x - r, y - r, 2 * r, 2 * r], { seed: 600 + n, alpha: .22, grain: 80 });
+    c.strokeStyle = PAL.ink; c.lineWidth = 3; wob(c, ellPts(x, y, r, r, 0, 60), 2, 610 + n, true);
+    iconRing(c, ic, x, y + (ic === 'pair' ? 14 : 0), { q, scale: 1.4 * q, ring: r + 24, seed: 620 + n, lw: 3.2, ringColor: PAL.accents[0] });
+    if (ic === 'tag' && q >= .95) hand(c, '$', x + 4, y + 30, { size: 74, ink: PAL.accents[1], ink2: null, align: 'center' });
+    if (ic === 'pair' && q >= .95) aster(c, x, y - 70, 6, 10, PAL.accents[2], 640, 1, PAL.accents[2], PAL.ink);
+    hand(c, label, x, y + 250, { size: 52, align: 'center', al: q });
+  });
+  c.save(); c.translate(W * .72, H * .86); c.scale(.75, .75); drawPerson(c, 'ink', { mood: .8, blink: blinkAt(i) }, 26, SAM); c.restore();
+  c.save(); c.translate(W * .80, H * .86); c.scale(.75, .75); drawPerson(c, 'ink', { mood: .7, blink: blinkAt(i, 4) }, 510, GPS[0]); c.restore();
+  caption(c, 'Save money. Get diagnosed fast. Find a doctor who gets you.', { size: 50 });
+}
+
+// 11. The tagline
+function sceneTagline(c, tau, i) {
+  usePalette(ADHDME); paper(c); cam(c, CX, CY, 1);
+  ripples(c, CX, CY - 60, [420, 520, 640], alpha(PAL.accents[0], .25), 700, 3);
+  const a = 'The right ADHD doctor', b = 'should not be hard to find.';
+  hand(c, a.slice(0, Math.round(a.length * sm(0, .7, tau))), CX, CY - 90, { size: 120, align: 'center' });
+  hand(c, b.slice(0, Math.round(b.length * sm(.6, 1.4, tau))), CX, CY + 40, { size: 120, align: 'center' });
+  const x = lerp(CX - 220, CX + 220, sm(0, 2, tau, easeIO));
+  c.save(); c.translate(x - 70, H * .82); c.scale(.8, .8); drawPerson(c, 'ink', { mood: .8, walk: tau * 1.5, lean: -.1, blink: blinkAt(i) }, 26, SAM); c.restore();
+  c.save(); c.translate(x + 70, H * .82); c.scale(.8, .8); drawPerson(c, 'ink', { mood: .7, walk: tau * 1.5 + .5, lean: -.1, blink: blinkAt(i, 4) }, 510, GPS[0]); c.restore();
+}
+
+// 12. Sign-off
+function sceneSignoff(c, tau, i) {
+  usePalette(ADHDME); paper(c); ripples(c, CX, CY, [260, 340, 430], alpha(PAL.accents[1], .3), 710, 3);
+  signOff(c, 'ADHDme', 'adhdme.au', { x: CX, y: CY - 30, size: 130, ink2: PAL.accents[0], progressA: sm(0, .5, tau), progressB: sm(.5, 1.0, tau) });
+  c.save(); c.translate(CX, H * .87); c.scale(.55, .55); drawPerson(c, 'ink', { mood: .9, arm: .9, blink: blinkAt(i) }, 26, SAM); c.restore();
+}
+
+// ===================== FILM =====================
+const TIMELINE = [
+  { name: 'sam',       dur: 2.50, fn: sceneSam },
+  { name: 'directory', dur: 2.00, fn: sceneDirectory },
+  { name: 'stuck',     dur: 4.25, fn: sceneStuck },
+  { name: 'frontdoor', dur: 2.75, fn: sceneFrontDoor },
+  { name: 'find',      dur: 2.50, fn: sceneFind },
+  { name: 'compare',   dur: 2.00, fn: sceneCompare },
+  { name: 'book',      dur: 1.75, fn: sceneBook },
+  { name: 'assess',    dur: 2.50, fn: sceneAssess },
+  { name: 'loop',      dur: 2.50, fn: sceneLoop },
+  { name: 'value',     dur: 2.50, fn: sceneValue },
+  { name: 'tagline',   dur: 2.00, fn: sceneTagline },
+  { name: 'signoff',   dur: 1.50, fn: sceneSignoff },
+];
+const T = {}; { let acc = 0; for (const s of TIMELINE) { T[s.name] = acc; acc += s.dur; } T.end = acc; }
+
+// ===================== SCORE =====================
+// Reads the same timeline as the pictures: a motif per scene, a cue on every cut and every reveal.
+function score(ac, t0, dest) {
+  const master = ac.createGain(); master.gain.value = .55; master.connect(dest); const r = rng(7);
+  const n = (hz, t, d, type, g) => note(ac, master, hz, t0, t, d, type, g);
+  for (let t = T.sam; t < T.directory; t += .5) n(pentHz(0, r() * 5 | 0), t, .7, 'triangle', .16);
+  for (let t = T.directory; t < T.stuck; t += .75) n(pentHz(-1, r() * 5 | 0), t, .9, 'sine', .12);
+  [0, 1, 2].forEach(k => n(pentHz(0, 4 - k), T.stuck + k, .5, 'triangle', .18)); n(pentHz(-1, 0), T.stuck + 3, 1.2, 'sine', .2);
+  n(55, T.frontdoor, 1.4, 'sawtooth', .10); n(110, T.frontdoor + .1, 1.2, 'sine', .14);
+  [0, 1, 2].forEach(k => n(pentHz(1, k + 1), T.frontdoor + 1.2 + k * .4, .5, 'sine', .2));
+  for (let k = 0; k < 5; k++) n(pentHz(1 + (k % 2), k), T.find + k * .5, .22, 'square', .06);
+  n(pentHz(0, 0), T.compare, .6, 'triangle', .16); n(pentHz(0, 2), T.compare + .5, .6, 'triangle', .16); n(pentHz(2, 4), T.compare + 1.25, .5, 'sine', .2);
+  n(pentHz(1, 0), T.book + .25, .4, 'sine', .2); n(pentHz(1, 2), T.book + .75, .4, 'sine', .2); for (let k = 0; k < 4; k++) n(pentHz(1, k), T.book + 1.0 + k * .125, .18, 'square', .05);
+  for (let t = T.assess; t < T.loop; t += .5) n(pentHz(0, r() * 5 | 0), t, .6, 'triangle', .12);
+  [0, 1, 2].forEach(k => n(pentHz(1, (k * 2) % 5), T.assess + .5 + k * .6, .5, 'sine', .18));
+  n(55, T.loop, 1.6, 'sawtooth', .09); n(110, T.loop + .1, 1.4, 'sine', .12);
+  for (let k = 0; k < 5; k++) n(pentHz(1, k), T.loop + .3 + k * .3, .3, 'sine', .16);
+  for (let k = 0; k < 5; k++) n(pentHz(2, k), T.loop + 1.9 + k * .12, .2, 'sine', .12);
+  [0, 1, 2].forEach(k => n(pentHz(1, [0, 2, 4][k]), T.value + k * .4, .7, 'triangle', .2));
+  n(pentHz(0, 0), T.tagline, 2.0, 'sine', .22); n(pentHz(1, 2), T.tagline + .6, 1.6, 'sine', .14);
+  n(pentHz(0, 0), T.signoff, 1.5, 'sine', .25); n(pentHz(0, 2), T.signoff + .6, 1.0, 'sine', .18);
+}
+
+// The hand font must be in before the first frame is drawn; render.mjs waits for window.__ready.
+document.fonts.load('600 40px "Bradley Hand"').catch(() => {}).then(() =>
+  defineFilm({ palette: ADHDME, timeline: TIMELINE, score, format: { ar: '16:9', width: 1920 } }));   // render.mjs --ar 1:1 or 9:16 overrides
+</script>
